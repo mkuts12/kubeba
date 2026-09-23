@@ -1,0 +1,1196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ことば · Kotoba</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light dark;
+  --paper:#ece6d6; --surface:#f7f2e8; --surface-2:#efe9db; --raised:#fbf8f1;
+  --ink:#221f19; --ink-soft:#6b6455; --line:#ddd4c1;
+  --indigo:#2a3c74; --indigo-2:#3b4f8f; --indigo-soft:#e3e6f1;
+  --shu:#d24e24; --shu-soft:#f3ddd2;
+  --matcha:#5f7a43; --matcha-soft:#e6ecda;
+  --amber:#c1892e;
+  --radius:16px; --radius-sm:11px; --radius-lg:24px;
+  --shadow:0 1px 2px rgba(40,34,20,.06), 0 8px 24px -12px rgba(40,34,20,.18);
+  --jp-serif:"Hiragino Mincho ProN","Yu Mincho",YuMincho,"Songti SC","Noto Serif JP",serif;
+  --jp-sans:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",YuGothic,Meiryo,"Noto Sans JP",sans-serif;
+  --ui:"Zen Kaku Gothic New",system-ui,-apple-system,"Segoe UI",sans-serif;
+  box-sizing:border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#141310; --surface:#201e18; --surface-2:#26231c; --raised:#2b281f;
+    --ink:#ece6d7; --ink-soft:#a49c88; --line:#37332a;
+    --indigo:#93a6dd; --indigo-2:#aab9e6; --indigo-soft:#232a40;
+    --shu:#e2662f; --shu-soft:#3a251b;
+    --matcha:#9db56f; --matcha-soft:#2a301f;
+    --amber:#d6a24a;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px -14px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="light"]{color-scheme:light}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#141310; --surface:#201e18; --surface-2:#26231c; --raised:#2b281f;
+  --ink:#ece6d7; --ink-soft:#a49c88; --line:#37332a;
+  --indigo:#93a6dd; --indigo-2:#aab9e6; --indigo-soft:#232a40;
+  --shu:#e2662f; --shu-soft:#3a251b;
+  --matcha:#9db56f; --matcha-soft:#2a301f;
+  --amber:#d6a24a;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px -14px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; scroll-padding-top: env(safe-area-inset-top, 0px);}
+html,body{height:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--ui); font-weight:400; line-height:1.5;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit}
+.jp{font-family:var(--jp-sans)}
+.serif{font-family:var(--jp-serif)}
+
+/* layout */
+#app{max-width:560px; margin:0 auto; min-height:100%; display:flex; flex-direction:column}
+.wrap{padding:16px 18px 40px}
+.center-screen{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; padding:24px}
+
+/* top bar */
+.topbar{position:sticky; top:env(safe-area-inset-top,0px); z-index:5;
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:12px 18px; background:color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter:saturate(1.2) blur(10px); border-bottom:1px solid var(--line)}
+.brand{display:flex; align-items:baseline; gap:8px}
+.brand .mark{font-family:var(--jp-serif); font-size:22px; font-weight:500; letter-spacing:.02em}
+.brand .sub{font-size:11px; color:var(--ink-soft); letter-spacing:.14em; text-transform:uppercase}
+.icon-btn{width:38px; height:38px; border-radius:12px; display:grid; place-items:center; color:var(--ink-soft)}
+.icon-btn:hover{background:var(--surface-2)}
+
+/* stat header */
+.stats-row{display:flex; gap:10px; margin-bottom:18px}
+.stat{flex:1; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:12px 14px; box-shadow:var(--shadow)}
+.stat .k{font-size:11px; color:var(--ink-soft); letter-spacing:.06em; display:flex; align-items:center; gap:5px}
+.stat .v{font-size:22px; font-weight:700; margin-top:3px; display:flex; align-items:baseline; gap:6px}
+.stat .v small{font-size:12px; font-weight:500; color:var(--ink-soft)}
+.flame{color:var(--shu)}
+
+/* level bar */
+.level-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; margin-bottom:14px; box-shadow:var(--shadow)}
+.level-top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px}
+.level-top .lv{font-weight:700}
+.level-top .xp{font-size:12px; color:var(--ink-soft)}
+.bar{height:9px; background:var(--surface-2); border-radius:99px; overflow:hidden; border:1px solid var(--line)}
+.bar > i{display:block; height:100%; background:linear-gradient(90deg,var(--indigo),var(--indigo-2)); border-radius:99px; transition:width .5s cubic-bezier(.22,1,.36,1)}
+
+/* xp chart */
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; margin-bottom:14px; box-shadow:var(--shadow)}
+.panel h3{margin:0 0 2px; font-size:14px; font-weight:700}
+.panel .hint{font-size:12px; color:var(--ink-soft); margin:0 0 12px}
+.chart{display:flex; align-items:flex-end; gap:5px; height:78px}
+.chart .col{flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; height:100%}
+.chart .barwrap{flex:1; width:100%; display:flex; align-items:flex-end}
+.chart .b{width:100%; background:linear-gradient(180deg,var(--indigo-2),var(--indigo)); border-radius:5px 5px 3px 3px; min-height:3px; transition:height .5s cubic-bezier(.22,1,.36,1)}
+.chart .b.today{background:linear-gradient(180deg,var(--shu),#b8431f)}
+.chart .lbl{font-size:9px; color:var(--ink-soft)}
+
+/* path */
+.section-title{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); margin:22px 4px 12px}
+.path{display:flex; flex-direction:column; gap:0}
+.node{display:flex; align-items:center; gap:14px; padding:10px 0; position:relative}
+.node .rail{position:absolute; left:27px; top:-2px; bottom:-2px; width:2px; background:var(--line); z-index:0}
+.node:first-child .rail{top:50%}
+.node:last-child .rail{bottom:50%}
+.ring{position:relative; width:56px; height:56px; flex:none; border-radius:50%; z-index:1;
+  display:grid; place-items:center; background:var(--surface); border:1px solid var(--line); box-shadow:var(--shadow)}
+.ring .fill{position:absolute; inset:-1px; border-radius:50%; }
+.ring .inner{position:relative; width:44px; height:44px; border-radius:50%; background:var(--raised);
+  display:grid; place-items:center; font-family:var(--jp-serif); font-size:20px}
+.ring.done .inner{background:var(--matcha-soft)}
+.node .meta{flex:1; min-width:0}
+.node .meta .nm{font-weight:700; font-size:15px}
+.node .meta .ds{font-size:12px; color:var(--ink-soft); margin-top:2px; display:flex; gap:8px; flex-wrap:wrap}
+.pill{font-size:10.5px; padding:2px 8px; border-radius:99px; background:var(--surface-2); color:var(--ink-soft); border:1px solid var(--line)}
+.pill.new{background:var(--shu-soft); color:var(--shu); border-color:transparent; font-weight:700}
+.pill.due{background:var(--indigo-soft); color:var(--indigo); border-color:transparent; font-weight:700}
+.pill.master{background:var(--matcha-soft); color:var(--matcha); border-color:transparent; font-weight:700}
+.node .go{width:34px; height:34px; border-radius:11px; display:grid; place-items:center; color:var(--indigo); background:var(--indigo-soft)}
+.node.locked{opacity:.5}
+
+/* buttons */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%;
+  padding:15px 18px; border-radius:14px; font-weight:700; font-size:16px;
+  background:var(--indigo); color:#fff; box-shadow:0 3px 0 color-mix(in srgb,var(--indigo) 60%, #000); transition:transform .06s, box-shadow .06s}
+.btn:active{transform:translateY(2px); box-shadow:0 1px 0 color-mix(in srgb,var(--indigo) 60%, #000)}
+.btn.shu{background:var(--shu); box-shadow:0 3px 0 color-mix(in srgb,var(--shu) 55%, #000)}
+.btn.ghost{background:var(--surface); color:var(--ink); border:1px solid var(--line); box-shadow:var(--shadow)}
+.btn.big{padding:17px}
+.btn[disabled]{opacity:.45; pointer-events:none}
+.daily-cta{margin-bottom:6px}
+
+/* lesson */
+.lesson-head{display:flex; align-items:center; gap:12px; padding:12px 18px; position:sticky; top:env(safe-area-inset-top,0px); background:var(--paper); z-index:5}
+.lesson-head .close{font-size:22px; color:var(--ink-soft); width:34px; height:34px; border-radius:10px}
+.progress{flex:1; height:12px; background:var(--surface-2); border:1px solid var(--line); border-radius:99px; overflow:hidden}
+.progress > i{display:block; height:100%; background:linear-gradient(90deg,var(--matcha),#77934f); border-radius:99px; transition:width .35s cubic-bezier(.22,1,.36,1)}
+.combo{display:flex; align-items:center; gap:4px; font-weight:800; color:var(--shu); font-size:15px; min-width:44px; justify-content:flex-end; opacity:0; transition:opacity .2s}
+.combo.on{opacity:1}
+.stage{padding:8px 18px 150px}
+.kicker{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); margin:14px 0 14px; text-align:center}
+.prompt{text-align:center; margin:8px 0 26px}
+.prompt .big{font-family:var(--jp-serif); font-size:clamp(38px,13vw,64px); line-height:1.1; font-weight:500}
+.prompt .en{font-size:clamp(22px,6vw,30px); font-weight:700}
+.prompt .rd{color:var(--ink-soft); margin-top:8px; font-size:15px}
+
+/* choices */
+.choices{display:grid; gap:11px}
+.choice{display:flex; align-items:center; gap:12px; padding:15px 16px; border-radius:14px; background:var(--surface); border:1.5px solid var(--line); font-size:17px; font-weight:500; text-align:left; box-shadow:var(--shadow); transition:border-color .12s, background .12s}
+.choice .jpc{font-family:var(--jp-sans)}
+.choice:active{transform:scale(.99)}
+.choice.correct{border-color:var(--matcha); background:var(--matcha-soft)}
+.choice.wrong{border-color:var(--shu); background:var(--shu-soft)}
+.choice.dim{opacity:.5}
+.choice .badge{margin-left:auto; font-weight:800}
+.choices.grid2{grid-template-columns:1fr 1fr}
+.choice.kana-choice{justify-content:center; font-family:var(--jp-serif); font-size:34px; padding:18px 10px}
+
+/* build */
+.answer-line{min-height:58px; border:1.5px dashed var(--line); border-radius:14px; padding:10px; display:flex; flex-wrap:wrap; gap:8px; align-content:flex-start; margin-bottom:8px; background:var(--surface)}
+.answer-line.correct{border-color:var(--matcha); border-style:solid; background:var(--matcha-soft)}
+.answer-line.wrong{border-color:var(--shu); border-style:solid; background:var(--shu-soft)}
+.bank{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:6px}
+.tile{font-family:var(--jp-sans); font-size:18px; font-weight:500; padding:10px 14px; border-radius:11px; background:var(--raised); border:1.5px solid var(--line); box-shadow:0 2px 0 var(--line)}
+.tile:active{transform:translateY(1px)}
+.tile.used{visibility:hidden}
+.tile.placed{background:var(--indigo-soft); border-color:transparent}
+
+/* type */
+.type-in{width:100%; padding:15px 16px; font-size:19px; font-family:var(--ui); border-radius:14px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); text-align:center; box-shadow:var(--shadow)}
+.type-in:focus{outline:none; border-color:var(--indigo)}
+.type-in.correct{border-color:var(--matcha); background:var(--matcha-soft)}
+.type-in.wrong{border-color:var(--shu); background:var(--shu-soft)}
+.verdict{text-align:center; margin-top:16px; font-weight:700; min-height:24px}
+.verdict.ok{color:var(--matcha)} .verdict.no{color:var(--shu)}
+.verdict .sol{font-family:var(--jp-sans); font-weight:800}
+
+/* footer action bar */
+.actionbar{position:fixed; left:0; right:0; bottom:0; z-index:6; padding:14px 18px calc(14px + env(safe-area-inset-bottom,0px)); background:color-mix(in srgb,var(--paper) 92%, transparent); backdrop-filter:blur(10px); border-top:1px solid var(--line)}
+.actionbar .inner{max-width:560px; margin:0 auto}
+.override{display:block; width:100%; text-align:center; margin-top:10px; color:var(--ink-soft); font-size:13px; font-weight:600}
+.override u{text-decoration-thickness:1px; text-underline-offset:3px}
+
+/* complete */
+.complete{text-align:center; padding:30px 22px}
+.complete .seal{width:98px; height:98px; margin:6px auto 18px; border-radius:50%; display:grid; place-items:center;
+  font-family:var(--jp-serif); font-size:40px; color:#fff; background:radial-gradient(circle at 35% 30%, var(--shu), #a83c1a);
+  box-shadow:0 10px 30px -8px color-mix(in srgb,var(--shu) 60%, transparent)}
+.complete h2{margin:0 0 4px; font-size:24px}
+.complete .lead{color:var(--ink-soft); margin:0 0 22px}
+.result-grid{display:grid; grid-template-columns:1fr 1fr; gap:11px; margin-bottom:24px}
+.result{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+.result .rk{font-size:11px; color:var(--ink-soft); letter-spacing:.06em}
+.result .rv{font-size:26px; font-weight:800; margin-top:4px}
+
+/* confetti */
+#fx{position:fixed; inset:0; pointer-events:none; z-index:50; overflow:hidden}
+.cf{position:absolute; width:9px; height:14px; border-radius:2px; will-change:transform,opacity}
+.burst{position:fixed; left:50%; top:42%; transform:translate(-50%,-50%) scale(.6); z-index:51;
+  font-weight:900; font-size:30px; color:var(--shu); text-align:center; pointer-events:none;
+  font-family:var(--ui); opacity:0}
+.burst .n{font-family:var(--jp-serif); font-size:52px; display:block; line-height:1}
+@keyframes pop{0%{opacity:0; transform:translate(-50%,-50%) scale(.5)}18%{opacity:1; transform:translate(-50%,-50%) scale(1.12)}80%{opacity:1; transform:translate(-50%,-50%) scale(1)}100%{opacity:0; transform:translate(-50%,-56%) scale(1)}}
+.burst.go{animation:pop 1.15s cubic-bezier(.22,1,.36,1) forwards}
+.toast{position:fixed; left:50%; bottom:calc(96px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%) translateY(10px); z-index:52; background:var(--ink); color:var(--paper); padding:10px 16px; border-radius:99px; font-weight:700; font-size:14px; opacity:0; transition:opacity .2s, transform .2s; pointer-events:none; box-shadow:var(--shadow); white-space:nowrap; max-width:92vw}
+.toast.on{opacity:1; transform:translateX(-50%) translateY(0)}
+.frz{color:var(--indigo)}
+.modal-ov{position:fixed; inset:0; z-index:60; background:rgba(20,17,10,.55); display:flex; align-items:flex-end; justify-content:center}
+.modal{background:var(--surface); width:100%; max-width:560px; border-radius:22px 22px 0 0; padding:18px 18px calc(20px + env(safe-area-inset-bottom,0px)); box-shadow:var(--shadow); max-height:88vh; overflow:auto; animation:sheet .25s cubic-bezier(.22,1,.36,1)}
+@keyframes sheet{from{transform:translateY(30px); opacity:.6}to{transform:none; opacity:1}}
+.modal-h{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px}
+.modal-h h3{margin:0; font-size:17px}
+.io-area{width:100%; min-height:120px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px; line-height:1.4; border:1.5px solid var(--line); border-radius:12px; padding:10px; background:var(--raised); color:var(--ink); resize:vertical}
+.io-area:focus{outline:none; border-color:var(--indigo)}
+.modal .btn{margin-top:12px}
+
+.name-row{display:flex; gap:9px; margin-top:6px}
+.name-row input{flex:1; padding:13px 14px; border-radius:12px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); font-family:var(--ui); font-size:16px}
+.name-row input:focus{outline:none; border-color:var(--indigo)}
+.muted{color:var(--ink-soft); font-size:13px}
+.loading .spin{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--indigo);animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.001ms !important; transition-duration:.001ms !important}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="center-screen loading">
+    <div class="brand" style="flex-direction:column;align-items:center;gap:6px">
+      <div class="mark serif" style="font-size:40px">ことば</div>
+      <div class="sub">Kotoba · Japanese</div>
+    </div>
+    <div class="spin" style="margin-top:8px"></div>
+  </div>
+</div>
+<div id="fx"></div>
+
+<script>
+"use strict";
+(function(){
+
+/* ---------------- Course content (curated, Genki-style arc) ----------------
+   Vocabulary + example phrases authored for this app; not copied from Genki.
+   Each item: {id, jp, romaji, en, parts?} grouped under a topic.        */
+// [jp, romaji, altAccepted?] — en shown in MC is the romaji; alt spellings are accepted when typing
+const kana = (list)=>list.map(([jp,romaji,alt])=>({jp,romaji,en:romaji,alt:alt||[],tags:["kana"],
+  script: /[\u30a0-\u30ff]/.test(jp)?"kata":"hira"}));
+
+// visually confusable kana — preferred as multiple-choice distractors
+const LOOKALIKES = [
+  ["ぬ","め"],["わ","れ","ね"],["は","ほ","ま"],["さ","き","ち"],["る","ろ"],["あ","お"],["い","り"],["う","つ"],["こ","に"],["け","は"],["た","な"],["す","む"],["そ","ろ"],["ゆ","よ"],
+  ["ば","ぱ","は"],["び","ぴ"],["ぶ","ぷ"],["べ","ぺ"],["ぼ","ぽ"],["ざ","さ"],["じ","ぢ"],["ず","づ"],["だ","た"],["ぎ","き"],
+  ["シ","ツ","ソ","ン"],["ク","ケ","タ","ワ"],["ア","マ","ヤ"],["ウ","ワ","フ","ラ"],["コ","ユ","ヨ","ロ"],["ス","ヌ"],["ナ","メ"],["チ","テ"],["ノ","メ"],["ホ","オ"],["セ","サ"],["ル","レ"],
+  ["バ","パ"],["ビ","ピ"],["ブ","プ"],["ベ","ペ"],["ボ","ポ"],["ジ","ヂ"],["ズ","ヅ"]
+];
+const LOOK = {}; LOOKALIKES.forEach(g=>g.forEach(c=>{ LOOK[c]=(LOOK[c]||[]).concat(g.filter(x=>x!==c)); }));
+
+const COURSE = {
+  title:"Japanese",
+  topics:[
+    { id:"kana1", name:"Hiragana · あ–そ", glyph:"あ", tag:"kana",
+      items: kana([["あ","a"],["い","i"],["う","u"],["え","e"],["お","o"],
+        ["か","ka"],["き","ki"],["く","ku"],["け","ke"],["こ","ko"],
+        ["さ","sa"],["し","shi"],["す","su"],["せ","se"],["そ","so"]]) },
+    { id:"kana2", name:"Hiragana · た–ん", glyph:"た", tag:"kana",
+      items: kana([["た","ta"],["ち","chi"],["つ","tsu"],["て","te"],["と","to"],
+        ["な","na"],["に","ni"],["ぬ","nu"],["ね","ne"],["の","no"],
+        ["は","ha"],["ひ","hi"],["ふ","fu"],["へ","he"],["ほ","ho"],
+        ["ま","ma"],["み","mi"],["む","mu"],["め","me"],["も","mo"],
+        ["や","ya"],["ゆ","yu"],["よ","yo"],
+        ["ら","ra"],["り","ri"],["る","ru"],["れ","re"],["ろ","ro"],
+        ["わ","wa"],["を","o",["wo"]],["ん","n"]]) },
+    { id:"kana3", name:"Hiragana · が–ぽ", glyph:"が", tag:"kana",
+      items: kana([["が","ga"],["ぎ","gi"],["ぐ","gu"],["げ","ge"],["ご","go"],
+        ["ざ","za"],["じ","ji",["zi"]],["ず","zu"],["ぜ","ze"],["ぞ","zo"],
+        ["だ","da"],["ぢ","ji",["di","dji"]],["づ","zu",["du","dzu"]],["で","de"],["ど","do"],
+        ["ば","ba"],["び","bi"],["ぶ","bu"],["べ","be"],["ぼ","bo"],
+        ["ぱ","pa"],["ぴ","pi"],["ぷ","pu"],["ぺ","pe"],["ぽ","po"]]) },
+    { id:"kana4", name:"Hiragana · きゃ–ぴょ", glyph:"きゃ", tag:"kana",
+      items: kana([["きゃ","kya"],["きゅ","kyu"],["きょ","kyo"],
+        ["しゃ","sha"],["しゅ","shu"],["しょ","sho"],
+        ["ちゃ","cha"],["ちゅ","chu"],["ちょ","cho"],
+        ["にゃ","nya"],["にゅ","nyu"],["にょ","nyo"],
+        ["ひゃ","hya"],["ひゅ","hyu"],["ひょ","hyo"],
+        ["みゃ","mya"],["みゅ","myu"],["みょ","myo"],
+        ["りゃ","rya"],["りゅ","ryu"],["りょ","ryo"],
+        ["ぎゃ","gya"],["ぎゅ","gyu"],["ぎょ","gyo"],
+        ["じゃ","ja"],["じゅ","ju"],["じょ","jo"],
+        ["びゃ","bya"],["びゅ","byu"],["びょ","byo"],
+        ["ぴゃ","pya"],["ぴゅ","pyu"],["ぴょ","pyo"]]) },
+    { id:"kata1", name:"Katakana · ア–ソ", glyph:"ア", tag:"kana",
+      items: kana([["ア","a"],["イ","i"],["ウ","u"],["エ","e"],["オ","o"],
+        ["カ","ka"],["キ","ki"],["ク","ku"],["ケ","ke"],["コ","ko"],
+        ["サ","sa"],["シ","shi"],["ス","su"],["セ","se"],["ソ","so"]]) },
+    { id:"kata2", name:"Katakana · タ–ン", glyph:"タ", tag:"kana",
+      items: kana([["タ","ta"],["チ","chi"],["ツ","tsu"],["テ","te"],["ト","to"],
+        ["ナ","na"],["ニ","ni"],["ヌ","nu"],["ネ","ne"],["ノ","no"],
+        ["ハ","ha"],["ヒ","hi"],["フ","fu"],["ヘ","he"],["ホ","ho"],
+        ["マ","ma"],["ミ","mi"],["ム","mu"],["メ","me"],["モ","mo"],
+        ["ヤ","ya"],["ユ","yu"],["ヨ","yo"],
+        ["ラ","ra"],["リ","ri"],["ル","ru"],["レ","re"],["ロ","ro"],
+        ["ワ","wa"],["ヲ","o",["wo"]],["ン","n"]]) },
+    { id:"kata3", name:"Katakana · ガ–ポ", glyph:"ガ", tag:"kana",
+      items: kana([["ガ","ga"],["ギ","gi"],["グ","gu"],["ゲ","ge"],["ゴ","go"],
+        ["ザ","za"],["ジ","ji",["zi"]],["ズ","zu"],["ゼ","ze"],["ゾ","zo"],
+        ["ダ","da"],["ヂ","ji",["di","dji"]],["ヅ","zu",["du","dzu"]],["デ","de"],["ド","do"],
+        ["バ","ba"],["ビ","bi"],["ブ","bu"],["ベ","be"],["ボ","bo"],
+        ["パ","pa"],["ピ","pi"],["プ","pu"],["ペ","pe"],["ポ","po"]]) },
+    { id:"greet", name:"Greetings", glyph:"挨", tag:"phrase",
+      items:[
+        {jp:"おはよう",romaji:"ohayou",en:"good morning (casual)"},
+        {jp:"おはようございます",romaji:"ohayou gozaimasu",en:"good morning (polite)",parts:["おはよう","ございます"]},
+        {jp:"こんにちは",romaji:"konnichiwa",en:"hello / good afternoon"},
+        {jp:"こんばんは",romaji:"konbanwa",en:"good evening"},
+        {jp:"おやすみなさい",romaji:"oyasuminasai",en:"good night"},
+        {jp:"さようなら",romaji:"sayounara",en:"goodbye"},
+        {jp:"ありがとう",romaji:"arigatou",en:"thank you"},
+        {jp:"ありがとうございます",romaji:"arigatou gozaimasu",en:"thank you (polite)",parts:["ありがとう","ございます"]},
+        {jp:"すみません",romaji:"sumimasen",en:"excuse me / sorry"},
+        {jp:"おねがいします",romaji:"onegaishimasu",en:"please"},
+        {jp:"はい",romaji:"hai",en:"yes"},
+        {jp:"いいえ",romaji:"iie",en:"no"}
+      ]},
+    { id:"num", name:"Numbers 1–10", glyph:"数", tag:"number",
+      items:[
+        {jp:"いち",romaji:"ichi",en:"one (1)"},
+        {jp:"に",romaji:"ni",en:"two (2)"},
+        {jp:"さん",romaji:"san",en:"three (3)"},
+        {jp:"よん",romaji:"yon",en:"four (4)"},
+        {jp:"ご",romaji:"go",en:"five (5)"},
+        {jp:"ろく",romaji:"roku",en:"six (6)"},
+        {jp:"なな",romaji:"nana",en:"seven (7)"},
+        {jp:"はち",romaji:"hachi",en:"eight (8)"},
+        {jp:"きゅう",romaji:"kyuu",en:"nine (9)"},
+        {jp:"じゅう",romaji:"juu",en:"ten (10)"}
+      ]},
+    { id:"intro", name:"Introductions", glyph:"自", tag:"phrase",
+      items:[
+        {jp:"わたし",romaji:"watashi",en:"I / me"},
+        {jp:"なまえ",romaji:"namae",en:"name"},
+        {jp:"がくせい",romaji:"gakusei",en:"student"},
+        {jp:"せんせい",romaji:"sensei",en:"teacher"},
+        {jp:"はじめまして",romaji:"hajimemashite",en:"nice to meet you"},
+        {jp:"どうぞよろしく",romaji:"douzo yoroshiku",en:"please treat me well (set phrase after はじめまして)",parts:["どうぞ","よろしく"]},
+        {jp:"わたしはがくせいです",romaji:"watashi wa gakusei desu",en:"I am a student",parts:["わたし","は","がくせい","です"]},
+        {jp:"おなまえはなんですか",romaji:"onamae wa nan desu ka",en:"what is your name?",parts:["おなまえ","は","なん","です","か"]}
+      ]},
+    { id:"demo", name:"This & that", glyph:"此", tag:"phrase",
+      items:[
+        {jp:"これ",romaji:"kore",en:"this (near me)"},
+        {jp:"それ",romaji:"sore",en:"that (near you)"},
+        {jp:"あれ",romaji:"are",en:"that (over there)"},
+        {jp:"どれ",romaji:"dore",en:"which one"},
+        {jp:"ここ",romaji:"koko",en:"here"},
+        {jp:"そこ",romaji:"soko",en:"there"},
+        {jp:"あそこ",romaji:"asoko",en:"over there"},
+        {jp:"ほん",romaji:"hon",en:"book"},
+        {jp:"かばん",romaji:"kaban",en:"bag"},
+        {jp:"これはほんです",romaji:"kore wa hon desu",en:"this is a book",parts:["これ","は","ほん","です"]},
+        {jp:"これはなんですか",romaji:"kore wa nan desu ka",en:"what is this?",parts:["これ","は","なん","です","か"]}
+      ]},
+    { id:"days", name:"Days & when", glyph:"日", tag:"vocab",
+      items:[
+        {jp:"きょう",romaji:"kyou",en:"today"},
+        {jp:"あした",romaji:"ashita",en:"tomorrow"},
+        {jp:"きのう",romaji:"kinou",en:"yesterday"},
+        {jp:"いま",romaji:"ima",en:"now"},
+        {jp:"まいにち",romaji:"mainichi",en:"every day"},
+        {jp:"にちようび",romaji:"nichiyoubi",en:"Sunday"},
+        {jp:"げつようび",romaji:"getsuyoubi",en:"Monday"},
+        {jp:"かようび",romaji:"kayoubi",en:"Tuesday"},
+        {jp:"すいようび",romaji:"suiyoubi",en:"Wednesday"},
+        {jp:"もくようび",romaji:"mokuyoubi",en:"Thursday"},
+        {jp:"きんようび",romaji:"kinyoubi",en:"Friday"},
+        {jp:"どようび",romaji:"doyoubi",en:"Saturday"}
+      ]},
+    { id:"verbs", name:"Everyday verbs", glyph:"動", tag:"phrase",
+      items:[
+        {jp:"たべます",romaji:"tabemasu",en:"eat"},
+        {jp:"のみます",romaji:"nomimasu",en:"drink"},
+        {jp:"みます",romaji:"mimasu",en:"see / watch"},
+        {jp:"ききます",romaji:"kikimasu",en:"listen / hear"},
+        {jp:"よみます",romaji:"yomimasu",en:"read"},
+        {jp:"いきます",romaji:"ikimasu",en:"go"},
+        {jp:"きます",romaji:"kimasu",en:"come"},
+        {jp:"します",romaji:"shimasu",en:"do"},
+        {jp:"かいます",romaji:"kaimasu",en:"buy"},
+        {jp:"わかります",romaji:"wakarimasu",en:"understand"},
+        {jp:"ねます",romaji:"nemasu",en:"sleep"}
+      ]},
+    { id:"family", name:"People & family", glyph:"家", tag:"vocab",
+      items:[
+        {jp:"かぞく",romaji:"kazoku",en:"family"},
+        {jp:"ともだち",romaji:"tomodachi",en:"friend"},
+        {jp:"ちち",romaji:"chichi",en:"(my) father"},
+        {jp:"はは",romaji:"haha",en:"(my) mother"},
+        {jp:"あに",romaji:"ani",en:"(my) older brother"},
+        {jp:"あね",romaji:"ane",en:"(my) older sister"},
+        {jp:"おとうと",romaji:"otouto",en:"younger brother"},
+        {jp:"いもうと",romaji:"imouto",en:"younger sister"},
+        {jp:"おとうさん",romaji:"otousan",en:"father (someone else's)"},
+        {jp:"おかあさん",romaji:"okaasan",en:"mother (someone else's)"}
+      ]},
+    { id:"adj", name:"Colours & adjectives", glyph:"色", tag:"vocab",
+      items:[
+        {jp:"あかい",romaji:"akai",en:"red (i-adj)"},
+        {jp:"あおい",romaji:"aoi",en:"blue (i-adj)"},
+        {jp:"しろい",romaji:"shiroi",en:"white (i-adj)"},
+        {jp:"くろい",romaji:"kuroi",en:"black (i-adj)"},
+        {jp:"おおきい",romaji:"ookii",en:"big (i-adj)"},
+        {jp:"ちいさい",romaji:"chiisai",en:"small (i-adj)"},
+        {jp:"たかい",romaji:"takai",en:"expensive / tall (i-adj)"},
+        {jp:"やすい",romaji:"yasui",en:"cheap (i-adj)"},
+        {jp:"おいしい",romaji:"oishii",en:"delicious (i-adj)"},
+        {jp:"きれい",romaji:"kirei",en:"pretty / clean (na-adj)"},
+        {jp:"ゆうめい",romaji:"yuumei",en:"famous (na-adj)"},
+        {jp:"すき",romaji:"suki",en:"liked / favourite (na-adj)"}
+      ]},
+    { id:"food", name:"Food & drink", glyph:"食", tag:"vocab",
+      items:[
+        {jp:"ごはん",romaji:"gohan",en:"rice / meal"},
+        {jp:"みず",romaji:"mizu",en:"water"},
+        {jp:"おちゃ",romaji:"ocha",en:"tea"},
+        {jp:"コーヒー",romaji:"koohii",en:"coffee"},
+        {jp:"パン",romaji:"pan",en:"bread"},
+        {jp:"にく",romaji:"niku",en:"meat"},
+        {jp:"さかな",romaji:"sakana",en:"fish"},
+        {jp:"たまご",romaji:"tamago",en:"egg"},
+        {jp:"やさい",romaji:"yasai",en:"vegetables"},
+        {jp:"くだもの",romaji:"kudamono",en:"fruit"}
+      ]},
+    { id:"table", name:"At the table", glyph:"膳", tag:"phrase",
+      items:[
+        {jp:"いただきます",romaji:"itadakimasu",en:"let's eat (before a meal)"},
+        {jp:"ごちそうさまでした",romaji:"gochisousama deshita",en:"thanks for the meal (after)"},
+        {jp:"メニューをください",romaji:"menyuu o kudasai",en:"the menu, please",parts:["メニュー","を","ください"]},
+        {jp:"みずをください",romaji:"mizu o kudasai",en:"water, please",parts:["みず","を","ください"]},
+        {jp:"これをください",romaji:"kore o kudasai",en:"this one, please",parts:["これ","を","ください"]},
+        {jp:"おいしいです",romaji:"oishii desu",en:"it's delicious",parts:["おいしい","です"]}
+      ]},
+    { id:"go", name:"Getting around", glyph:"駅", tag:"phrase", free:true,
+      items:[
+        {jp:"えき",romaji:"eki",en:"station"},
+        {jp:"でんしゃ",romaji:"densha",en:"train"},
+        {jp:"ちかてつ",romaji:"chikatetsu",en:"subway"},
+        {jp:"バス",romaji:"basu",en:"bus"},
+        {jp:"くうこう",romaji:"kuukou",en:"airport"},
+        {jp:"きっぷ",romaji:"kippu",en:"ticket"},
+        {jp:"みぎ",romaji:"migi",en:"right"},
+        {jp:"ひだり",romaji:"hidari",en:"left"},
+        {jp:"まっすぐ",romaji:"massugu",en:"straight ahead"},
+        {jp:"でぐち",romaji:"deguchi",en:"exit"},
+        {jp:"いりぐち",romaji:"iriguchi",en:"entrance"},
+        {jp:"えきはどこですか",romaji:"eki wa doko desu ka",en:"where is the station?",parts:["えき","は","どこ","です","か"]}
+      ]},
+    { id:"about", name:"Out & about", glyph:"街", tag:"phrase", free:true,
+      items:[
+        {jp:"いくらですか",romaji:"ikura desu ka",en:"how much is it?",parts:["いくら","です","か"]},
+        {jp:"これはいくらですか",romaji:"kore wa ikura desu ka",en:"how much is this?",parts:["これ","は","いくら","です","か"]},
+        {jp:"トイレはどこですか",romaji:"toire wa doko desu ka",en:"where's the toilet?",parts:["トイレ","は","どこ","です","か"]},
+        {jp:"げんきん",romaji:"genkin",en:"cash"},
+        {jp:"クレジットカード",romaji:"kurejitto kaado",en:"credit card"},
+        {jp:"えいごがわかりますか",romaji:"eigo ga wakarimasu ka",en:"do you understand English?",parts:["えいご","が","わかります","か"]},
+        {jp:"わかりません",romaji:"wakarimasen",en:"I don't understand"},
+        {jp:"だいじょうぶです",romaji:"daijoubu desu",en:"I'm fine / it's okay"},
+        {jp:"たすけてください",romaji:"tasukete kudasai",en:"please help",parts:["たすけて","ください"]},
+        {jp:"もういちどおねがいします",romaji:"mou ichido onegaishimasu",en:"one more time, please",parts:["もう","いちど","おねがいします"]},
+        {jp:"ちかい",romaji:"chikai",en:"near (i-adj)"},
+        {jp:"とおい",romaji:"tooi",en:"far (i-adj)"}
+      ]},
+    { id:"verbs2", name:"Verbs in sentences", glyph:"文", tag:"phrase",
+      items:[
+        {jp:"ごはんをたべます",romaji:"gohan o tabemasu",en:"I eat a meal",parts:["ごはん","を","たべます"]},
+        {jp:"みずをのみます",romaji:"mizu o nomimasu",en:"I drink water",parts:["みず","を","のみます"]},
+        {jp:"ほんをよみます",romaji:"hon o yomimasu",en:"I read a book",parts:["ほん","を","よみます"]},
+        {jp:"テレビをみます",romaji:"terebi o mimasu",en:"I watch TV",parts:["テレビ","を","みます"]},
+        {jp:"がっこうへいきます",romaji:"gakkou e ikimasu",en:"I go to school (へ = to)",parts:["がっこう","へ","いきます"]},
+        {jp:"うちでたべます",romaji:"uchi de tabemasu",en:"I eat at home (で = at)",parts:["うち","で","たべます"]},
+        {jp:"コーヒーをのみません",romaji:"koohii o nomimasen",en:"I don't drink coffee",parts:["コーヒー","を","のみません"]},
+        {jp:"ほんをよみました",romaji:"hon o yomimashita",en:"I read a book (past)",parts:["ほん","を","よみました"]},
+        {jp:"テレビをみませんでした",romaji:"terebi o mimasen deshita",en:"I didn't watch TV (past)",parts:["テレビ","を","みません","でした"]},
+        {jp:"なにをたべますか",romaji:"nani o tabemasu ka",en:"what do you eat?",parts:["なに","を","たべます","か"]}
+      ]},
+    { id:"desc", name:"Describing & places", glyph:"所", tag:"phrase",
+      items:[
+        {jp:"ねこ",romaji:"neko",en:"cat"},
+        {jp:"いぬ",romaji:"inu",en:"dog"},
+        {jp:"はな",romaji:"hana",en:"flower"},
+        {jp:"つくえ",romaji:"tsukue",en:"desk"},
+        {jp:"いす",romaji:"isu",en:"chair"},
+        {jp:"ねこがいます",romaji:"neko ga imasu",en:"there is a cat (います = animate)",parts:["ねこ","が","います"]},
+        {jp:"ほんがあります",romaji:"hon ga arimasu",en:"there is a book (あります = inanimate)",parts:["ほん","が","あります"]},
+        {jp:"つくえのうえ",romaji:"tsukue no ue",en:"on the desk",parts:["つくえ","の","うえ"]},
+        {jp:"いすのした",romaji:"isu no shita",en:"under the chair",parts:["いす","の","した"]},
+        {jp:"きれいなはな",romaji:"kirei na hana",en:"a pretty flower (na-adj + な)",parts:["きれい","な","はな"]},
+        {jp:"このほんはおもしろいです",romaji:"kono hon wa omoshiroi desu",en:"this book is interesting",parts:["この","ほん","は","おもしろい","です"]},
+        {jp:"たのしかったです",romaji:"tanoshikatta desu",en:"it was fun (i-adj past)",parts:["たのしかった","です"]}
+      ]}
+  ]
+};
+
+// index items with stable ids + back-refs to topic
+const ITEMS = {};      // id -> item
+const TOPIC_OF = {};   // itemId -> topicId
+COURSE.topics.forEach(t=>{
+  t.itemIds = [];
+  t.items.forEach((it,i)=>{
+    it.id = t.id+"-"+i;
+    it.topic = t.id;
+    it.tags = it.tags || [t.tag];
+    ITEMS[it.id] = it;
+    TOPIC_OF[it.id] = t.id;
+    t.itemIds.push(it.id);
+  });
+});
+const ALL_IDS = Object.keys(ITEMS);
+const TOPIC = {}; COURSE.topics.forEach(t=>TOPIC[t.id]=t);
+
+/* ---------------- Config ---------------- */
+const CFG = {
+  newPerLesson: 5,
+  lessonSize: 12,
+  dailyMax: 20,
+  targetR: 0.9,            // review when recall prob would drop to this
+  comboEvery: 5,
+  recordMin: 20,           // only celebrate beating a personal best above this
+  xp:{ mc:8, build:12, type:15, easyBonus:4, comboBonus:20 },
+};
+const DAY = 86400000;
+const now = ()=>Date.now();
+const todayStr = (d=new Date())=>{ const z=new Date(d.getTime()-d.getTimezoneOffset()*60000); return z.toISOString().slice(0,10); };
+
+/* ---------------- Storage (on-device; export/import to move it) ---------------- */
+const LS_KEY = "kotoba.v1";
+function blankProfile(){ return { name:"", memory:{}, xp:{total:0, byDay:{}}, streak:{current:0, longest:0, lastActive:""}, answerStreak:{current:0, best:0}, theme:"" }; }
+let profile = blankProfile();
+let backend = "local";
+
+function initStore(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw) profile = normalizeProfile(JSON.parse(raw));
+  }catch(e){}
+  backend = "local";
+}
+function normalizeProfile(p){ const b=blankProfile(); return {
+  name: p.name||"", memory:p.memory||{}, theme:p.theme||"",
+  xp:{ total:(p.xp&&p.xp.total)||0, byDay:(p.xp&&p.xp.byDay)||{} },
+  streak:{ current:(p.streak&&p.streak.current)||0, longest:(p.streak&&p.streak.longest)||0, lastActive:(p.streak&&p.streak.lastActive)||"" },
+  answerStreak:{ current:(p.answerStreak&&p.answerStreak.current)||0, best:(p.answerStreak&&p.answerStreak.best)||0 }
+};}
+function save(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(profile)); }catch(e){}
+}
+
+/* ---------------- FSRS-lite engine ----------------
+   Confidence == retrievability R = 0.9^(elapsedDays / stability).
+   Correct raises stability (more when R was low); wrong shrinks it. */
+function clamp(x,a,b){ return Math.max(a,Math.min(b,x)); }
+function mem(id){ return profile.memory[id]; }
+function retrievability(m,t){ if(!m||!m.S) return 0; const e=(t-m.last)/DAY; return clamp(Math.pow(0.9, e/m.S),0,1); }
+function confidence(id,t){ const m=mem(id); return m?retrievability(m,t):0; }
+function isNew(id){ return !mem(id); }
+function isDue(id,t){ const m=mem(id); return m && m.due<=t; }
+
+function review(id, grade, t){
+  const m = mem(id);
+  let S,D,reps,lapses;
+  if(!m){
+    D = grade==="easy"?4 : grade==="again"?6.5 : 5;
+    S = grade==="easy"?3 : grade==="again"?0.5 : 1.4;
+    reps = 1; lapses = grade==="again"?1:0;
+  } else {
+    const R = retrievability(m,t);
+    D = clamp(m.D + (grade==="again"?1.0 : grade==="easy"?-0.8 : -0.3), 1, 10);
+    reps = m.reps+1; lapses = m.lapses + (grade==="again"?1:0);
+    if(grade==="again"){
+      S = Math.max(0.4, m.S*0.5);
+    } else {
+      const factor = grade==="easy"?3.0:1.8;
+      const diffMod = (11-D)/6;
+      S = m.S * (1 + factor*(1-R)*diffMod);
+      S = Math.max(S, m.S*(grade==="easy"?1.5:1.2)); // guarantee growth
+    }
+  }
+  const due = t + (S * Math.log(CFG.targetR)/Math.log(0.9)) * DAY; // = t + S days at targetR 0.9
+  profile.memory[id] = { S, D, last:t, due, reps, lapses };
+}
+
+/* ---------------- XP / streak ---------------- */
+function addXP(n){
+  profile.xp.total += n;
+  const d = todayStr();
+  profile.xp.byDay[d] = (profile.xp.byDay[d]||0) + n;
+}
+function levelInfo(){ const t=profile.xp.total; const lv=Math.floor(t/100)+1; return {lv, into:t%100, need:100, total:t}; }
+function currentStreak(){
+  // a streak only counts if you studied today or yesterday
+  const s=profile.streak, d=todayStr(), y=todayStr(new Date(Date.now()-DAY));
+  return (s.lastActive===d || s.lastActive===y) ? s.current : 0;
+}
+function touchStreak(){
+  const d = todayStr(); const s = profile.streak;
+  if(s.lastActive===d) return;
+  const y = todayStr(new Date(Date.now()-DAY));
+  s.current = (s.lastActive===y) ? s.current+1 : 1;
+  s.lastActive = d;
+  s.longest = Math.max(s.longest, s.current);
+}
+
+/* ---------------- Session generator ---------------- */
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function topicStats(t){
+  const T=now(); let mastered=0, seen=0, due=0, fresh=0, sum=0;
+  t.itemIds.forEach(id=>{ const m=mem(id);
+    if(!m){ fresh++; } else { seen++; sum+=retrievability(m,T); if(m.due<=T)due++; if(m.S>=21 && m.reps>=3)mastered++; }
+  });
+  const avg = t.itemIds.length? (sum/t.itemIds.length):0;
+  return {mastered, seen, due, fresh, avg, total:t.itemIds.length};
+}
+function buildTopicLesson(topicId){
+  const T=now(); const t=TOPIC[topicId];
+  const fresh = t.itemIds.filter(isNew).slice(0, CFG.newPerLesson);
+  const freshSet = new Set(fresh);
+  // due reviews across whole course, weakest first, topic's own first
+  const due = ALL_IDS.filter(id=>isDue(id,T) && !freshSet.has(id))
+    .sort((a,b)=> (TOPIC_OF[b]===topicId) - (TOPIC_OF[a]===topicId) || confidence(a,T)-confidence(b,T));
+  let queue = fresh.concat(due).slice(0, Math.max(fresh.length, CFG.lessonSize));
+  // top up with lowest-confidence seen topic items if short
+  if(queue.length < Math.min(CFG.lessonSize, t.itemIds.length)){
+    const have=new Set(queue);
+    const extra = t.itemIds.filter(id=>!have.has(id)).sort((a,b)=>confidence(a,T)-confidence(b,T));
+    queue = queue.concat(extra).slice(0, CFG.lessonSize);
+  }
+  return interleave(queue, freshSet);
+}
+function buildDaily(){
+  const T=now();
+  const due = ALL_IDS.filter(id=>isDue(id,T)).sort((a,b)=>confidence(a,T)-confidence(b,T)).slice(0,CFG.dailyMax);
+  return {queue: due, freshSet:new Set()};
+}
+function interleave(queue, freshSet){
+  // spread the "new" items out rather than clustering at the front
+  const fresh = queue.filter(id=>freshSet.has(id));
+  const rev = shuffle(queue.filter(id=>!freshSet.has(id)));
+  if(!fresh.length) return {queue:rev, freshSet};
+  const out=[]; const gap = Math.max(1, Math.floor((rev.length+fresh.length)/fresh.length));
+  let fi=0, ri=0, k=0;
+  while(fi<fresh.length || ri<rev.length){
+    if(ri<rev.length){ out.push(rev[ri++]); k++; }
+    if(fi<fresh.length && (k%gap===0 || ri>=rev.length)){ out.push(fresh[fi++]); }
+  }
+  return {queue:out, freshSet};
+}
+
+/* ---------------- Exercise selection ---------------- */
+function chooseKind(id, isFresh){
+  // use the confidence snapshot taken when the session began, so a card reviewed a moment ago isn't treated as 100%
+  const c = (session && session.conf && id in session.conf) ? session.conf[id] : confidence(id, now());
+  const it = ITEMS[id];
+  const canBuild = it.parts && it.parts.length>=2;
+  // items missed earlier this session come back as recognition, not production
+  if(isFresh || c<0.5 || (session && session._requeued && session._requeued[id])) return "mc";
+  if(c<0.8) return canBuild ? "build" : (Math.random()<0.5?"type":"mc");
+  return canBuild && Math.random()<0.4 ? "build" : "type";
+}
+function distractors(id, useJp, n){
+  const it=ITEMS[id]; const tag=it.tags[0];
+  let pool = ALL_IDS.filter(x=>x!==id && ITEMS[x].tags[0]===tag);
+  if(tag==="kana"){
+    // stay within the same script (hiragana vs katakana)
+    pool = pool.filter(x=>ITEMS[x].script===it.script && ITEMS[x].jp.length===it.jp.length); // same script; singles vs きゃ-type digraphs
+    // look-alikes first, then the rest of the script at random
+    const near = shuffle(pool.filter(x=>(LOOK[it.jp]||[]).includes(ITEMS[x].jp)));
+    const nearSet = new Set(near);
+    // keep it honest: usually 1–2 look-alikes, never all four, so the odd one out isn't a giveaway
+    const take = Math.min(near.length, 1+Math.floor(Math.random()*2));
+    pool = near.slice(0,take).concat(shuffle(pool.filter(x=>!nearSet.has(x))));
+  } else {
+    pool = shuffle(pool);
+  }
+  if(pool.length<n) pool = pool.concat(shuffle(ALL_IDS.filter(x=>x!==id && !pool.includes(x))));
+  const seen=new Set([norm(useJp?it.jp:it.en)]); const out=[];
+  const ansR=norm(it.romaji), ansJ=norm(it.jp);
+  for(const x of pool){
+    const o=ITEMS[x]; if(norm(o.romaji)===ansR || norm(o.jp)===ansJ) continue; // じ vs ぢ both read "ji"
+    const v=useJp?o.jp:o.en; const k=norm(v);
+    if(!seen.has(k)){ seen.add(k); out.push(v);} if(out.length>=n)break; }
+  return out;
+}
+function norm(s){
+  let v=(s||"").toString().normalize("NFKC").toLowerCase().trim()
+    .replace(/[\s\u3000ー・.,!?;:'"()\-]/g,"").replace(/[、。！？「」]/g,"");
+  // Unify romanisation styles: macrons, kunrei/IME spellings (si/ti/tu/hu/zi), を as wo/o.
+  v=v.replace(/ō|ô/g,"oo").replace(/ū|û/g,"uu").replace(/ā|â/g,"aa").replace(/ī|î/g,"ii").replace(/ē|ê/g,"ee");
+  v=v.replace(/sya/g,"sha").replace(/syu/g,"shu").replace(/syo/g,"sho").replace(/wo/g,"o");
+  v=v.replace(/si/g,"shi").replace(/ti/g,"chi").replace(/tu/g,"tsu").replace(/(?<![sc])hu/g,"fu").replace(/zi/g,"ji")
+     .replace(/(?:tya|cya)/g,"cha").replace(/(?:tyu|cyu)/g,"chu").replace(/(?:tyo|cyo)/g,"cho")
+     .replace(/(?:zya|jya)/g,"ja").replace(/(?:zyu|jyu)/g,"ju").replace(/(?:zyo|jyo)/g,"jo");
+  // Collapse long vowels so "ohayou", "ohayō" and "ohayo" all compare equal.
+  v=v.replace(/ou|oo/g,"o").replace(/uu/g,"u").replace(/ii/g,"i").replace(/ee/g,"e").replace(/aa/g,"a");
+  return v; }
+
+/* ---------------- App state ---------------- */
+const app = document.getElementById("app");
+const fx = document.getElementById("fx");
+let session = null; // {queue, freshSet, i, total, correct, wrong, xp, bestCombo, combo, advanced, source, topicId}
+
+/* ---------------- Rendering: HOME ---------------- */
+function h(tag, attrs, kids){
+  const el=document.createElement(tag);
+  if(attrs) for(const k in attrs){ if(attrs[k]==null||attrs[k]===false)continue; if(k==="class")el.className=attrs[k]; else if(k==="html")el.innerHTML=attrs[k]; else if(k.slice(0,2)==="on")el.addEventListener(k.slice(2),attrs[k]); else el.setAttribute(k,attrs[k]); }
+  (kids||[]).forEach(c=>{ if(c==null)return; el.appendChild(typeof c==="string"?document.createTextNode(c):c); });
+  return el;
+}
+function confColor(c){ return c>=0.9?"var(--matcha)": c>=0.66?"var(--indigo)": c>=0.33?"var(--amber)":"var(--shu)"; }
+
+function modal(titleText, bodyNodes){
+  const ov=h("div",{class:"modal-ov"});
+  const card=h("div",{class:"modal"});
+  card.appendChild(h("div",{class:"modal-h"},[ h("h3",null,[titleText]), h("button",{class:"icon-btn",html:"✕","aria-label":"Close",onclick:()=>ov.remove()}) ]));
+  bodyNodes.forEach(n=>card.appendChild(n));
+  ov.appendChild(card);
+  ov.addEventListener("click",e=>{ if(e.target===ov)ov.remove(); });
+  document.body.appendChild(ov);
+  return ov;
+}
+function openExport(){
+  const json=JSON.stringify(profile);
+  const ta=h("textarea",{class:"io-area",readonly:"readonly"}); ta.value=json;
+  const status=h("div",{class:"muted",style:"margin-top:8px; min-height:18px"});
+  const copyBtn=h("button",{class:"btn",onclick:()=>{
+    ta.focus(); ta.select(); ta.setSelectionRange(0,999999);
+    let ok=false;
+    try{ ok=document.execCommand&&document.execCommand("copy"); }catch(e){}
+    try{ if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(json).catch(()=>{}); }catch(e){}
+    status.textContent = ok ? "Copied ✓ — paste it into Import on your other phone." : "Selected — long-press to copy, then paste into Import elsewhere.";
+  }},["Copy"]);
+  modal("Export progress",[
+    h("p",{class:"hint"},["Your full progress — streak, XP, and every word's memory. Copy it and keep it safe, or paste it into Import on another device."]),
+    ta, copyBtn, status
+  ]);
+  setTimeout(()=>{ ta.focus(); ta.select(); },60);
+}
+function openImport(){
+  const ta=h("textarea",{class:"io-area",placeholder:"Paste your exported progress here…"});
+  const status=h("div",{class:"muted",style:"margin-top:8px; min-height:18px"});
+  const restore=h("button",{class:"btn",onclick:()=>{
+    let data;
+    try{ data=JSON.parse(ta.value.trim()); }catch(e){ status.textContent="That doesn't look like valid progress data."; return; }
+    if(!data || typeof data!=="object" || (!data.memory && !data.xp && !data.answerStreak)){ status.textContent="That doesn't look like Kotoba progress."; return; }
+    if(!confirm("Replace the progress on this device with the imported one? This can't be undone.")) return;
+    profile=normalizeProfile(data); save();
+    document.querySelectorAll(".modal-ov").forEach(m=>m.remove());
+    renderHome();
+  }},["Restore"]);
+  modal("Import progress",[
+    h("p",{class:"hint"},["Paste progress exported from another device. This replaces what's on this device."]),
+    ta, restore, status
+  ]);
+  setTimeout(()=>ta.focus(),60);
+}
+
+function renderHome(){
+  session=null;
+  const T=now();
+  const li=levelInfo();
+  const totalDue = ALL_IDS.filter(id=>isDue(id,T)).length;
+  const greetName = profile.name ? profile.name : "";
+
+  const top = h("div",{class:"topbar"},[
+    h("div",{class:"brand"},[ h("span",{class:"mark serif"},["ことば"]), h("span",{class:"sub"},["Kotoba"]) ]),
+    h("button",{class:"icon-btn","aria-label":"Toggle theme",onclick:toggleTheme,html:themeIcon()})
+  ]);
+
+  const wrap = h("div",{class:"wrap"});
+
+  if(!profile.name){
+    wrap.appendChild(h("div",{class:"panel"},[
+      h("h3",null,["Who's studying?"]),
+      h("p",{class:"hint"},["Progress saves on this device — no account needed. To move it to another phone, use Export & Import at the bottom."]),
+      (function(){ const row=h("div",{class:"name-row"});
+        const inp=h("input",{type:"text",placeholder:"Your name",maxlength:"24"});
+        const go=h("button",{class:"btn",style:"width:auto;padding-left:20px;padding-right:20px",onclick:()=>{ const v=inp.value.trim(); if(v){ profile.name=v; save(); renderHome(); } }},["Start"]);
+        inp.addEventListener("keydown",e=>{ if(e.key==="Enter"){ const v=inp.value.trim(); if(v){profile.name=v;save();renderHome();} } });
+        row.appendChild(inp); row.appendChild(go); return row; })()
+    ]));
+  }
+
+  // stats
+  wrap.appendChild(h("div",{class:"stats-row"},[
+    h("div",{class:"stat"},[ h("div",{class:"k"},["🔥 Day streak"]), h("div",{class:"v"},[String(currentStreak()), h("small",null,[currentStreak()===1?"day":"days"])]) ]),
+    h("div",{class:"stat"},[ h("div",{class:"k"},["✦ Total XP"]), h("div",{class:"v"},[li.total.toLocaleString()]) ]),
+    h("div",{class:"stat"},[ h("div",{class:"k"},["⚡ Answer streak"]), h("div",{class:"v"},[String(profile.answerStreak.current), h("small",null,["best "+profile.answerStreak.best])]) ])
+  ]));
+
+  // level
+  wrap.appendChild(h("div",{class:"level-card"},[
+    h("div",{class:"level-top"},[ h("span",{class:"lv"},["Level "+li.lv]), h("span",{class:"xp"},[li.into+" / "+li.need+" XP"]) ]),
+    h("div",{class:"bar"},[ h("i",{style:"width:"+(li.into)+"%"}) ])
+  ]));
+
+  // xp chart (14d)
+  wrap.appendChild(renderXPChart());
+
+  // daily review
+  wrap.appendChild(h("button",{class:"btn shu big daily-cta"+(totalDue?"":" "),disabled: totalDue?null:"disabled",
+    onclick:()=>startSession(buildDaily(),{source:"daily"})},
+    [ totalDue? ("Daily review · "+totalDue+" due") : "Nothing due — come back later" ]));
+
+  // path
+  wrap.appendChild(h("div",{class:"section-title"},["Course"]));
+  const path=h("div",{class:"path"});
+  COURSE.topics.forEach((t,i)=>{
+    const st=topicStats(t);
+    const prev = i>0 ? topicStats(COURSE.topics[i-1]) : null;
+    const locked = !t.free && i>0 && prev.seen < Math.ceil(prev.total/2);
+    const done = st.mastered===st.total && st.total>0;
+    const pct = Math.round(st.avg*100);
+    const node=h("div",{class:"node"+(locked?" locked":"")});
+    node.appendChild(h("div",{class:"rail"}));
+    const ring=h("div",{class:"ring"+(done?" done":"")});
+    ring.appendChild(h("div",{class:"fill",style:"background:conic-gradient("+confColor(st.avg)+" "+pct+"%, var(--surface-2) 0)"}));
+    ring.appendChild(h("div",{class:"inner serif"},[ done?"✓":t.glyph ]));
+    node.appendChild(ring);
+    const pills=[];
+    if(!locked){
+      if(st.fresh>0) pills.push(h("span",{class:"pill new"},[st.fresh+" new"]));
+      if(st.due>0) pills.push(h("span",{class:"pill due"},[st.due+" review"]));
+      if(st.mastered>0) pills.push(h("span",{class:"pill master"},[st.mastered+" mastered"]));
+      if(!pills.length) pills.push(h("span",{class:"pill"},[st.total+" words"]));
+    } else pills.push(h("span",{class:"pill"},["Locked"]));
+    node.appendChild(h("div",{class:"meta"},[
+      h("div",{class:"nm"},[t.name]),
+      h("div",{class:"ds"},pills)
+    ]));
+    if(!locked) node.appendChild(h("button",{class:"go",html:"▶",onclick:()=>startSession(buildTopicLesson(t.id),{source:"topic",topicId:t.id})}));
+    if(!locked) node.style.cursor="pointer", node.addEventListener("click",e=>{ if(e.target.closest(".go"))return; startSession(buildTopicLesson(t.id),{source:"topic",topicId:t.id}); });
+    path.appendChild(node);
+  });
+  wrap.appendChild(path);
+  wrap.appendChild(h("div",{class:"panel",style:"margin-top:22px"},[
+    h("h3",null,["Back up & move progress"]),
+    h("p",{class:"hint"},["Saved on this device. Export copies your full progress; import it on another phone to move it over."]),
+    h("div",{style:"display:flex; gap:10px"},[
+      h("button",{class:"btn ghost",style:"flex:1",onclick:openExport},["Export"]),
+      h("button",{class:"btn ghost",style:"flex:1",onclick:openImport},["Import"])
+    ])
+  ]));
+  wrap.appendChild(h("p",{class:"muted",style:"text-align:center;margin-top:22px"},["Follows a Genki-style beginner arc · phrases written for this app"]));
+
+  app.replaceChildren(top, wrap);
+}
+
+function renderXPChart(){
+  const days=[]; for(let i=13;i>=0;i--){ const d=new Date(Date.now()-i*DAY); days.push(d); }
+  const vals=days.map(d=>profile.xp.byDay[todayStr(d)]||0);
+  const max=Math.max(10,...vals);
+  const tdy=todayStr();
+  const cols=days.map((d,idx)=>{
+    const v=vals[idx]; const isT=todayStr(d)===tdy;
+    const wd=["S","M","T","W","T","F","S"][d.getDay()];
+    return h("div",{class:"col"},[
+      h("div",{class:"barwrap"},[ h("div",{class:"b"+(isT?" today":""),style:"height:"+Math.round(v/max*100)+"%",title:v+" XP"}) ]),
+      h("div",{class:"lbl"},[wd])
+    ]);
+  });
+  const wk=vals.reduce((a,b)=>a+b,0);
+  return h("div",{class:"panel"},[
+    h("h3",null,["XP over time"]),
+    h("p",{class:"hint"},[wk>0? (wk.toLocaleString()+" XP in the last 14 days"):"Finish a lesson to start the chart"]),
+    h("div",{class:"chart"},cols)
+  ]);
+}
+
+/* ---------------- Session flow ---------------- */
+function startSession(built,opts){
+  if(!built.queue.length){ renderHome(); return; }
+  session={ queue:built.queue.slice(), freshSet:built.freshSet||new Set(), i:0,
+    total:built.queue.length, correct:0, wrong:0, xp:0, combo:profile.answerStreak.current, bestCombo:profile.answerStreak.current,
+    advanced:new Set(), source:opts.source, topicId:opts.topicId, startTopic:opts.topicId?topicStats(TOPIC[opts.topicId]).mastered:0, conf:{},
+    recordToBeat: profile.answerStreak.best, recordBroken:false, freezeUsed:false };
+  const T0=now(); session.queue.forEach(id=>{ session.conf[id]=confidence(id,T0); });
+  nextCard();
+}
+function sessionHead(){
+  const pct = Math.round(session.i / session.total * 100);
+  const combo = h("div",{class:"combo"+(session.combo>=2?" on":"")},["🔥 "+session.combo]);
+  return h("div",{class:"lesson-head"},[
+    (function(){ let armed=false, timer=null;
+      const b=h("button",{class:"close",html:"✕","aria-label":"End lesson"});
+      b.addEventListener("click",()=>{
+        if(armed){ clearTimeout(timer); finishSession(true); return; }
+        armed=true; b.innerHTML=""; b.style.width="auto"; b.style.fontSize="13px"; b.style.fontWeight="700"; b.style.padding="0 8px"; b.textContent="End lesson?";
+        timer=setTimeout(()=>{ armed=false; b.innerHTML="✕"; b.style.width=""; b.style.fontSize=""; b.style.fontWeight=""; b.style.padding=""; },2500);
+      });
+      return b; })(),
+    h("div",{class:"progress"},[ h("i",{style:"width:"+pct+"%"}) ]),
+    combo
+  ]);
+}
+function nextCard(){
+  if(session.i>=session.queue.length){ finishSession(false); return; }
+  session._attempt=0;
+  presentCard();
+}
+function presentCard(forceKind){
+  const id=session.queue[session.i];
+  const isFresh=session.freshSet.has(id) && !mem(id);
+  const kind=forceKind || chooseKind(id,isFresh);
+  session._activeKind=kind;
+  const stage=h("div",{class:"stage"});
+  app.replaceChildren(sessionHead(), stage);
+  (kind==="mc"?renderMC : kind==="build"?renderBuild : renderType)(id, kind, stage);
+  window.scrollTo(0,0);
+}
+function actionBar(children){ return h("div",{class:"actionbar"},[ h("div",{class:"inner"},children) ]); }
+function retryBar(o){
+  const inner=[ h("div",{class:"verdict no",style:"margin:2px 0 12px"},[o.text||"Incorrect — want to try again?"]) ];
+  if(o.onAgain) inner.push(h("button",{class:"btn big",onclick:o.onAgain},[o.againLabel||"Try again"]));
+  if(o.extra) inner.push(o.extra);
+  if(o.onShow) inner.push(h("button",{class:"override",onclick:o.onShow},[ h("u",null,[o.showLabel||"Show answer"]) ]));
+  return h("div",{class:"actionbar"},[ h("div",{class:"inner"},inner) ]);
+}
+
+function grade(id, correct, elapsed, fast){
+  const kind = session._kind;
+  const wasNew = !mem(id);
+  // a quick 1-in-4 guess on a brand-new word is not "easy"
+  if(kind==="mc" && wasNew) fast=false;
+  const g = correct ? (fast?"easy":"good") : "again";
+  review(id,g,now());
+  if(correct){
+    let x = CFG.xp[kind]||8; if(g==="easy") x+=CFG.xp.easyBonus;
+    session.correct++; session.combo++; session.bestCombo=Math.max(session.bestCombo,session.combo);
+    profile.answerStreak.current=session.combo; if(session.combo>profile.answerStreak.best)profile.answerStreak.best=session.combo;
+    session.advanced.add(id);
+    if(!session.recordBroken && session.recordToBeat>=CFG.recordMin && session.combo>session.recordToBeat){
+      // just passed your all-time best
+      session.recordBroken=true; x+=CFG.xp.comboBonus; celebrate(session.combo, "new record!", true);
+    } else if(session.combo>0 && session.combo%CFG.comboEvery===0){
+      x+=CFG.xp.comboBonus; const big=session.combo%100===0; celebrate(session.combo, big?"streak!":"combo!", big);
+    }
+    session.xp+=x; addXP(x);
+  } else {
+    session.wrong++;
+    if(session.combo>0){
+      if(!session.freezeUsed){ session.freezeUsed=true; toast("🧊 Streak freeze used — streak safe"); }
+      else { session.combo=0; profile.answerStreak.current=0; }
+    }
+    // re-show this item once more, a few cards later
+    if(!session._requeued) session._requeued={};
+    if(!session._requeued[id]){ session._requeued[id]=1; const pos=Math.min(session.queue.length, session.i+3); session.queue.splice(pos,0,id); session.total=session.queue.length; }
+  }
+  save();
+}
+function advance(){ session.i++; nextCard(); }
+
+/* ----- Multiple choice ----- */
+function renderMC(id,kind,stage){
+  session._kind="mc";
+  const it=ITEMS[id]; const T=now();
+  const isKana=it.tags[0]==="kana";
+  // direction: kana -> either read it (kana→rōmaji) or recognise it (rōmaji→kana); words: mostly jp→en
+  const jpToEn = isKana ? Math.random()<0.5 : Math.random()<0.6;
+  const promptJp = jpToEn;
+  const answer = jpToEn ? it.en : it.jp;
+  const opts = shuffle([answer, ...distractors(id,!jpToEn,3)]);
+  const start=now();
+
+  stage.appendChild(h("div",{class:"kicker"},[ isKana ? (jpToEn?"How do you read this?":"Which kana is this?") : (jpToEn?"Choose the meaning":"Choose the Japanese") ]));
+  stage.appendChild(h("div",{class:"prompt"},[
+    promptJp ? h("div",{class:"big serif"},[it.jp]) : h("div",{class: isKana?"big":"en"},[it.en]),
+    promptJp && !isKana ? h("div",{class:"rd"},[it.romaji]) : null
+  ]));
+  const box=h("div",{class:"choices"+(isKana&&!jpToEn?" grid2":"")});
+  let answered=false, retryBarEl=null;
+  const reveal=()=>{ Array.from(box.children).forEach(c=>{ if(c.classList.contains("wrong"))return; if(c.textContent===answer)c.classList.add("correct"); else c.classList.add("dim"); }); };
+  const finalizeWrong=(elapsed)=>{ if(answered)return; answered=true; if(retryBarEl){retryBarEl.remove();retryBarEl=null;} reveal(); grade(id,false,elapsed,false); showContinue(stage,false); };
+  opts.forEach(v=>{
+    const b=h("button",{class:"choice"+(isKana&&!jpToEn?" kana-choice":"")},[ h("span",{class: jpToEn?"":"jpc"},[v]) ]);
+    b.addEventListener("click",()=>{
+      if(answered)return;
+      if(retryBarEl){ retryBarEl.remove(); retryBarEl=null; }
+      const ok=(v===answer); const elapsed=now()-start;
+      if(ok){ answered=true; b.classList.add("correct"); Array.from(box.children).forEach(c=>{ if(c!==b)c.classList.add("dim"); }); grade(id,true,elapsed, session._attempt===0 && elapsed<3500); showContinue(stage,true); return; }
+      b.classList.add("wrong"); b.appendChild(h("span",{class:"badge"},["✕"])); b.style.pointerEvents="none";
+      if(session._attempt===0){
+        session._attempt=1;
+        retryBarEl=retryBar({ text:"Incorrect — want to try again? Pick another answer.", onShow:()=>finalizeWrong(elapsed) });
+        document.getElementById("app").appendChild(retryBarEl);
+      } else {
+        finalizeWrong(elapsed);
+      }
+    });
+    box.appendChild(b);
+  });
+  stage.appendChild(box);
+}
+
+/* ----- Build from parts ----- */
+function renderBuild(id,kind,stage){
+  session._kind="build";
+  const it=ITEMS[id];
+  const parts=it.parts;
+  stage.appendChild(h("div",{class:"kicker"},["Build the sentence"]));
+  stage.appendChild(h("div",{class:"prompt"},[ h("div",{class:"en"},[it.en]) ]));
+  const line=h("div",{class:"answer-line"});
+  const bank=h("div",{class:"bank"});
+  const placed=[];
+  const tiles = shuffle(parts.map((p,idx)=>({p,idx})));
+  tiles.forEach(o=>{
+    const tb=h("button",{class:"tile"},[o.p]);
+    tb.addEventListener("click",()=>{
+      if(tb.classList.contains("used"))return;
+      tb.classList.add("used");
+      const pt=h("button",{class:"tile placed"},[o.p]);
+      pt.addEventListener("click",()=>{ pt.remove(); tb.classList.remove("used"); const k=placed.indexOf(o); if(k>=0)placed.splice(k,1); });
+      placed.push(o); line.appendChild(pt);
+    });
+    bank.appendChild(tb);
+  });
+  stage.appendChild(line); stage.appendChild(bank);
+
+  const start=now();
+  const check=h("button",{class:"btn big"},["Check"]);
+  const bar=actionBar([check]);
+  let answered=false;
+  const finalizeWrong=(elapsed)=>{ if(answered)return; answered=true; if(bar.isConnected)bar.remove(); line.classList.add("wrong"); grade(id,false,elapsed,false); stage.appendChild(h("div",{class:"verdict no"},[ h("span",null,["Answer: ", h("span",{class:"sol"},[it.jp]), "  ("+it.romaji+")"]) ])); showContinue(stage,false); };
+  check.addEventListener("click",()=>{
+    if(answered || !placed.length)return;
+    const ok = placed.map(o=>o.p).join("|")===parts.join("|");
+    const elapsed=now()-start;
+    if(ok){ answered=true; line.classList.add("correct"); if(bar.isConnected)bar.remove(); grade(id,true,elapsed, session._attempt===0 && elapsed<7000); stage.appendChild(h("div",{class:"verdict ok"},["◎ "+it.romaji])); showContinue(stage,true); return; }
+    line.classList.add("wrong");
+    if(session._attempt===0){
+      session._attempt=1; bar.remove();
+      const rb=retryBar({ againLabel:"Try again", onAgain:()=>{ rb.remove(); line.classList.remove("wrong"); document.getElementById("app").appendChild(bar); }, onShow:()=>{ rb.remove(); finalizeWrong(elapsed); } });
+      document.getElementById("app").appendChild(rb);
+    } else {
+      finalizeWrong(elapsed);
+    }
+  });
+  document.getElementById("app").appendChild(bar);
+}
+
+/* ----- Type / translate ----- */
+function renderType(id,kind,stage){
+  session._kind="type";
+  const it=ITEMS[id];
+  const isKana=it.tags[0]==="kana";
+  // production: show EN, type romaji reading; (kana: show kana, type romaji)
+  const showJp = isKana ? true : Math.random()<0.4;
+  stage.appendChild(h("div",{class:"kicker"},[ showJp?"Type the rōmaji":"Type it in rōmaji" ]));
+  stage.appendChild(h("div",{class:"prompt"},[
+    showJp? h("div",{class:"big serif"},[it.jp]) : h("div",{class:"en"},[it.en])
+  ]));
+  const inp=h("input",{class:"type-in",type:"text",autocapitalize:"none",autocomplete:"off",autocorrect:"off",spellcheck:"false",placeholder:"rōmaji…"});
+  stage.appendChild(inp);
+  const verdict=h("div",{class:"verdict"}); stage.appendChild(verdict);
+  setTimeout(()=>inp.focus(),60);
+  const start=now();
+
+  // never accept what is already on screen; when the English is shown, kana is also fine
+  const alts=(it.alt||[]).map(norm);
+  const accepts=(showJp ? [norm(it.romaji)] : [norm(it.romaji), norm(it.jp)]).concat(alts);
+  const check=h("button",{class:"btn big"},["Check"]);
+  const bar=actionBar([check]);
+  document.getElementById("app").appendChild(bar);
+  let done=false;
+
+  function finalize(correct, elapsed){
+    done=true; inp.disabled=true; inp.classList.remove("correct","wrong"); inp.classList.add(correct?"correct":"wrong");
+    grade(id, correct, elapsed, correct && session._attempt===0 && elapsed<5000);
+    verdict.className="verdict "+(correct?"ok":"no");
+    verdict.replaceChildren(correct? document.createTextNode("◎ "+it.romaji) : h("span",null,["Answer: ", h("span",{class:"sol"},[it.romaji]), "  ("+it.jp+")"]));
+    if(bar.isConnected)bar.remove();
+    showContinue(stage, correct);
+  }
+  function doCheck(){
+    if(done)return;
+    const val=norm(inp.value);
+    if(!val)return;
+    const ok = accepts.includes(val);
+    const elapsed=now()-start;
+    if(ok){ finalize(true, elapsed); return; }
+    inp.classList.add("wrong");
+    if(session._attempt===0){
+      session._attempt=1; bar.remove();
+      verdict.className="verdict no"; verdict.textContent="Incorrect — want to try again?";
+      const rb=retryBar({
+        onAgain:()=>{ rb.remove(); verdict.textContent=""; verdict.className="verdict"; inp.classList.remove("wrong"); inp.value=""; inp.disabled=false; document.getElementById("app").appendChild(bar); setTimeout(()=>inp.focus(),30); },
+        extra: h("button",{class:"override",onclick:()=>{ rb.remove(); finalize(true, elapsed); }},[ h("u",null,["I was right — count it"]) ]),
+        onShow:()=>{ rb.remove(); finalize(false, elapsed); }
+      });
+      document.getElementById("app").appendChild(rb);
+    } else {
+      finalize(false, elapsed);
+    }
+  }
+  check.addEventListener("click",doCheck);
+  inp.addEventListener("keydown",e=>{ if(e.key==="Enter")doCheck(); });
+}
+
+function showContinue(stage, ok){
+  const btn=h("button",{class:"btn big"+(ok?"":" shu"),onclick:advance},[ session.i+1>=session.queue.length?"Finish":"Continue" ]);
+  document.getElementById("app").appendChild(actionBar([btn]));
+  // Enter continues (deferred so the Enter that submitted the answer doesn't also advance)
+  setTimeout(()=>{
+    const onKey=e=>{ if(e.key==="Enter"){ document.removeEventListener("keydown",onKey); if(session && btn.isConnected) advance(); } };
+    document.addEventListener("keydown",onKey);
+    btn.addEventListener("click",()=>document.removeEventListener("keydown",onKey),{once:true});
+  },0);
+}
+
+/* ----- combo celebration ----- */
+let _toastEl=null,_toastT=null;
+function toast(msg){
+  if(!_toastEl){ _toastEl=h("div",{class:"toast"}); document.body.appendChild(_toastEl); }
+  _toastEl.textContent=msg; requestAnimationFrame(()=>_toastEl.classList.add("on"));
+  clearTimeout(_toastT); _toastT=setTimeout(()=>{ if(_toastEl)_toastEl.classList.remove("on"); },1700);
+}
+function celebrate(n, label, big){
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const b=h("div",{class:"burst"},[ h("span",{class:"n serif"},[String(n)]), h("span",null,[label||"combo!"]) ]);
+  document.body.appendChild(b); requestAnimationFrame(()=>b.classList.add("go"));
+  setTimeout(()=>b.remove(),1200);
+  if(reduce) return;
+  const colors=["#d24e24","#2a3c74","#5f7a43","#c1892e","#3b4f8f"];
+  for(let i=0;i<(big?64:26);i++){
+    const c=h("div",{class:"cf"});
+    c.style.background=colors[i%colors.length];
+    const x=Math.random()*100; c.style.left=x+"vw"; c.style.top="-20px";
+    c.style.transform="rotate("+(Math.random()*360)+"deg)";
+    fx.appendChild(c);
+    const dx=(Math.random()-.5)*160, dur=900+Math.random()*700, rot=(Math.random()-.5)*720;
+    c.animate([{transform:c.style.transform,opacity:1,offset:0},
+      {transform:"translate("+dx+"px,"+(window.innerHeight+60)+"px) rotate("+rot+"deg)",opacity:.9}],
+      {duration:dur,easing:"cubic-bezier(.3,.6,.4,1)",fill:"forwards"});
+    setTimeout(()=>c.remove(),dur+50);
+  }
+}
+
+/* ---------------- Complete ---------------- */
+function finishSession(early){
+  touchStreak(); save();
+  const s=session;
+  const acc = (s.correct+s.wrong)? Math.round(s.correct/(s.correct+s.wrong)*100):0;
+  let masteredGain=0;
+  if(s.topicId){ masteredGain = topicStats(TOPIC[s.topicId]).mastered - s.startTopic; }
+  const c=h("div",{class:"complete"});
+  c.appendChild(h("div",{class:"seal serif"},[ acc>=100?"優": acc>=80?"良":"可" ]));
+  c.appendChild(h("h2",null,[ early?"Lesson paused":"Lesson complete" ]));
+  c.appendChild(h("p",{class:"lead"},[ profile.name? ("Nice work, "+profile.name+"."):"Nice work." ]));
+  c.appendChild(h("div",{class:"result-grid"},[
+    h("div",{class:"result"},[ h("div",{class:"rk"},["✦ XP earned"]), h("div",{class:"rv"},["+"+s.xp]) ]),
+    h("div",{class:"result"},[ h("div",{class:"rk"},["Accuracy"]), h("div",{class:"rv"},[acc+"%"]) ]),
+    h("div",{class:"result"},[ h("div",{class:"rk"},["🔥 Streak peak"]), h("div",{class:"rv"},[String(s.bestCombo)]) ]),
+    h("div",{class:"result"},[ h("div",{class:"rk"},["Words practiced"]), h("div",{class:"rv"},[String(s.advanced.size)]) ])
+  ]));
+  if(masteredGain>0) c.appendChild(h("p",{class:"lead"},["🎉 "+masteredGain+" new word"+(masteredGain>1?"s":"")+" mastered!"]));
+  c.appendChild(h("button",{class:"btn big",onclick:renderHome},["Back to course"]));
+  const wrap=h("div",{class:"wrap"}); wrap.appendChild(c);
+  app.replaceChildren(h("div",{class:"topbar"},[ h("div",{class:"brand"},[h("span",{class:"mark serif"},["ことば"])]) ]), wrap);
+  if(!early && acc>=80) setTimeout(()=>celebrate(acc+"%", acc>=100?"perfect!":"nice!"),200);
+}
+
+/* ---------------- Theme ---------------- */
+function themeIcon(){ const t=document.documentElement.getAttribute("data-theme"); return t==="dark"?"☀":"☾"; }
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute("data-theme");
+  const next = cur==="dark"?"light": cur==="light"?"dark": (window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"light":"dark");
+  document.documentElement.setAttribute("data-theme",next);
+  profile.theme=next; save();
+  const btn=document.querySelector(".topbar .icon-btn"); if(btn)btn.innerHTML=themeIcon();
+}
+
+/* ---------------- Boot ---------------- */
+async function boot(){
+  await initStore();
+  if(profile.theme) document.documentElement.setAttribute("data-theme",profile.theme);
+  renderHome();
+}
+boot();
+
+})();
+</script>
+</body>
+</html>
