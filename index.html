@@ -221,8 +221,9 @@ button{font-family:inherit; cursor:pointer; border:none; background:none; color:
 .io-area:focus{outline:none; border-color:var(--indigo)}
 .modal .btn{margin-top:12px}
 
-.name-row{display:flex; gap:9px; margin-top:6px}
-.name-row input{flex:1; padding:13px 14px; border-radius:12px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); font-family:var(--ui); font-size:16px}
+.name-row{display:flex; gap:9px; margin-top:6px; flex-wrap:nowrap}
+.name-row input{flex:1 1 auto; min-width:0; width:100%; padding:13px 14px; border-radius:12px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); font-family:var(--ui); font-size:16px}
+.name-row button{flex:0 0 auto}
 .name-row input:focus{outline:none; border-color:var(--indigo)}
 .muted{color:var(--ink-soft); font-size:13px}
 .loading .spin{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--indigo);animation:sp 1s linear infinite}
