@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ことば · Kotoba</title>
+<title>クベバ · Kubeba</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -235,8 +235,8 @@ button{font-family:inherit; cursor:pointer; border:none; background:none; color:
 <div id="app">
   <div class="center-screen loading">
     <div class="brand" style="flex-direction:column;align-items:center;gap:6px">
-      <div class="mark serif" style="font-size:40px">ことば</div>
-      <div class="sub">Kotoba · Japanese</div>
+      <div class="mark serif" style="font-size:40px">クベバ</div>
+      <div class="sub">Kubeba · Japanese</div>
     </div>
     <div class="spin" style="margin-top:8px"></div>
   </div>
@@ -756,7 +756,7 @@ function openImport(){
   const restore=h("button",{class:"btn",onclick:()=>{
     let data;
     try{ data=JSON.parse(ta.value.trim()); }catch(e){ status.textContent="That doesn't look like valid progress data."; return; }
-    if(!data || typeof data!=="object" || (!data.memory && !data.xp && !data.answerStreak)){ status.textContent="That doesn't look like Kotoba progress."; return; }
+    if(!data || typeof data!=="object" || (!data.memory && !data.xp && !data.answerStreak)){ status.textContent="That doesn't look like Kubeba progress."; return; }
     if(!confirm("Replace the progress on this device with the imported one? This can't be undone.")) return;
     profile=normalizeProfile(data); save();
     document.querySelectorAll(".modal-ov").forEach(m=>m.remove());
@@ -777,7 +777,7 @@ function renderHome(){
   const greetName = profile.name ? profile.name : "";
 
   const top = h("div",{class:"topbar"},[
-    h("div",{class:"brand"},[ h("span",{class:"mark serif"},["ことば"]), h("span",{class:"sub"},["Kotoba"]) ]),
+    h("div",{class:"brand"},[ h("span",{class:"mark serif"},["クベバ"]), h("span",{class:"sub"},["Kubeba"]) ]),
     h("button",{class:"icon-btn","aria-label":"Toggle theme",onclick:toggleTheme,html:themeIcon()})
   ]);
 
@@ -1169,7 +1169,7 @@ function finishSession(early){
   if(masteredGain>0) c.appendChild(h("p",{class:"lead"},["🎉 "+masteredGain+" new word"+(masteredGain>1?"s":"")+" mastered!"]));
   c.appendChild(h("button",{class:"btn big",onclick:renderHome},["Back to course"]));
   const wrap=h("div",{class:"wrap"}); wrap.appendChild(c);
-  app.replaceChildren(h("div",{class:"topbar"},[ h("div",{class:"brand"},[h("span",{class:"mark serif"},["ことば"])]) ]), wrap);
+  app.replaceChildren(h("div",{class:"topbar"},[ h("div",{class:"brand"},[h("span",{class:"mark serif"},["クベバ"])]) ]), wrap);
   if(!early && acc>=80) setTimeout(()=>celebrate(acc+"%", acc>=100?"perfect!":"nice!"),200);
 }
 
