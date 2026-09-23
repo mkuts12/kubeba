@@ -224,6 +224,21 @@ button{font-family:inherit; cursor:pointer; border:none; background:none; color:
 .verdict .spk{width:32px; height:32px; font-size:15px; margin-left:8px}
 .spk-pair{display:inline-flex; gap:6px; margin-left:10px; vertical-align:middle}
 .spk-pair .spk{margin-left:0}
+.words-link{font-size:12px; letter-spacing:.03em; text-transform:none; color:var(--indigo); font-weight:700}
+.search-bar{position:sticky; top:env(safe-area-inset-top,0px); z-index:4; padding:10px 18px; background:color-mix(in srgb,var(--paper) 92%, transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line)}
+.word-search{width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); font-family:var(--ui); font-size:16px}
+.word-search:focus{outline:none; border-color:var(--indigo)}
+.words-wrap{padding-top:10px}
+.word-group{display:flex; align-items:center; gap:8px; margin:18px 2px 8px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); font-weight:700}
+.word-row{display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:12px; background:var(--surface); border:1px solid var(--line); margin-bottom:7px; box-shadow:var(--shadow)}
+.word-row.locked{opacity:.55}
+.wdot{width:10px; height:10px; border-radius:50%; flex:none}
+.wlock{width:14px; text-align:center; flex:none; font-size:12px}
+.w-jp{font-family:var(--jp-sans); font-size:20px; min-width:62px}
+.w-meta{flex:1; min-width:0}
+.w-rd{font-size:12px; color:var(--ink-soft)}
+.w-en{font-size:14px}
+.word-row .spk{margin-left:auto}
 .modal-ov{position:fixed; inset:0; z-index:60; background:rgba(20,17,10,.55); display:flex; align-items:flex-end; justify-content:center}
 .modal{background:var(--surface); width:100%; max-width:560px; border-radius:22px 22px 0 0; padding:18px 18px calc(20px + env(safe-area-inset-bottom,0px)); box-shadow:var(--shadow); max-height:88vh; overflow:auto; animation:sheet .25s cubic-bezier(.22,1,.36,1)}
 @keyframes sheet{from{transform:translateY(30px); opacity:.6}to{transform:none; opacity:1}}
@@ -686,6 +701,12 @@ function topicStats(t){
   const avg = t.itemIds.length? (sum/t.itemIds.length):0;
   return {mastered, seen, due, fresh, avg, total:t.itemIds.length};
 }
+function isLockedIndex(i){
+  const t=COURSE.topics[i];
+  if(t.free || i===0) return false;
+  const p=topicStats(COURSE.topics[i-1]);
+  return p.seen < Math.ceil(p.total/2);
+}
 function buildTopicLesson(topicId){
   const T=now(); const t=TOPIC[topicId];
   const fresh = t.itemIds.filter(isNew).slice(0, CFG.newPerLesson);
@@ -836,6 +857,57 @@ function openImport(){
   setTimeout(()=>ta.focus(),60);
 }
 
+function renderWords(){
+  const T=now();
+  const top = h("div",{class:"topbar"},[
+    h("button",{class:"icon-btn",html:"‹","aria-label":"Back",onclick:renderHome}),
+    h("div",{class:"brand"},[ h("span",{class:"mark serif"},["言葉"]), h("span",{class:"sub"},["Words"]) ]),
+    h("span",{style:"width:38px"})
+  ]);
+  const search=h("input",{class:"word-search",type:"text",placeholder:"Search — English, rōmaji, or kana…",autocapitalize:"none",autocorrect:"off",spellcheck:"false"});
+  const searchBar=h("div",{class:"search-bar"},[search]);
+  const listWrap=h("div",{class:"wrap words-wrap"});
+
+  function playBtn(it){ const b=h("button",{class:"spk","aria-label":"Play"},["🔊"]); b.addEventListener("click",e=>{ e.stopPropagation(); speak(it.jp,"ja-JP",false); }); return b; }
+
+  function render(qraw){
+    const q=(qraw||"").trim().toLowerCase();
+    const nq=norm(q);
+    listWrap.replaceChildren();
+    let total=0;
+    COURSE.topics.forEach((t,i)=>{
+      const locked=isLockedIndex(i);
+      const matches=t.itemIds.map(id=>ITEMS[id]).filter(it=>{
+        if(!q) return true;
+        if((it.en||"").toLowerCase().includes(q)) return true;
+        if((it.romaji||"").toLowerCase().includes(q)) return true;
+        if((it.jp||"").includes(qraw.trim())) return true;
+        if(nq && (norm(it.romaji).includes(nq) || norm(it.jp).includes(nq))) return true;
+        if((it.alt||[]).some(a=>(a||"").toLowerCase().includes(q))) return true;
+        return false;
+      });
+      if(!matches.length) return;
+      total+=matches.length;
+      listWrap.appendChild(h("div",{class:"word-group"},[ h("span",null,[t.name]), locked? h("span",{class:"pill"},["🔒 Locked"]) : null ]));
+      matches.forEach(it=>{
+        const m=mem(it.id);
+        const mark = locked ? h("span",{class:"wlock"},["🔒"]) : h("span",{class:"wdot",style:"background:"+(m?confColor(retrievability(m,T)):"var(--line)")});
+        listWrap.appendChild(h("div",{class:"word-row"+(locked?" locked":"")},[
+          mark,
+          h("div",{class:"w-jp jp"},[it.jp]),
+          h("div",{class:"w-meta"},[ h("div",{class:"w-rd"},[it.romaji]), h("div",{class:"w-en"},[it.en]) ]),
+          playBtn(it)
+        ]));
+      });
+    });
+    if(!total) listWrap.appendChild(h("p",{class:"muted",style:"text-align:center; margin-top:34px"},["No words match “"+qraw.trim()+"”."]));
+  }
+  search.addEventListener("input",()=>render(search.value));
+  render("");
+  app.replaceChildren(top, searchBar, listWrap);
+  window.scrollTo(0,0);
+}
+
 function renderHome(){
   session=null;
   const T=now();
@@ -889,7 +961,7 @@ function renderHome(){
 
   // path
   const anyLocked = COURSE.topics.some((t,i)=>{ if(t.free||i===0)return false; const p=topicStats(COURSE.topics[i-1]); return p.seen < Math.ceil(p.total/2); });
-  wrap.appendChild(h("div",{class:"section-title"},["Course"]));
+  wrap.appendChild(h("div",{class:"section-title",style:"display:flex; justify-content:space-between; align-items:center"},[ h("span",null,["Course"]), h("button",{class:"words-link",onclick:renderWords},["📖 All words"]) ]));
   if(anyLocked) wrap.appendChild(h("p",{class:"hint",style:"margin:-4px 4px 12px"},["Already know some? Tap 🔓 on a locked topic to mark earlier ones known and jump there."]));
   const path=h("div",{class:"path"});
   COURSE.topics.forEach((t,i)=>{
