@@ -1310,10 +1310,19 @@ let _voices=[];
 function loadVoices(){ try{ _voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : []; }catch(e){ _voices=[]; } }
 if(window.speechSynthesis){ loadVoices(); try{ window.speechSynthesis.addEventListener("voiceschanged",loadVoices); }catch(e){} }
 function muted(){ return profile.sound===false; }
+function spokenText(t){
+  // strip display-only annotations so TTS says the word, not the note:
+  // "ten (10)"→"ten", "red (i-adj)"→"red", "hello / good afternoon"→"hello, good afternoon"
+  let s=(t||"").toString()
+    .replace(/[（(][^）)]*[）)]/g, " ")
+    .replace(/\s*\/\s*/g, ", ")
+    .replace(/\s+/g, " ").trim();
+  return s || (t||"").toString().trim();   // fall back if cleaning left nothing
+}
 function speak(text, lang, slow){
   if(!("speechSynthesis" in window) || !text) return;
   try{
-    const u=new SpeechSynthesisUtterance(text);
+    const u=new SpeechSynthesisUtterance(spokenText(text));
     u.lang=lang||"ja-JP"; u.rate= slow?0.5:0.9; u.pitch=1;
     if(!_voices.length) loadVoices();
     const v=_voices.find(v=>v.lang===u.lang) || _voices.find(v=>((v.lang||"").toLowerCase().replace("_","-")).indexOf((u.lang||"ja").slice(0,2))===0);
@@ -1390,15 +1399,34 @@ function finishSession(early){
   if(masteredGain>0) c.appendChild(h("p",{class:"lead"},["🎉 "+masteredGain+" new word"+(masteredGain>1?"s":"")+" mastered!"]));
   const src=s.source, tid=s.topicId;
   const startNext=()=>{
-    let built = (src==="daily") ? buildDaily() : (tid ? buildTopicLesson(tid) : buildDaily());
-    if(!built || !built.queue.length){ built=buildDaily(); }
-    if(built && built.queue.length) startSession(built, {source: (src==="daily"||!tid)?"daily":"topic", topicId: tid});
+    const hasNew=(topicId)=> TOPIC[topicId].itemIds.some(isNew);
+    let built=null, srcOut="daily", tidOut=null;
+    if(src!=="daily" && tid){
+      // stay in this chapter while it still has new words; otherwise jump to the next unlocked chapter that does
+      let targetId = hasNew(tid) ? tid : null;
+      if(!targetId){
+        const ci = COURSE.topics.findIndex(t=>t.id===tid);
+        for(let i=(ci>=0?ci+1:0); i<COURSE.topics.length; i++){
+          if(!isLockedIndex(i) && hasNew(COURSE.topics[i].id)){ targetId=COURSE.topics[i].id; break; }
+        }
+      }
+      if(targetId){ built=buildTopicLesson(targetId); srcOut="topic"; tidOut=targetId; }
+    }
+    if(!built || !built.queue.length){ built=buildDaily(); srcOut="daily"; tidOut=null; }   // nothing new left → mixed review
+    if(built && built.queue.length) startSession(built, {source:srcOut, topicId:tidOut});
     else renderHome();
   };
-  c.appendChild(h("div",{style:"display:flex; gap:10px"},[
-    h("button",{class:"btn big",style:"flex:1",onclick:startNext},["Next lesson"]),
-    h("button",{class:"btn ghost big",style:"flex:1",onclick:renderHome},["Back to course"])
-  ]));
+  const practiceThis=()=>{
+    let built = tid ? buildTopicLesson(tid) : buildDaily();
+    if(!built || !built.queue.length) built=buildDaily();
+    if(built && built.queue.length) startSession(built, {source: tid?"topic":"daily", topicId: tid});
+    else renderHome();
+  };
+  const actions=h("div",{style:"display:flex; flex-direction:column; gap:10px"});
+  actions.appendChild(h("button",{class:"btn big",onclick:startNext},["Next lesson"]));
+  if(tid && src!=="daily") actions.appendChild(h("button",{class:"btn ghost big",onclick:practiceThis},["Practice this chapter"]));
+  actions.appendChild(h("button",{class:"btn ghost big",onclick:renderHome},["Back to course"]));
+  c.appendChild(actions);
   const wrap=h("div",{class:"wrap"}); wrap.appendChild(c);
   app.replaceChildren(h("div",{class:"topbar"},[ h("div",{class:"brand"},[h("span",{class:"mark serif"},["クベバ"])]) ]), wrap);
   if(!early && acc>=80) setTimeout(()=>celebrate(acc+"%", acc>=100?"perfect!":"nice!"),200);
