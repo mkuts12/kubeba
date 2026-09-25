@@ -1,0 +1,2757 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>クベバ · Kubeba</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light dark;
+  --paper:#ece6d6; --surface:#f7f2e8; --surface-2:#efe9db; --raised:#fbf8f1;
+  --ink:#221f19; --ink-soft:#6b6455; --line:#ddd4c1;
+  --indigo:#2a3c74; --indigo-2:#3b4f8f; --indigo-soft:#e3e6f1;
+  --shu:#d24e24; --shu-soft:#f3ddd2;
+  --matcha:#5f7a43; --matcha-soft:#e6ecda;
+  --amber:#c1892e;
+  --radius:16px; --radius-sm:11px; --radius-lg:24px;
+  --shadow:0 1px 2px rgba(40,34,20,.06), 0 8px 24px -12px rgba(40,34,20,.18);
+  --jp-serif:"Hiragino Mincho ProN","Yu Mincho",YuMincho,"Songti SC","Noto Serif JP",serif;
+  --jp-sans:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",YuGothic,Meiryo,"Noto Sans JP",sans-serif;
+  --ui:"Zen Kaku Gothic New",system-ui,-apple-system,"Segoe UI",sans-serif;
+  box-sizing:border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#141310; --surface:#201e18; --surface-2:#26231c; --raised:#2b281f;
+    --ink:#ece6d7; --ink-soft:#a49c88; --line:#37332a;
+    --indigo:#93a6dd; --indigo-2:#aab9e6; --indigo-soft:#232a40;
+    --shu:#e2662f; --shu-soft:#3a251b;
+    --matcha:#9db56f; --matcha-soft:#2a301f;
+    --amber:#d6a24a;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px -14px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="light"]{color-scheme:light}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#141310; --surface:#201e18; --surface-2:#26231c; --raised:#2b281f;
+  --ink:#ece6d7; --ink-soft:#a49c88; --line:#37332a;
+  --indigo:#93a6dd; --indigo-2:#aab9e6; --indigo-soft:#232a40;
+  --shu:#e2662f; --shu-soft:#3a251b;
+  --matcha:#9db56f; --matcha-soft:#2a301f;
+  --amber:#d6a24a;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 30px -14px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; scroll-padding-top: env(safe-area-inset-top, 0px);}
+html,body{height:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--ui); font-weight:400; line-height:1.5;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit}
+.jp{font-family:var(--jp-sans)}
+.serif{font-family:var(--jp-serif)}
+
+/* layout */
+#app{max-width:560px; margin:0 auto; min-height:100%; display:flex; flex-direction:column}
+.wrap{padding:16px 18px 40px}
+.center-screen{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; padding:24px}
+
+/* top bar */
+.topbar{position:sticky; top:env(safe-area-inset-top,0px); z-index:5;
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:12px 18px; background:color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter:saturate(1.2) blur(10px); border-bottom:1px solid var(--line)}
+.brand{display:flex; align-items:baseline; gap:8px}
+.brand .mark{font-family:var(--jp-serif); font-size:22px; font-weight:500; letter-spacing:.02em}
+.brand .sub{font-size:11px; color:var(--ink-soft); letter-spacing:.14em; text-transform:uppercase}
+.icon-btn{width:38px; height:38px; border-radius:12px; display:grid; place-items:center; color:var(--ink-soft)}
+.icon-btn:hover{background:var(--surface-2)}
+.icon-btn.mode{font-weight:800; font-size:16px; border:1px solid var(--line); background:var(--surface)}
+.mode-link{display:block; text-align:center; margin-top:12px; color:var(--ink-soft); font-size:13px}
+.mode-link u{text-decoration-thickness:1px; text-underline-offset:3px}
+
+/* stat header */
+.stats-row{display:flex; gap:10px; margin-bottom:18px}
+.stat{flex:1; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:12px 14px; box-shadow:var(--shadow)}
+.stat .k{font-size:11px; color:var(--ink-soft); letter-spacing:.06em; display:flex; align-items:center; gap:5px}
+.stat .v{font-size:22px; font-weight:700; margin-top:3px; display:flex; align-items:baseline; gap:6px}
+.stat .v small{font-size:12px; font-weight:500; color:var(--ink-soft)}
+.flame{color:var(--shu)}
+
+/* level bar */
+.level-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; margin-bottom:14px; box-shadow:var(--shadow)}
+.level-top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px}
+.level-top .lv{font-weight:700}
+.level-top .xp{font-size:12px; color:var(--ink-soft)}
+.bar{height:9px; background:var(--surface-2); border-radius:99px; overflow:hidden; border:1px solid var(--line)}
+.bar > i{display:block; height:100%; background:linear-gradient(90deg,var(--indigo),var(--indigo-2)); border-radius:99px; transition:width .5s cubic-bezier(.22,1,.36,1)}
+
+/* xp chart */
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; margin-bottom:14px; box-shadow:var(--shadow)}
+.panel h3{margin:0 0 2px; font-size:14px; font-weight:700}
+.panel .hint{font-size:12px; color:var(--ink-soft); margin:0 0 12px}
+.chart{display:flex; align-items:flex-end; gap:5px; height:78px}
+.chart .col{flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; height:100%}
+.chart .barwrap{flex:1; width:100%; display:flex; align-items:flex-end}
+.chart .b{width:100%; background:linear-gradient(180deg,var(--indigo-2),var(--indigo)); border-radius:5px 5px 3px 3px; min-height:3px; transition:height .5s cubic-bezier(.22,1,.36,1)}
+.chart .b.today{background:linear-gradient(180deg,var(--shu),#b8431f)}
+.chart .lbl{font-size:9px; color:var(--ink-soft)}
+
+/* path */
+.section-title{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); margin:22px 4px 12px}
+.path{display:flex; flex-direction:column; gap:0}
+.node{display:flex; align-items:center; gap:14px; padding:10px 0; position:relative}
+.node .rail{position:absolute; left:27px; top:-2px; bottom:-2px; width:2px; background:var(--line); z-index:0}
+.node:first-child .rail{top:50%}
+.node:last-child .rail{bottom:50%}
+.ring{position:relative; width:56px; height:56px; flex:none; border-radius:50%; z-index:1;
+  display:grid; place-items:center; background:var(--surface); border:1px solid var(--line); box-shadow:var(--shadow)}
+.ring .fill{position:absolute; inset:-1px; border-radius:50%; }
+.ring .inner{position:relative; width:44px; height:44px; border-radius:50%; background:var(--raised);
+  display:grid; place-items:center; font-family:var(--jp-serif); font-size:20px}
+.ring.done .inner{background:var(--matcha-soft)}
+.node .meta{flex:1; min-width:0}
+.node .meta .nm{font-weight:700; font-size:15px}
+.node .meta .ds{font-size:12px; color:var(--ink-soft); margin-top:2px; display:flex; gap:8px; flex-wrap:wrap}
+.pill{font-size:10.5px; padding:2px 8px; border-radius:99px; background:var(--surface-2); color:var(--ink-soft); border:1px solid var(--line)}
+.pill.new{background:var(--shu-soft); color:var(--shu); border-color:transparent; font-weight:700}
+.pill.due{background:var(--indigo-soft); color:var(--indigo); border-color:transparent; font-weight:700}
+.pill.master{background:var(--matcha-soft); color:var(--matcha); border-color:transparent; font-weight:700}
+.pill.genki{background:var(--amber); color:#fff; border-color:transparent; font-weight:700; letter-spacing:.02em}
+.node .go.info{background:var(--surface); color:var(--ink-soft); border:1px solid var(--line); font-size:15px; margin-right:-6px}
+.note-card{background:var(--indigo-soft); border-radius:var(--radius); padding:14px 16px; margin:14px 0; font-size:14px; line-height:1.55}
+.note-card .lbl{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--indigo); font-weight:700; margin-bottom:6px}
+.intro-head{display:flex; align-items:center; gap:12px; margin:8px 0 4px}
+.intro-head .glyph{font-family:var(--jp-serif); font-size:34px; width:56px; height:56px; border-radius:50%; display:grid; place-items:center; background:var(--surface); border:1px solid var(--line); box-shadow:var(--shadow)}
+.intro-head h2{margin:0; font-size:20px}
+.intro-words{display:flex; flex-direction:column; gap:4px; margin-top:6px}
+.intro-words .word-row{padding:8px 0}
+.word-note{font-size:12.5px; color:var(--ink-soft); line-height:1.5; margin:-4px 0 8px; padding:0 2px}
+.node .go{width:34px; height:34px; border-radius:11px; display:grid; place-items:center; color:var(--indigo); background:var(--indigo-soft)}
+.node.locked .ring, .node.locked .meta{opacity:.45}
+.node .go.skip{background:var(--surface-2); color:var(--ink-soft); border:1px solid var(--line)}
+.node .go.skip:active{transform:scale(.94)}
+
+/* buttons */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%;
+  padding:15px 18px; border-radius:14px; font-weight:700; font-size:16px;
+  background:var(--indigo); color:#fff; box-shadow:0 3px 0 color-mix(in srgb,var(--indigo) 60%, #000); transition:transform .06s, box-shadow .06s}
+.btn:active{transform:translateY(2px); box-shadow:0 1px 0 color-mix(in srgb,var(--indigo) 60%, #000)}
+.btn.shu{background:var(--shu); box-shadow:0 3px 0 color-mix(in srgb,var(--shu) 55%, #000)}
+.btn.ghost{background:var(--surface); color:var(--ink); border:1px solid var(--line); box-shadow:var(--shadow)}
+.btn.big{padding:17px}
+.btn[disabled]{opacity:.45; pointer-events:none}
+.daily-cta{margin-bottom:6px}
+
+/* lesson */
+.lesson-head{display:flex; align-items:center; gap:12px; padding:12px 18px; position:sticky; top:env(safe-area-inset-top,0px); background:var(--paper); z-index:5}
+.lesson-head .close{font-size:22px; color:var(--ink-soft); width:34px; height:34px; border-radius:10px}
+.progress{flex:1; height:12px; background:var(--surface-2); border:1px solid var(--line); border-radius:99px; overflow:hidden}
+.progress > i{display:block; height:100%; background:linear-gradient(90deg,var(--matcha),#77934f); border-radius:99px; transition:width .35s cubic-bezier(.22,1,.36,1)}
+.combo{display:flex; align-items:center; gap:4px; font-weight:800; color:var(--shu); font-size:15px; min-width:44px; justify-content:flex-end; opacity:0; transition:opacity .2s}
+.combo.on{opacity:1}
+.stage{padding:8px 18px 210px}
+.prompt .big ruby, .w-jp ruby{ruby-position:over}
+rt{font-family:var(--jp-sans); font-size:.38em; font-weight:400; color:var(--ink-soft); letter-spacing:0}
+.w-jp rt{font-size:.5em}
+.kanji-note{font-size:12px; color:var(--ink-soft); margin:-4px 4px 12px}
+.kicker{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); margin:14px 0 14px; text-align:center}
+.prompt{text-align:center; margin:8px 0 26px}
+.prompt .big{font-family:var(--jp-serif); font-size:clamp(38px,13vw,64px); line-height:1.1; font-weight:500}
+.prompt .en{font-size:clamp(22px,6vw,30px); font-weight:700}
+.prompt .rd{color:var(--ink-soft); margin-top:8px; font-size:15px}
+
+/* choices */
+.choices{display:grid; gap:11px}
+.choice{display:flex; align-items:center; gap:12px; padding:15px 16px; border-radius:14px; background:var(--surface); border:1.5px solid var(--line); font-size:17px; font-weight:500; text-align:left; box-shadow:var(--shadow); transition:border-color .12s, background .12s}
+.choice .jpc{font-family:var(--jp-sans)}
+.choice:active{transform:scale(.99)}
+.choice.correct{border-color:var(--matcha); background:var(--matcha-soft)}
+.choice.wrong{border-color:var(--shu); background:var(--shu-soft)}
+.choice.dim{opacity:.5}
+.choice .badge{margin-left:auto; font-weight:800}
+.choices.grid2{grid-template-columns:1fr 1fr}
+.choice.kana-choice{justify-content:center; font-family:var(--jp-serif); font-size:34px; padding:18px 10px}
+
+/* build */
+.answer-line{min-height:58px; border:1.5px dashed var(--line); border-radius:14px; padding:10px; display:flex; flex-wrap:wrap; gap:8px; align-content:flex-start; margin-bottom:8px; background:var(--surface)}
+.answer-line.correct{border-color:var(--matcha); border-style:solid; background:var(--matcha-soft)}
+.answer-line.wrong{border-color:var(--shu); border-style:solid; background:var(--shu-soft)}
+.bank{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:6px}
+.tile{font-family:var(--jp-sans); font-size:18px; font-weight:500; padding:10px 14px; border-radius:11px; background:var(--raised); border:1.5px solid var(--line); box-shadow:0 2px 0 var(--line)}
+.tile:active{transform:translateY(1px)}
+.tile.used{visibility:hidden}
+.tile.placed{background:var(--indigo-soft); border-color:transparent}
+
+/* type */
+.type-in{width:100%; padding:15px 16px; font-size:19px; font-family:var(--ui); border-radius:14px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); text-align:center; box-shadow:var(--shadow)}
+.type-in:focus{outline:none; border-color:var(--indigo)}
+.type-in.correct{border-color:var(--matcha); background:var(--matcha-soft)}
+.type-in.wrong{border-color:var(--shu); background:var(--shu-soft)}
+.verdict{text-align:center; margin-top:16px; font-weight:700; min-height:24px}
+.verdict.ok{color:var(--matcha)} .verdict.no{color:var(--shu)}
+.verdict .sol{font-family:var(--jp-sans); font-weight:800}
+
+/* footer action bar */
+.actionbar{position:fixed; left:0; right:0; bottom:0; z-index:6; padding:14px 18px calc(14px + env(safe-area-inset-bottom,0px)); background:color-mix(in srgb,var(--paper) 92%, transparent); backdrop-filter:blur(10px); border-top:1px solid var(--line)}
+.actionbar .inner{max-width:560px; margin:0 auto}
+.actionbar .row{display:flex; gap:10px}
+.actionbar .row .btn.big{flex:1}
+.actionbar .row .btn.ghost{flex:0 0 auto; width:auto; padding-left:16px; padding-right:16px; font-size:14px}
+.override{display:block; width:100%; text-align:center; margin-top:10px; color:var(--ink-soft); font-size:13px; font-weight:600}
+.override u{text-decoration-thickness:1px; text-underline-offset:3px}
+
+/* complete */
+.complete{text-align:center; padding:30px 22px}
+.complete .seal{width:98px; height:98px; margin:6px auto 18px; border-radius:50%; display:grid; place-items:center;
+  font-family:var(--jp-serif); font-size:40px; color:#fff; background:radial-gradient(circle at 35% 30%, var(--shu), #a83c1a);
+  box-shadow:0 10px 30px -8px color-mix(in srgb,var(--shu) 60%, transparent)}
+.complete h2{margin:0 0 4px; font-size:24px}
+.complete .lead{color:var(--ink-soft); margin:0 0 22px}
+.result-grid{display:grid; grid-template-columns:1fr 1fr; gap:11px; margin-bottom:24px}
+.result{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+.result .rk{font-size:11px; color:var(--ink-soft); letter-spacing:.06em}
+.result .rv{font-size:26px; font-weight:800; margin-top:4px}
+
+/* confetti */
+#fx{position:fixed; inset:0; pointer-events:none; z-index:50; overflow:hidden}
+.cf{position:absolute; width:9px; height:14px; border-radius:2px; will-change:transform,opacity}
+.burst{position:fixed; left:50%; top:42%; transform:translate(-50%,-50%) scale(.6); z-index:51;
+  font-weight:900; font-size:30px; color:var(--shu); text-align:center; pointer-events:none;
+  font-family:var(--ui); opacity:0}
+.burst .n{font-family:var(--jp-serif); font-size:52px; display:block; line-height:1}
+@keyframes pop{0%{opacity:0; transform:translate(-50%,-50%) scale(.5)}18%{opacity:1; transform:translate(-50%,-50%) scale(1.12)}80%{opacity:1; transform:translate(-50%,-50%) scale(1)}100%{opacity:0; transform:translate(-50%,-56%) scale(1)}}
+.burst.go{animation:pop 1.15s cubic-bezier(.22,1,.36,1) forwards}
+.burst.lvl{color:var(--indigo)}
+.burst.lvl .n{font-size:64px}
+.toast{position:fixed; left:50%; bottom:calc(96px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%) translateY(10px); z-index:52; background:var(--ink); color:var(--paper); padding:10px 16px; border-radius:99px; font-weight:700; font-size:14px; opacity:0; transition:opacity .2s, transform .2s; pointer-events:none; box-shadow:var(--shadow); white-space:nowrap; max-width:92vw}
+.toast.on{opacity:1; transform:translateX(-50%) translateY(0)}
+.frz{color:var(--indigo)}
+.spk{display:inline-grid; place-items:center; width:38px; height:38px; border-radius:11px; background:var(--surface-2); border:1px solid var(--line); font-size:17px; vertical-align:middle; margin-left:12px; line-height:1}
+.spk:active{transform:scale(.93)}
+.verdict .spk{width:32px; height:32px; font-size:15px; margin-left:8px}
+.spk-pair{display:inline-flex; gap:6px; margin-left:10px; vertical-align:middle}
+.spk-pair .spk{margin-left:0}
+.words-link{font-size:12px; letter-spacing:.03em; text-transform:none; color:var(--indigo); font-weight:700}
+.search-bar{position:sticky; top:env(safe-area-inset-top,0px); z-index:4; padding:10px 18px; background:color-mix(in srgb,var(--paper) 92%, transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line)}
+.word-search{width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); font-family:var(--ui); font-size:16px}
+.word-search:focus{outline:none; border-color:var(--indigo)}
+.words-wrap{padding-top:10px}
+.word-group{display:flex; align-items:center; gap:8px; margin:18px 2px 8px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); font-weight:700}
+.word-row{display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:12px; background:var(--surface); border:1px solid var(--line); margin-bottom:7px; box-shadow:var(--shadow)}
+.word-row.locked{opacity:.55}
+.wdot{width:10px; height:10px; border-radius:50%; flex:none}
+.wlock{width:14px; text-align:center; flex:none; font-size:12px}
+.w-jp{font-family:var(--jp-sans); font-size:20px; min-width:62px}
+.w-meta{flex:1; min-width:0}
+.w-rd{font-size:12px; color:var(--ink-soft)}
+.w-en{font-size:14px}
+.word-row .spk{margin-left:auto}
+.modal-ov{position:fixed; inset:0; z-index:60; background:rgba(20,17,10,.55); display:flex; align-items:flex-end; justify-content:center}
+.modal{background:var(--surface); width:100%; max-width:560px; border-radius:22px 22px 0 0; padding:18px 18px calc(20px + env(safe-area-inset-bottom,0px)); box-shadow:var(--shadow); max-height:88vh; overflow:auto; animation:sheet .25s cubic-bezier(.22,1,.36,1)}
+@keyframes sheet{from{transform:translateY(30px); opacity:.6}to{transform:none; opacity:1}}
+.modal-h{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px}
+.modal-h h3{margin:0; font-size:17px}
+.io-area{width:100%; min-height:120px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px; line-height:1.4; border:1.5px solid var(--line); border-radius:12px; padding:10px; background:var(--raised); color:var(--ink); resize:vertical}
+.io-area:focus{outline:none; border-color:var(--indigo)}
+.modal .btn{margin-top:12px}
+
+.name-row{display:flex; gap:9px; margin-top:6px; flex-wrap:nowrap}
+.name-row input{flex:1 1 auto; min-width:0; width:100%; padding:13px 14px; border-radius:12px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); font-family:var(--ui); font-size:16px}
+.name-row button{flex:0 0 auto}
+.name-row input:focus{outline:none; border-color:var(--indigo)}
+.muted{color:var(--ink-soft); font-size:13px}
+.loading .spin{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--indigo);animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.001ms !important; transition-duration:.001ms !important}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="center-screen loading">
+    <div class="brand" style="flex-direction:column;align-items:center;gap:6px">
+      <div class="mark serif" style="font-size:40px">クベバ</div>
+      <div class="sub">Kubeba · Japanese</div>
+    </div>
+    <div class="spin" style="margin-top:8px"></div>
+  </div>
+</div>
+<div id="fx"></div>
+
+<script>
+"use strict";
+(function(){
+
+/* ---------------- Course content (curated, Genki-style arc) ----------------
+   Vocabulary + example phrases authored for this app; not copied from Genki.
+   Each item: {id, jp, romaji, en, parts?} grouped under a topic.        */
+// [jp, romaji, altAccepted?] — en shown in MC is the romaji; alt spellings are accepted when typing
+const kana = (list)=>list.map(([jp,romaji,alt,en])=>({jp,romaji,en:en||romaji,alt:alt||[],tags:["kana"],
+  script: /[\u30a0-\u30ff]/.test(jp)?"kata":"hira"}));
+
+// visually confusable kana — preferred as multiple-choice distractors
+const LOOKALIKES = [
+  ["ぬ","め"],["わ","れ","ね"],["は","ほ","ま"],["さ","き","ち"],["る","ろ"],["あ","お"],["い","り"],["う","つ"],["こ","に"],["け","は"],["た","な"],["す","む"],["そ","ろ"],["ゆ","よ"],
+  ["ば","ぱ","は"],["び","ぴ"],["ぶ","ぷ"],["べ","ぺ"],["ぼ","ぽ"],["ざ","さ"],["じ","ぢ"],["ず","づ"],["だ","た"],["ぎ","き"],
+  ["シ","ツ","ソ","ン"],["ク","ケ","タ","ワ"],["ア","マ","ヤ"],["ウ","ワ","フ","ラ"],["コ","ユ","ヨ","ロ"],["ス","ヌ"],["ナ","メ"],["チ","テ"],["ノ","メ"],["ホ","オ"],["セ","サ"],["ル","レ"],
+  ["バ","パ"],["ビ","ピ"],["ブ","プ"],["ベ","ペ"],["ボ","ポ"],["ジ","ヂ"],["ズ","ヅ"]
+];
+const LOOK = {}; LOOKALIKES.forEach(g=>g.forEach(c=>{ LOOK[c]=(LOOK[c]||[]).concat(g.filter(x=>x!==c)); }));
+
+const COURSE = {
+  title:"Japanese",
+  topics:[
+    /* ---------- Kana ---------- */
+    { id:"kana1", name:"Hiragana · あ–そ", glyph:"あ", tag:"kana", genki:"Kana",
+      note:"Hiragana is the phonetic script for native Japanese words and grammar. Each symbol is one syllable: a vowel (あ a) or consonant + vowel (か ka). Master these and you can read every example in this course.",
+      items: kana([["あ","a"],["い","i"],["う","u"],["え","e"],["お","o"],
+        ["か","ka"],["き","ki"],["く","ku"],["け","ke"],["こ","ko"],
+        ["さ","sa"],["し","shi"],["す","su"],["せ","se"],["そ","so"]]) },
+    { id:"kana2", name:"Hiragana · た–ん", glyph:"た", tag:"kana", genki:"Kana",
+      note:"Watch the irregular readings: ち chi, つ tsu, ふ fu. を is only used as the object particle and is pronounced o. ん is the one stand-alone consonant.",
+      items: kana([["た","ta"],["ち","chi"],["つ","tsu"],["て","te"],["と","to"],
+        ["な","na"],["に","ni"],["ぬ","nu"],["ね","ne"],["の","no"],
+        ["は","ha"],["ひ","hi"],["ふ","fu"],["へ","he"],["ほ","ho"],
+        ["ま","ma"],["み","mi"],["む","mu"],["め","me"],["も","mo"],
+        ["や","ya"],["ゆ","yu"],["よ","yo"],
+        ["ら","ra"],["り","ri"],["る","ru"],["れ","re"],["ろ","ro"],
+        ["わ","wa"],["を","o",["wo"],"o (wo)"],["ん","n"]]) },
+    { id:"kana3", name:"Hiragana · が–ぽ", glyph:"が", tag:"kana", genki:"Kana",
+      note:"Two small marks change the sound: ゛(dakuten) voices a consonant — か ka → が ga, さ → ざ za, た → だ da, は → ば ba. ゜(handakuten) turns は-row into p: ぱ pa.",
+      items: kana([["が","ga"],["ぎ","gi"],["ぐ","gu"],["げ","ge"],["ご","go"],
+        ["ざ","za"],["じ","ji",["zi"]],["ず","zu"],["ぜ","ze"],["ぞ","zo"],
+        ["だ","da"],["ぢ","ji",["di","dji"],"ji (di)"],["づ","zu",["du","dzu"],"zu (du)"],["で","de"],["ど","do"],
+        ["ば","ba"],["び","bi"],["ぶ","bu"],["べ","be"],["ぼ","bo"],
+        ["ぱ","pa"],["ぴ","pi"],["ぷ","pu"],["ぺ","pe"],["ぽ","po"]]) },
+    { id:"kana4", name:"Hiragana · きゃ–ぴょ", glyph:"きゃ", tag:"kana", genki:"Kana",
+      note:"An い-row kana followed by a small ゃ ゅ ょ blends into one syllable: き + small ゃ = きゃ kya. Compare きや (two syllables) with きゃ (one). Long vowels are written by adding a vowel: おう ou, えい ei; a small っ doubles the next consonant (きって kitte).",
+      items: kana([["きゃ","kya"],["きゅ","kyu"],["きょ","kyo"],
+        ["しゃ","sha"],["しゅ","shu"],["しょ","sho"],
+        ["ちゃ","cha"],["ちゅ","chu"],["ちょ","cho"],
+        ["にゃ","nya"],["にゅ","nyu"],["にょ","nyo"],
+        ["ひゃ","hya"],["ひゅ","hyu"],["ひょ","hyo"],
+        ["みゃ","mya"],["みゅ","myu"],["みょ","myo"],
+        ["りゃ","rya"],["りゅ","ryu"],["りょ","ryo"],
+        ["ぎゃ","gya"],["ぎゅ","gyu"],["ぎょ","gyo"],
+        ["じゃ","ja"],["じゅ","ju"],["じょ","jo"],
+        ["びゃ","bya"],["びゅ","byu"],["びょ","byo"],
+        ["ぴゃ","pya"],["ぴゅ","pyu"],["ぴょ","pyo"]]) },
+    { id:"kata1", name:"Katakana · ア–ソ", glyph:"ア", tag:"kana", genki:"Kana",
+      note:"Katakana has the same sounds as hiragana but is used for foreign loanwords (コーヒー coffee), foreign names, and emphasis. The shapes are angular. Beware the look-alikes シ shi / ツ tsu and ソ so / ン n.",
+      items: kana([["ア","a"],["イ","i"],["ウ","u"],["エ","e"],["オ","o"],
+        ["カ","ka"],["キ","ki"],["ク","ku"],["ケ","ke"],["コ","ko"],
+        ["サ","sa"],["シ","shi"],["ス","su"],["セ","se"],["ソ","so"]]) },
+    { id:"kata2", name:"Katakana · タ–ン", glyph:"タ", tag:"kana", genki:"Kana",
+      note:"In katakana a long vowel is written with a bar ー: コーヒー koohii, ケーキ keeki. ヲ is almost never used in modern writing.",
+      items: kana([["タ","ta"],["チ","chi"],["ツ","tsu"],["テ","te"],["ト","to"],
+        ["ナ","na"],["ニ","ni"],["ヌ","nu"],["ネ","ne"],["ノ","no"],
+        ["ハ","ha"],["ヒ","hi"],["フ","fu"],["ヘ","he"],["ホ","ho"],
+        ["マ","ma"],["ミ","mi"],["ム","mu"],["メ","me"],["モ","mo"],
+        ["ヤ","ya"],["ユ","yu"],["ヨ","yo"],
+        ["ラ","ra"],["リ","ri"],["ル","ru"],["レ","re"],["ロ","ro"],
+        ["ワ","wa"],["ヲ","o",["wo"],"o (wo)"],["ン","n"]]) },
+    { id:"kata3", name:"Katakana · ガ–ポ", glyph:"ガ", tag:"kana", genki:"Kana",
+      note:"Same dakuten rules as hiragana: カ → ガ ga, サ → ザ za, タ → ダ da, ハ → バ ba / パ pa. ヴ (vu) exists for foreign v-sounds but is often replaced with バ-row.",
+      items: kana([["ガ","ga"],["ギ","gi"],["グ","gu"],["ゲ","ge"],["ゴ","go"],
+        ["ザ","za"],["ジ","ji",["zi"]],["ズ","zu"],["ゼ","ze"],["ゾ","zo"],
+        ["ダ","da"],["ヂ","ji",["di","dji"],"ji (di)"],["ヅ","zu",["du","dzu"],"zu (du)"],["デ","de"],["ド","do"],
+        ["バ","ba"],["ビ","bi"],["ブ","bu"],["ベ","be"],["ボ","bo"],
+        ["パ","pa"],["ピ","pi"],["プ","pu"],["ペ","pe"],["ポ","po"]]) },
+    { id:"kata4", name:"Katakana · キャ–チェ", glyph:"キャ", tag:"kana", genki:"Kana",
+      note:"Katakana combines the same way as hiragana (キャ kya, シュ shu, ジョ jo). It also has extra combinations for foreign sounds that Japanese lacks: ファ fa, ティ ti, ディ di, ウィ wi, ウェ we, ジェ je, チェ che — as in ファミリー, パーティー, チェック.",
+      items: kana([["キャ","kya"],["キュ","kyu"],["キョ","kyo"],
+        ["シャ","sha"],["シュ","shu"],["ショ","sho"],
+        ["チャ","cha"],["チュ","chu"],["チョ","cho"],
+        ["ニャ","nya"],["ニュ","nyu"],["ニョ","nyo"],
+        ["ヒャ","hya"],["ヒュ","hyu"],["ヒョ","hyo"],
+        ["ミャ","mya"],["ミュ","myu"],["ミョ","myo"],
+        ["リャ","rya"],["リュ","ryu"],["リョ","ryo"],
+        ["ギャ","gya"],["ギュ","gyu"],["ギョ","gyo"],
+        ["ジャ","ja"],["ジュ","ju"],["ジョ","jo"],
+        ["ビャ","bya"],["ビュ","byu"],["ビョ","byo"],
+        ["ピャ","pya"],["ピュ","pyu"],["ピョ","pyo"],
+        ["ファ","fa"],["フィ","fi"],["フェ","fe"],["フォ","fo"],
+        ["ティ","ti"],["ディ","di"],["ウィ","wi"],["ウェ","we"],["ウォ","wo",["uo"],"wo (as in ウォーター)"],
+        ["シェ","she"],["ジェ","je"],["チェ","che"]]) },
+
+    /* ---------- Genki L1: New friends ---------- */
+    { id:"greet", name:"Greetings", glyph:"挨", tag:"phrase", genki:"L1",
+      note:"Japanese greetings are set phrases tied to the moment: leaving home (いってきます / いってらっしゃい), coming back (ただいま / おかえり), meals (いただきます / ごちそうさま). Adding ございます or なさい makes a greeting more polite.",
+      items:[
+        {jp:"おはよう",romaji:"ohayou",en:"good morning (casual)"},
+        {jp:"おはようございます",romaji:"ohayou gozaimasu",en:"good morning (polite)",parts:["おはよう","ございます"]},
+        {jp:"こんにちは",romaji:"konnichiwa",en:"hello / good afternoon",alt:["konnichiha"]},
+        {jp:"こんばんは",romaji:"konbanwa",en:"good evening",alt:["konbanha"]},
+        {jp:"おやすみなさい",romaji:"oyasuminasai",en:"good night"},
+        {jp:"さようなら",romaji:"sayounara",en:"goodbye"},
+        {jp:"ありがとう",romaji:"arigatou",en:"thank you"},
+        {jp:"ありがとうございます",romaji:"arigatou gozaimasu",en:"thank you (polite)",parts:["ありがとう","ございます"]},
+        {jp:"すみません",romaji:"sumimasen",en:"excuse me / sorry"},
+        {jp:"おねがいします",romaji:"onegaishimasu",en:"please"},
+        {jp:"はい",romaji:"hai",en:"yes"},
+        {jp:"いいえ",romaji:"iie",en:"no / not at all (reply to thanks)"},
+        // — added —
+        {jp:"おやすみ",romaji:"oyasumi",en:"good night (casual)"},
+        {jp:"いってきます",romaji:"ittekimasu",en:"I'll go and come back (when leaving home)"},
+        {jp:"いってらっしゃい",romaji:"itterasshai",en:"please go and come back (to someone leaving)"},
+        {jp:"ただいま",romaji:"tadaima",en:"I'm home"},
+        {jp:"おかえり",romaji:"okaeri",en:"welcome home (casual)"},
+        {jp:"おかえりなさい",romaji:"okaerinasai",en:"welcome home (polite)",parts:["おかえり","なさい"]},
+        {jp:"じゃあ、また",romaji:"jaa, mata",en:"see you (casual)",parts:["じゃあ","また"]},
+        {jp:"またあした",romaji:"mata ashita",en:"see you tomorrow",parts:["また","あした"]},
+        {jp:"どうも",romaji:"doumo",en:"thanks (casual)"},
+        {jp:"いいえ、けっこうです",romaji:"iie, kekkou desu",en:"no, thank you",parts:["いいえ","けっこう","です"]},
+        {jp:"ごめんなさい",romaji:"gomennasai",en:"I'm sorry"},
+        {jp:"しつれいします",romaji:"shitsurei shimasu",en:"excuse me (entering/leaving a room)",parts:["しつれい","します"]},
+        {jp:"おげんきですか",romaji:"ogenki desu ka",en:"how are you?",parts:["おげんき","です","か"]},
+        {jp:"げんきです",romaji:"genki desu",en:"I'm fine",parts:["げんき","です"]},
+        {jp:"おめでとう",romaji:"omedetou",en:"congratulations"},
+        {jp:"ようこそ",romaji:"youkoso",en:"welcome"}
+      ]},
+    { id:"num", name:"Numbers", glyph:"数", tag:"number", genki:"L1–2",
+      note:"Numbers stack: じゅう (10) + いち (1) = じゅういち (11); に (2) + じゅう = にじゅう (20). 4, 7 and 9 each have two readings; よん, なな, きゅう are the safe defaults. Note the sound changes in 300 さんびゃく, 600 ろっぴゃく, 800 はっぴゃく, 3000 さんぜん, 8000 はっせん.",
+      items:[
+        {jp:"いち",romaji:"ichi",en:"one (1)"},
+        {jp:"に",romaji:"ni",en:"two (2)"},
+        {jp:"さん",romaji:"san",en:"three (3)"},
+        {jp:"よん",romaji:"yon",en:"four (4)",alt:["shi"]},
+        {jp:"ご",romaji:"go",en:"five (5)"},
+        {jp:"ろく",romaji:"roku",en:"six (6)"},
+        {jp:"なな",romaji:"nana",en:"seven (7)",alt:["shichi"]},
+        {jp:"はち",romaji:"hachi",en:"eight (8)"},
+        {jp:"きゅう",romaji:"kyuu",en:"nine (9)",alt:["ku"]},
+        {jp:"じゅう",romaji:"juu",en:"ten (10)"},
+        // — added —
+        {jp:"ゼロ",romaji:"zero",en:"zero (0)",alt:["rei"]},
+        {jp:"じゅういち",romaji:"juuichi",en:"eleven (11)",parts:["じゅう","いち"]},
+        {jp:"じゅうに",romaji:"juuni",en:"twelve (12)",parts:["じゅう","に"]},
+        {jp:"じゅうご",romaji:"juugo",en:"fifteen (15)",parts:["じゅう","ご"]},
+        {jp:"にじゅう",romaji:"nijuu",en:"twenty (20)",parts:["に","じゅう"]},
+        {jp:"にじゅうさん",romaji:"nijuusan",en:"twenty-three (23)",parts:["に","じゅう","さん"]},
+        {jp:"さんじゅう",romaji:"sanjuu",en:"thirty (30)",parts:["さん","じゅう"]},
+        {jp:"よんじゅう",romaji:"yonjuu",en:"forty (40)",parts:["よん","じゅう"]},
+        {jp:"ごじゅう",romaji:"gojuu",en:"fifty (50)",parts:["ご","じゅう"]},
+        {jp:"ろくじゅう",romaji:"rokujuu",en:"sixty (60)",parts:["ろく","じゅう"]},
+        {jp:"ななじゅう",romaji:"nanajuu",en:"seventy (70)",parts:["なな","じゅう"]},
+        {jp:"はちじゅう",romaji:"hachijuu",en:"eighty (80)",parts:["はち","じゅう"]},
+        {jp:"きゅうじゅう",romaji:"kyuujuu",en:"ninety (90)",parts:["きゅう","じゅう"]},
+        {jp:"ひゃく",romaji:"hyaku",en:"one hundred (100)"},
+        {jp:"さんびゃく",romaji:"sanbyaku",en:"three hundred (300)"},
+        {jp:"ろっぴゃく",romaji:"roppyaku",en:"six hundred (600)"},
+        {jp:"はっぴゃく",romaji:"happyaku",en:"eight hundred (800)"},
+        {jp:"せん",romaji:"sen",en:"one thousand (1,000)"},
+        {jp:"さんぜん",romaji:"sanzen",en:"three thousand (3,000)"},
+        {jp:"はっせん",romaji:"hassen",en:"eight thousand (8,000)"},
+        {jp:"いちまん",romaji:"ichiman",en:"ten thousand (10,000)",parts:["いち","まん"]},
+        {jp:"にせんごひゃく",romaji:"nisen gohyaku",en:"2,500",parts:["に","せん","ご","ひゃく"]},
+        {jp:"はんぶん",romaji:"hanbun",en:"half"},
+        {jp:"なんばん",romaji:"nanban",en:"what number?"}
+      ]},
+    { id:"time", name:"Time & age", glyph:"時", tag:"phrase", genki:"L1",
+      note:"Hours take 〜じ: いちじ 1 o'clock. Irregular: よじ (4), しちじ (7), くじ (9). はん = half past, ごぜん = a.m., ごご = p.m. Age uses 〜さい: じゅうはっさい (18) — but 20 is irregular: はたち. Ask 'what time' with なんじ and 'how old' with なんさい.",
+      items:[
+        {jp:"いちじ",romaji:"ichiji",en:"one o'clock",parts:["いち","じ"]},
+        {jp:"にじ",romaji:"niji",en:"two o'clock",parts:["に","じ"]},
+        {jp:"さんじ",romaji:"sanji",en:"three o'clock",parts:["さん","じ"]},
+        {jp:"よじ",romaji:"yoji",en:"four o'clock (irregular)",parts:["よ","じ"]},
+        {jp:"ごじ",romaji:"goji",en:"five o'clock",parts:["ご","じ"]},
+        {jp:"ろくじ",romaji:"rokuji",en:"six o'clock",parts:["ろく","じ"]},
+        {jp:"しちじ",romaji:"shichiji",en:"seven o'clock (irregular)",parts:["しち","じ"]},
+        {jp:"はちじ",romaji:"hachiji",en:"eight o'clock",parts:["はち","じ"]},
+        {jp:"くじ",romaji:"kuji",en:"nine o'clock (irregular)",parts:["く","じ"]},
+        {jp:"じゅうじ",romaji:"juuji",en:"ten o'clock",parts:["じゅう","じ"]},
+        {jp:"じゅういちじ",romaji:"juuichiji",en:"eleven o'clock",parts:["じゅう","いち","じ"]},
+        {jp:"じゅうにじ",romaji:"juuniji",en:"twelve o'clock",parts:["じゅう","に","じ"]},
+        {jp:"はん",romaji:"han",en:"half (past)"},
+        {jp:"ごぜん",romaji:"gozen",en:"a.m."},
+        {jp:"ごご",romaji:"gogo",en:"p.m."},
+        {jp:"いま",romaji:"ima",en:"now"},
+        {jp:"なんじ",romaji:"nanji",en:"what time?"},
+        {jp:"いまなんじですか",romaji:"ima nanji desu ka",en:"what time is it now?",parts:["いま","なんじ","です","か"]},
+        {jp:"さんじです",romaji:"sanji desu",en:"it's three o'clock",parts:["さんじ","です"]},
+        {jp:"くじはんです",romaji:"kuji han desu",en:"it's half past nine",parts:["くじ","はん","です"]},
+        {jp:"ごごしちじです",romaji:"gogo shichiji desu",en:"it's 7 p.m.",parts:["ごご","しちじ","です"]},
+        {jp:"ごぜんろくじはん",romaji:"gozen rokuji han",en:"6:30 a.m.",parts:["ごぜん","ろくじ","はん"]},
+        {jp:"〜さい",romaji:"sai",en:"years old (counter)",alt:["-sai"]},
+        {jp:"なんさいですか",romaji:"nansai desu ka",en:"how old are you?",parts:["なんさい","です","か"]},
+        {jp:"はたち",romaji:"hatachi",en:"20 years old (irregular)"},
+        {jp:"はたちです",romaji:"hatachi desu",en:"I'm 20 years old",parts:["はたち","です"]},
+        {jp:"じゅうはっさい",romaji:"juuhassai",en:"18 years old",parts:["じゅうはっ","さい"]},
+        {jp:"でんわ",romaji:"denwa",en:"telephone"},
+        {jp:"ばんごう",romaji:"bangou",en:"number"},
+        {jp:"でんわばんごう",romaji:"denwa bangou",en:"telephone number",parts:["でんわ","ばんごう"]},
+        {jp:"でんわばんごうはなんばんですか",romaji:"denwa bangou wa nanban desu ka",en:"what's your phone number?",parts:["でんわばんごう","は","なんばん","です","か"]}
+      ]},
+    { id:"intro", name:"Introductions", glyph:"自", tag:"phrase", genki:"L1",
+      note:"The core sentence is X は Y です — X is Y. は (read wa) marks the topic; です is the polite 'is'. Add か at the end to make a question. の links two nouns like 's or 'of': わたしのほん my book, にほんごのがくせい a student of Japanese. Drop わたし whenever it's obvious. あなた is here so you recognise it, but Japanese people rarely say it — address someone by name + さん instead.",
+      items:[
+        {jp:"わたし",romaji:"watashi",en:"I / me"},
+        {jp:"あなた",romaji:"anata",en:"you (rare in speech — prefer name + さん)"},
+        {jp:"なまえ",romaji:"namae",en:"name"},
+        {jp:"ともだち",romaji:"tomodachi",en:"friend"},
+        {jp:"がくせい",romaji:"gakusei",en:"student"},
+        {jp:"せんせい",romaji:"sensei",en:"teacher"},
+        {jp:"かいしゃいん",romaji:"kaishain",en:"office worker"},
+        {jp:"いしゃ",romaji:"isha",en:"doctor"},
+        {jp:"だいがく",romaji:"daigaku",en:"university"},
+        {jp:"にほん",romaji:"nihon",en:"Japan"},
+        {jp:"にほんじん",romaji:"nihonjin",en:"Japanese (person)"},
+        {jp:"アメリカ",romaji:"amerika",en:"America"},
+        {jp:"アメリカじん",romaji:"amerikajin",en:"American (person)"},
+        {jp:"はじめまして",romaji:"hajimemashite",en:"nice to meet you"},
+        {jp:"どうぞよろしく",romaji:"douzo yoroshiku",en:"please treat me well (set phrase after はじめまして)",parts:["どうぞ","よろしく"]},
+        {jp:"わたしはがくせいです",romaji:"watashi wa gakusei desu",en:"I am a student",parts:["わたし","は","がくせい","です"]},
+        {jp:"わたしはにほんじんです",romaji:"watashi wa nihonjin desu",en:"I am Japanese",parts:["わたし","は","にほんじん","です"]},
+        {jp:"たなかさんはせんせいです",romaji:"tanaka san wa sensei desu",en:"Mr./Ms. Tanaka is a teacher",parts:["たなか","さん","は","せんせい","です"]},
+        {jp:"あなたはがくせいですか",romaji:"anata wa gakusei desu ka",en:"are you a student?",parts:["あなた","は","がくせい","です","か"]},
+        {jp:"はい、そうです",romaji:"hai, sou desu",en:"yes, that's right",parts:["はい","そうです"]},
+        {jp:"いいえ、ちがいます",romaji:"iie, chigaimasu",en:"no, that's not right",parts:["いいえ","ちがいます"]},
+        {jp:"これはわたしのほんです",romaji:"kore wa watashi no hon desu",en:"this is my book",parts:["これ","は","わたし","の","ほん","です"]},
+        {jp:"せんせいのなまえ",romaji:"sensei no namae",en:"the teacher's name",parts:["せんせい","の","なまえ"]},
+        {jp:"おなまえはなんですか",romaji:"onamae wa nan desu ka",en:"what is your name?",parts:["おなまえ","は","なん","です","か"]},
+        // — added —
+        {jp:"よろしくおねがいします",romaji:"yoroshiku onegaishimasu",en:"pleased to meet you (polite set phrase)",parts:["よろしく","おねがいします"]},
+        {jp:"〜さん",romaji:"san",en:"Mr. / Ms. (after a name)",alt:["-san"]},
+        {jp:"そうですか",romaji:"sou desu ka",en:"I see / is that so?",parts:["そう","です","か"]},
+        {jp:"ええ",romaji:"ee",en:"yes (softer than はい)"},
+        {jp:"りゅうがくせい",romaji:"ryuugakusei",en:"international student"},
+        {jp:"だいがくせい",romaji:"daigakusei",en:"university student",parts:["だいがく","せい"]},
+        {jp:"こうこうせい",romaji:"koukousei",en:"high-school student"},
+        {jp:"こうこう",romaji:"koukou",en:"high school"},
+        {jp:"〜ねんせい",romaji:"nensei",en:"…year student",alt:["-nensei"]},
+        {jp:"いちねんせい",romaji:"ichinensei",en:"first-year student",parts:["いち","ねんせい"]},
+        {jp:"にねんせい",romaji:"ninensei",en:"second-year student",parts:["に","ねんせい"]},
+        {jp:"せんこう",romaji:"senkou",en:"major (field of study)"},
+        {jp:"しごと",romaji:"shigoto",en:"job / work"},
+        {jp:"わたしはたなかです",romaji:"watashi wa tanaka desu",en:"I am Tanaka",parts:["わたし","は","たなか","です"]},
+        {jp:"にほんごのがくせいです",romaji:"nihongo no gakusei desu",en:"I'm a student of Japanese",parts:["にほんご","の","がくせい","です"]},
+        {jp:"だいがくのせんせい",romaji:"daigaku no sensei",en:"a university teacher",parts:["だいがく","の","せんせい"]},
+        {jp:"せんこうはなんですか",romaji:"senkou wa nan desu ka",en:"what is your major?",parts:["せんこう","は","なん","です","か"]},
+        {jp:"なんねんせいですか",romaji:"nannensei desu ka",en:"what year (student) are you?",parts:["なんねんせい","です","か"]},
+        {jp:"たなかさんはにほんじんですか",romaji:"tanaka san wa nihonjin desu ka",en:"is Ms. Tanaka Japanese?",parts:["たなかさん","は","にほんじん","です","か"]},
+        {jp:"ともだちのなまえはメアリーです",romaji:"tomodachi no namae wa mearii desu",en:"my friend's name is Mary",parts:["ともだち","の","なまえ","は","メアリー","です"]}
+      ]},
+    { id:"world", name:"Countries, languages & jobs", glyph:"国", tag:"vocab", genki:"L1",
+      note:"Country + じん = a person from there (アメリカじん American); country + ご = its language (にほんご Japanese, えいご English — note the irregular one). Genki lists majors and occupations here so you can introduce yourself fully.",
+      items:[
+        {jp:"にほんご",romaji:"nihongo",en:"Japanese (language)"},
+        {jp:"えいご",romaji:"eigo",en:"English (language)"},
+        {jp:"ちゅうごく",romaji:"chuugoku",en:"China"},
+        {jp:"ちゅうごくご",romaji:"chuugokugo",en:"Chinese (language)",parts:["ちゅうごく","ご"]},
+        {jp:"かんこく",romaji:"kankoku",en:"Korea"},
+        {jp:"かんこくじん",romaji:"kankokujin",en:"Korean (person)",parts:["かんこく","じん"]},
+        {jp:"イギリス",romaji:"igirisu",en:"Britain / the UK"},
+        {jp:"オーストラリア",romaji:"oosutoraria",en:"Australia"},
+        {jp:"カナダ",romaji:"kanada",en:"Canada"},
+        {jp:"フランス",romaji:"furansu",en:"France"},
+        {jp:"ドイツ",romaji:"doitsu",en:"Germany"},
+        {jp:"スウェーデン",romaji:"suweeden",en:"Sweden"},
+        {jp:"〜じん",romaji:"jin",en:"…person / nationality",alt:["-jin"]},
+        {jp:"〜ご",romaji:"go",en:"…language (suffix; sounds like ご 5)",alt:["-go"]},
+        {jp:"けいざい",romaji:"keizai",en:"economics"},
+        {jp:"れきし",romaji:"rekishi",en:"history"},
+        {jp:"ぶんがく",romaji:"bungaku",en:"literature"},
+        {jp:"せいじ",romaji:"seiji",en:"politics"},
+        {jp:"かがく",romaji:"kagaku",en:"science"},
+        {jp:"コンピューター",romaji:"konpyuutaa",en:"computer"},
+        {jp:"ビジネス",romaji:"bijinesu",en:"business"},
+        {jp:"アジアけんきゅう",romaji:"ajia kenkyuu",en:"Asian studies",parts:["アジア","けんきゅう"]},
+        {jp:"こくさいかんけい",romaji:"kokusai kankei",en:"international relations",parts:["こくさい","かんけい"]},
+        {jp:"べんごし",romaji:"bengoshi",en:"lawyer"},
+        {jp:"しゅふ",romaji:"shufu",en:"housewife / homemaker"},
+        {jp:"かんごし",romaji:"kangoshi",en:"nurse"},
+        {jp:"だいがくいんせい",romaji:"daigakuinsei",en:"graduate student"},
+        {jp:"せんこうはけいざいです",romaji:"senkou wa keizai desu",en:"my major is economics",parts:["せんこう","は","けいざい","です"]},
+        {jp:"にほんごのせんせいです",romaji:"nihongo no sensei desu",en:"I'm a Japanese teacher",parts:["にほんご","の","せんせい","です"]},
+        {jp:"リーさんはちゅうごくじんです",romaji:"rii san wa chuugokujin desu",en:"Mr. Li is Chinese",parts:["リーさん","は","ちゅうごくじん","です"]},
+        {jp:"イギリスじんですか",romaji:"igirisujin desu ka",en:"are you British?",parts:["イギリスじん","です","か"]}
+      ]},
+
+    /* ---------- Genki L2: Shopping ---------- */
+    { id:"demo", name:"This & that", glyph:"此", tag:"phrase", genki:"L2",
+      note:"こ- = near me, そ- = near you, あ- = away from both, ど- = question. これ/それ/あれ stand alone ('this one'); この/その/あの must come before a noun (このほん this book). Places: ここ/そこ/あそこ/どこ. も means 'also' and replaces は. じゃないです is the negative of です.",
+      items:[
+        {jp:"これ",romaji:"kore",en:"this (near me)"},
+        {jp:"それ",romaji:"sore",en:"that (near you)"},
+        {jp:"あれ",romaji:"are",en:"that (over there)"},
+        {jp:"どれ",romaji:"dore",en:"which one"},
+        {jp:"ここ",romaji:"koko",en:"here"},
+        {jp:"そこ",romaji:"soko",en:"there"},
+        {jp:"あそこ",romaji:"asoko",en:"over there"},
+        {jp:"ほん",romaji:"hon",en:"book"},
+        {jp:"かばん",romaji:"kaban",en:"bag"},
+        {jp:"これはほんです",romaji:"kore wa hon desu",en:"this is a book",parts:["これ","は","ほん","です"]},
+        {jp:"これはなんですか",romaji:"kore wa nan desu ka",en:"what is this?",parts:["これ","は","なん","です","か"]},
+        // — added —
+        {jp:"この",romaji:"kono",en:"this … (before a noun)"},
+        {jp:"その",romaji:"sono",en:"that … (before a noun)"},
+        {jp:"あの",romaji:"ano",en:"that … over there (before a noun)"},
+        {jp:"どの",romaji:"dono",en:"which … (before a noun)"},
+        {jp:"どこ",romaji:"doko",en:"where"},
+        {jp:"ひと",romaji:"hito",en:"person"},
+        {jp:"だれ",romaji:"dare",en:"who"},
+        {jp:"だれの",romaji:"dare no",en:"whose",parts:["だれ","の"]},
+        {jp:"も",romaji:"mo",en:"also / too (particle)"},
+        {jp:"じゃないです",romaji:"ja nai desu",en:"is not (negative of です)",alt:["janaidesu","ja arimasen"]},
+        {jp:"ね",romaji:"ne",en:"…right? (seeking agreement)"},
+        {jp:"よ",romaji:"yo",en:"…you know (adding emphasis)"},
+        {jp:"このほんはわたしのです",romaji:"kono hon wa watashi no desu",en:"this book is mine",parts:["この","ほん","は","わたし","の","です"]},
+        {jp:"あのひとはだれですか",romaji:"ano hito wa dare desu ka",en:"who is that person?",parts:["あの","ひと","は","だれ","です","か"]},
+        {jp:"それはだれのかばんですか",romaji:"sore wa dare no kaban desu ka",en:"whose bag is that?",parts:["それ","は","だれ","の","かばん","です","か"]},
+        {jp:"どれがあなたのですか",romaji:"dore ga anata no desu ka",en:"which one is yours?",parts:["どれ","が","あなた","の","です","か"]},
+        {jp:"わたしもがくせいです",romaji:"watashi mo gakusei desu",en:"I am a student too",parts:["わたし","も","がくせい","です"]},
+        {jp:"これはほんじゃないです",romaji:"kore wa hon ja nai desu",en:"this is not a book",parts:["これ","は","ほん","じゃない","です"]},
+        {jp:"たなかさんはがくせいじゃないです",romaji:"tanaka san wa gakusei ja nai desu",en:"Ms. Tanaka is not a student",parts:["たなかさん","は","がくせい","じゃない","です"]},
+        {jp:"おいしいですね",romaji:"oishii desu ne",en:"it's delicious, isn't it?",parts:["おいしい","です","ね"]},
+        {jp:"おいしいですよ",romaji:"oishii desu yo",en:"it's delicious, you know!",parts:["おいしい","です","よ"]},
+        {jp:"あそこはとしょかんです",romaji:"asoko wa toshokan desu",en:"over there is the library",parts:["あそこ","は","としょかん","です"]}
+      ]},
+    { id:"shop", name:"Things & shopping", glyph:"買", tag:"phrase", genki:"L2",
+      note:"The shopkeeper says いらっしゃいませ (welcome). Ask a price with いくらですか; prices take 〜えん. To buy, name the thing + をください or おねがいします. Counting objects without a specific counter: ひとつ, ふたつ, みっつ …",
+      items:[
+        {jp:"えんぴつ",romaji:"enpitsu",en:"pencil"},
+        {jp:"ペン",romaji:"pen",en:"pen"},
+        {jp:"ノート",romaji:"nooto",en:"notebook"},
+        {jp:"じしょ",romaji:"jisho",en:"dictionary"},
+        {jp:"しんぶん",romaji:"shinbun",en:"newspaper"},
+        {jp:"ざっし",romaji:"zasshi",en:"magazine"},
+        {jp:"かさ",romaji:"kasa",en:"umbrella"},
+        {jp:"くつ",romaji:"kutsu",en:"shoes"},
+        {jp:"さいふ",romaji:"saifu",en:"wallet"},
+        {jp:"とけい",romaji:"tokei",en:"watch / clock"},
+        {jp:"ぼうし",romaji:"boushi",en:"hat / cap"},
+        {jp:"Tシャツ",romaji:"tii shatsu",en:"T-shirt",alt:["t-shirt","tshirt"]},
+        {jp:"ジーンズ",romaji:"jiinzu",en:"jeans"},
+        {jp:"じてんしゃ",romaji:"jitensha",en:"bicycle"},
+        {jp:"きっさてん",romaji:"kissaten",en:"café / coffee shop"},
+        {jp:"ぎんこう",romaji:"ginkou",en:"bank"},
+        {jp:"ゆうびんきょく",romaji:"yuubinkyoku",en:"post office"},
+        {jp:"としょかん",romaji:"toshokan",en:"library"},
+        {jp:"おてあらい",romaji:"otearai",en:"restroom"},
+        {jp:"〜えん",romaji:"en",en:"yen",alt:["-en","yen"]},
+        {jp:"いくら",romaji:"ikura",en:"how much?"},
+        {jp:"たかい",romaji:"takai",en:"expensive / tall (i-adj)"},
+        {jp:"やすい",romaji:"yasui",en:"cheap (i-adj)"},
+        {jp:"おいしい",romaji:"oishii",en:"delicious (i-adj)"},
+        {jp:"いらっしゃいませ",romaji:"irasshaimase",en:"welcome (to a shop)"},
+        {jp:"ください",romaji:"kudasai",en:"please give me"},
+        {jp:"どうぞ",romaji:"douzo",en:"here you are / please go ahead"},
+        {jp:"じゃあ",romaji:"jaa",en:"well then"},
+        {jp:"ひとつ",romaji:"hitotsu",en:"one (thing)"},
+        {jp:"ふたつ",romaji:"futatsu",en:"two (things)"},
+        {jp:"みっつ",romaji:"mittsu",en:"three (things)"},
+        {jp:"よっつ",romaji:"yottsu",en:"four (things)"},
+        {jp:"いつつ",romaji:"itsutsu",en:"five (things)"},
+        {jp:"このかさはいくらですか",romaji:"kono kasa wa ikura desu ka",en:"how much is this umbrella?",parts:["この","かさ","は","いくら","です","か"]},
+        {jp:"せんえんです",romaji:"sen en desu",en:"it's 1,000 yen",parts:["せん","えん","です"]},
+        {jp:"さんびゃくえんです",romaji:"sanbyaku en desu",en:"it's 300 yen",parts:["さんびゃく","えん","です"]},
+        {jp:"にせんごひゃくえんです",romaji:"nisen gohyaku en desu",en:"it's 2,500 yen",parts:["にせん","ごひゃく","えん","です"]},
+        {jp:"じゃあ、これをください",romaji:"jaa, kore o kudasai",en:"well then, I'll take this one",parts:["じゃあ","これ","を","ください"]},
+        {jp:"そのとけいをください",romaji:"sono tokei o kudasai",en:"that watch, please",parts:["その","とけい","を","ください"]},
+        {jp:"これをふたつください",romaji:"kore o futatsu kudasai",en:"two of these, please",parts:["これ","を","ふたつ","ください"]},
+        {jp:"たかいですね",romaji:"takai desu ne",en:"it's expensive, isn't it",parts:["たかい","です","ね"]},
+        {jp:"あのかばんはやすいですよ",romaji:"ano kaban wa yasui desu yo",en:"that bag over there is cheap!",parts:["あの","かばん","は","やすい","です","よ"]},
+        {jp:"ぎんこうはどこですか",romaji:"ginkou wa doko desu ka",en:"where is the bank?",parts:["ぎんこう","は","どこ","です","か"]}
+      ]},
+
+    /* ---------- Genki L3: Making a date ---------- */
+    { id:"days", name:"Days & when", glyph:"日", tag:"vocab", genki:"L3",
+      note:"Time words that are relative (きょう, あした, まいにち) take no particle. Days of the week and clock times take に: どようびに on Saturday, しちじに at seven. ごろ softens a time to 'around'.",
+      items:[
+        {jp:"きょう",romaji:"kyou",en:"today"},
+        {jp:"あした",romaji:"ashita",en:"tomorrow"},
+        {jp:"きのう",romaji:"kinou",en:"yesterday"},
+        {jp:"まいにち",romaji:"mainichi",en:"every day"},
+        {jp:"にちようび",romaji:"nichiyoubi",en:"Sunday"},
+        {jp:"げつようび",romaji:"getsuyoubi",en:"Monday"},
+        {jp:"かようび",romaji:"kayoubi",en:"Tuesday"},
+        {jp:"すいようび",romaji:"suiyoubi",en:"Wednesday"},
+        {jp:"もくようび",romaji:"mokuyoubi",en:"Thursday"},
+        {jp:"きんようび",romaji:"kinyoubi",en:"Friday"},
+        {jp:"どようび",romaji:"doyoubi",en:"Saturday"},
+        // — added —
+        {jp:"あさ",romaji:"asa",en:"morning"},
+        {jp:"ひる",romaji:"hiru",en:"noon / daytime"},
+        {jp:"よる",romaji:"yoru",en:"night"},
+        {jp:"ばん",romaji:"ban",en:"evening"},
+        {jp:"こんばん",romaji:"konban",en:"tonight"},
+        {jp:"まいあさ",romaji:"maiasa",en:"every morning",parts:["まい","あさ"]},
+        {jp:"まいばん",romaji:"maiban",en:"every night",parts:["まい","ばん"]},
+        {jp:"しゅうまつ",romaji:"shuumatsu",en:"weekend"},
+        {jp:"せんしゅう",romaji:"senshuu",en:"last week"},
+        {jp:"こんしゅう",romaji:"konshuu",en:"this week"},
+        {jp:"らいしゅう",romaji:"raishuu",en:"next week"},
+        {jp:"こんげつ",romaji:"kongetsu",en:"this month"},
+        {jp:"らいげつ",romaji:"raigetsu",en:"next month"},
+        {jp:"いつ",romaji:"itsu",en:"when"},
+        {jp:"〜ごろ",romaji:"goro",en:"around (a time)",alt:["-goro"]},
+        {jp:"テスト",romaji:"tesuto",en:"test / exam"},
+        {jp:"なんようび",romaji:"nanyoubi",en:"what day of the week?"},
+        {jp:"きょうはなんようびですか",romaji:"kyou wa nanyoubi desu ka",en:"what day is it today?",parts:["きょう","は","なんようび","です","か"]},
+        {jp:"きょうはきんようびです",romaji:"kyou wa kinyoubi desu",en:"today is Friday",parts:["きょう","は","きんようび","です"]},
+        {jp:"しちじごろ",romaji:"shichiji goro",en:"around seven o'clock",parts:["しちじ","ごろ"]},
+        {jp:"テストはいつですか",romaji:"tesuto wa itsu desu ka",en:"when is the test?",parts:["テスト","は","いつ","です","か"]}
+      ]},
+    { id:"verbs", name:"Everyday verbs", glyph:"動", tag:"phrase", genki:"L3",
+      note:"The 〜ます form is polite present/future: たべます I eat / will eat. Negative: 〜ません. Genki groups verbs as ru-verbs (たべる, みる), u-verbs (のむ, いく) and the two irregulars する / くる — the groups matter once you learn other forms.",
+      items:[
+        {jp:"たべます",romaji:"tabemasu",en:"eat"},
+        {jp:"のみます",romaji:"nomimasu",en:"drink"},
+        {jp:"みます",romaji:"mimasu",en:"see / watch"},
+        {jp:"ききます",romaji:"kikimasu",en:"listen / hear"},
+        {jp:"よみます",romaji:"yomimasu",en:"read"},
+        {jp:"いきます",romaji:"ikimasu",en:"go"},
+        {jp:"きます",romaji:"kimasu",en:"come"},
+        {jp:"します",romaji:"shimasu",en:"do"},
+        {jp:"かいます",romaji:"kaimasu",en:"buy"},
+        {jp:"わかります",romaji:"wakarimasu",en:"understand"},
+        {jp:"ねます",romaji:"nemasu",en:"sleep"},
+        // — added —
+        {jp:"おきます",romaji:"okimasu",en:"get up / wake up"},
+        {jp:"かえります",romaji:"kaerimasu",en:"go home / return"},
+        {jp:"はなします",romaji:"hanashimasu",en:"speak / talk"},
+        {jp:"べんきょうします",romaji:"benkyou shimasu",en:"study",parts:["べんきょう","します"]},
+        {jp:"あいます",romaji:"aimasu",en:"meet"},
+        {jp:"かきます",romaji:"kakimasu",en:"write"},
+        {jp:"とります",romaji:"torimasu",en:"take (a photo)"},
+        {jp:"まちます",romaji:"machimasu",en:"wait"},
+        {jp:"およぎます",romaji:"oyogimasu",en:"swim"},
+        {jp:"のります",romaji:"norimasu",en:"ride / get on"},
+        {jp:"でかけます",romaji:"dekakemasu",en:"go out"},
+        {jp:"あそびます",romaji:"asobimasu",en:"play / hang out"},
+        {jp:"はたらきます",romaji:"hatarakimasu",en:"work (Genki L11)"},
+        {jp:"うたいます",romaji:"utaimasu",en:"sing"},
+        {jp:"たべません",romaji:"tabemasen",en:"don't eat",parts:["たべ","ません"]},
+        {jp:"いきません",romaji:"ikimasen",en:"don't go",parts:["いき","ません"]},
+        {jp:"たべる",romaji:"taberu",en:"to eat (dictionary form, ru-verb)"},
+        {jp:"のむ",romaji:"nomu",en:"to drink (dictionary form, u-verb)"},
+        {jp:"いく",romaji:"iku",en:"to go (dictionary form, u-verb)"},
+        {jp:"する",romaji:"suru",en:"to do (dictionary form, irregular)"},
+        {jp:"くる",romaji:"kuru",en:"to come (dictionary form, irregular)"}
+      ]},
+    { id:"food", name:"Food & drink", glyph:"食", tag:"vocab", genki:"L3",
+      note:"ごはん means both cooked rice and a meal; あさごはん / ひるごはん / ばんごはん are breakfast, lunch and dinner. お in おちゃ, おさけ, おみず is a politeness prefix.",
+      items:[
+        {jp:"ごはん",romaji:"gohan",en:"rice / meal"},
+        {jp:"みず",romaji:"mizu",en:"water"},
+        {jp:"おちゃ",romaji:"ocha",en:"tea"},
+        {jp:"コーヒー",romaji:"koohii",en:"coffee"},
+        {jp:"パン",romaji:"pan",en:"bread"},
+        {jp:"にく",romaji:"niku",en:"meat"},
+        {jp:"さかな",romaji:"sakana",en:"fish"},
+        {jp:"たまご",romaji:"tamago",en:"egg"},
+        {jp:"やさい",romaji:"yasai",en:"vegetables"},
+        {jp:"くだもの",romaji:"kudamono",en:"fruit"},
+        // — added —
+        {jp:"あさごはん",romaji:"asagohan",en:"breakfast",parts:["あさ","ごはん"]},
+        {jp:"ひるごはん",romaji:"hirugohan",en:"lunch",parts:["ひる","ごはん"]},
+        {jp:"ばんごはん",romaji:"bangohan",en:"dinner",parts:["ばん","ごはん"]},
+        {jp:"たべもの",romaji:"tabemono",en:"food"},
+        {jp:"のみもの",romaji:"nomimono",en:"drink / beverage"},
+        {jp:"おさけ",romaji:"osake",en:"sake / alcohol"},
+        {jp:"ビール",romaji:"biiru",en:"beer"},
+        {jp:"ジュース",romaji:"juusu",en:"juice"},
+        {jp:"ぎゅうにゅう",romaji:"gyuunyuu",en:"milk"},
+        {jp:"アイスクリーム",romaji:"aisukuriimu",en:"ice cream"},
+        {jp:"ケーキ",romaji:"keeki",en:"cake"},
+        {jp:"とんかつ",romaji:"tonkatsu",en:"pork cutlet"},
+        {jp:"ラーメン",romaji:"raamen",en:"ramen"},
+        {jp:"すし",romaji:"sushi",en:"sushi"},
+        {jp:"おにぎり",romaji:"onigiri",en:"rice ball"},
+        {jp:"りんご",romaji:"ringo",en:"apple"},
+        {jp:"ハンバーガー",romaji:"hanbaagaa",en:"hamburger"},
+        {jp:"サラダ",romaji:"sarada",en:"salad"},
+        {jp:"てんぷら",romaji:"tenpura",en:"tempura"}
+      ]},
+    { id:"verbs2", name:"Verbs in sentences", glyph:"文", tag:"phrase", genki:"L3",
+      note:"Particles do the grammar: を marks the object, に marks a time or destination, へ marks direction, で marks where something happens, と means 'with'. Frequency words go before the verb: よく often, ときどき sometimes; あまり and ぜんぜん need a negative verb.",
+      items:[
+        {jp:"ごはんをたべます",romaji:"gohan o tabemasu",en:"I eat a meal",parts:["ごはん","を","たべます"]},
+        {jp:"みずをのみます",romaji:"mizu o nomimasu",en:"I drink water",parts:["みず","を","のみます"]},
+        {jp:"ほんをよみます",romaji:"hon o yomimasu",en:"I read a book",parts:["ほん","を","よみます"]},
+        {jp:"テレビをみます",romaji:"terebi o mimasu",en:"I watch TV",parts:["テレビ","を","みます"]},
+        {jp:"がっこうへいきます",romaji:"gakkou e ikimasu",en:"I go to school (へ = to)",parts:["がっこう","へ","いきます"]},
+        {jp:"うちでたべます",romaji:"uchi de tabemasu",en:"I eat at home (で = at)",parts:["うち","で","たべます"]},
+        {jp:"コーヒーをのみません",romaji:"koohii o nomimasen",en:"I don't drink coffee",parts:["コーヒー","を","のみません"]},
+        {jp:"ほんをよみました",romaji:"hon o yomimashita",en:"I read a book (past)",parts:["ほん","を","よみました"]},
+        {jp:"テレビをみませんでした",romaji:"terebi o mimasen deshita",en:"I didn't watch TV (past)",parts:["テレビ","を","みません","でした"]},
+        {jp:"なにをたべますか",romaji:"nani o tabemasu ka",en:"what do you eat?",parts:["なに","を","たべます","か"]},
+        // — added —
+        {jp:"よく",romaji:"yoku",en:"often"},
+        {jp:"たいてい",romaji:"taitei",en:"usually"},
+        {jp:"ときどき",romaji:"tokidoki",en:"sometimes"},
+        {jp:"あまり",romaji:"amari",en:"not much (+ negative)"},
+        {jp:"ぜんぜん",romaji:"zenzen",en:"not at all (+ negative)"},
+        {jp:"うち",romaji:"uchi",en:"home / house"},
+        {jp:"がっこう",romaji:"gakkou",en:"school"},
+        {jp:"テレビ",romaji:"terebi",en:"TV"},
+        {jp:"しちじにおきます",romaji:"shichiji ni okimasu",en:"I get up at seven (に = at)",parts:["しちじ","に","おきます"]},
+        {jp:"じゅういちじにねます",romaji:"juuichiji ni nemasu",en:"I go to bed at eleven",parts:["じゅういちじ","に","ねます"]},
+        {jp:"どようびにえいがをみます",romaji:"doyoubi ni eiga o mimasu",en:"I watch a movie on Saturday",parts:["どようび","に","えいが","を","みます"]},
+        {jp:"だいがくにいきます",romaji:"daigaku ni ikimasu",en:"I go to university (に = to)",parts:["だいがく","に","いきます"]},
+        {jp:"うちにかえります",romaji:"uchi ni kaerimasu",en:"I go home",parts:["うち","に","かえります"]},
+        {jp:"としょかんでべんきょうします",romaji:"toshokan de benkyou shimasu",en:"I study at the library",parts:["としょかん","で","べんきょうします"]},
+        {jp:"ともだちとはなします",romaji:"tomodachi to hanashimasu",en:"I talk with a friend (と = with)",parts:["ともだち","と","はなします"]},
+        {jp:"ともだちにあいます",romaji:"tomodachi ni aimasu",en:"I meet a friend (あう takes に)",parts:["ともだち","に","あいます"]},
+        {jp:"まいにちにほんごをべんきょうします",romaji:"mainichi nihongo o benkyou shimasu",en:"I study Japanese every day",parts:["まいにち","にほんご","を","べんきょうします"]},
+        {jp:"よくおんがくをききます",romaji:"yoku ongaku o kikimasu",en:"I often listen to music",parts:["よく","おんがく","を","ききます"]},
+        {jp:"ときどきコーヒーをのみます",romaji:"tokidoki koohii o nomimasu",en:"I sometimes drink coffee",parts:["ときどき","コーヒー","を","のみます"]},
+        {jp:"あまりテレビをみません",romaji:"amari terebi o mimasen",en:"I don't watch much TV",parts:["あまり","テレビ","を","みません"]},
+        {jp:"ぜんぜんおさけをのみません",romaji:"zenzen osake o nomimasen",en:"I don't drink alcohol at all",parts:["ぜんぜん","おさけ","を","のみません"]},
+        {jp:"きのうなにをしましたか",romaji:"kinou nani o shimashita ka",en:"what did you do yesterday?",parts:["きのう","なに","を","しました","か"]},
+        {jp:"どこでひるごはんをたべますか",romaji:"doko de hirugohan o tabemasu ka",en:"where do you eat lunch?",parts:["どこ","で","ひるごはん","を","たべます","か"]},
+        {jp:"なんじにおきますか",romaji:"nanji ni okimasu ka",en:"what time do you get up?",parts:["なんじ","に","おきます","か"]}
+      ]},
+    { id:"invite", name:"Making plans", glyph:"約", tag:"phrase", genki:"L3–6",
+      note:"〜ませんか ('won't you…?') is the polite way to invite: えいがをみませんか. Accept with いいですね, decline softly with ちょっと… (trailing off). 〜ましょう means 'let's' (Genki formally introduces it in L6). Ask about plans with なにをしますか.",
+      items:[
+        {jp:"えいが",romaji:"eiga",en:"movie"},
+        {jp:"おんがく",romaji:"ongaku",en:"music"},
+        {jp:"スポーツ",romaji:"supootsu",en:"sports"},
+        {jp:"テニス",romaji:"tenisu",en:"tennis"},
+        {jp:"サッカー",romaji:"sakkaa",en:"soccer"},
+        {jp:"デート",romaji:"deeto",en:"a date"},
+        {jp:"カフェ",romaji:"kafe",en:"café"},
+        {jp:"かいもの",romaji:"kaimono",en:"shopping"},
+        {jp:"アルバイト",romaji:"arubaito",en:"part-time job"},
+        {jp:"いい",romaji:"ii",en:"good"},
+        {jp:"でも",romaji:"demo",en:"but"},
+        {jp:"ちょっと",romaji:"chotto",en:"a little / (softly declining)"},
+        {jp:"ひま",romaji:"hima",en:"free / not busy (na-adj)"},
+        {jp:"いっしょに",romaji:"issho ni",en:"together"},
+        {jp:"えき",romaji:"eki",en:"station"},
+        {jp:"まえ",romaji:"mae",en:"in front / before"},
+        {jp:"どうですか",romaji:"dou desu ka",en:"how about…?",parts:["どう","です","か"]},
+        {jp:"そうですね",romaji:"sou desu ne",en:"that's right / let me see",parts:["そう","です","ね"]},
+        {jp:"いいですね",romaji:"ii desu ne",en:"that sounds good",parts:["いい","です","ね"]},
+        {jp:"えいがをみませんか",romaji:"eiga o mimasen ka",en:"won't you watch a movie (with me)?",parts:["えいが","を","みません","か"]},
+        {jp:"いっしょにたべませんか",romaji:"issho ni tabemasen ka",en:"shall we eat together?",parts:["いっしょに","たべません","か"]},
+        {jp:"テニスをしませんか",romaji:"tenisu o shimasen ka",en:"won't you play tennis?",parts:["テニス","を","しません","か"]},
+        {jp:"どようびはちょっと…",romaji:"doyoubi wa chotto…",en:"Saturday is a bit… (soft no)",parts:["どようび","は","ちょっと"],alt:["doyoubi wa chotto"]},
+        {jp:"いきましょう",romaji:"ikimashou",en:"let's go"},
+        {jp:"たべましょう",romaji:"tabemashou",en:"let's eat"},
+        {jp:"いっしょにいきましょう",romaji:"issho ni ikimashou",en:"let's go together",parts:["いっしょに","いきましょう"]},
+        {jp:"なんじにあいましょうか",romaji:"nanji ni aimashou ka",en:"what time shall we meet?",parts:["なんじ","に","あいましょう","か"]},
+        {jp:"しゅうまつになにをしますか",romaji:"shuumatsu ni nani o shimasu ka",en:"what will you do at the weekend?",parts:["しゅうまつ","に","なに","を","します","か"]},
+        {jp:"こんばんひまですか",romaji:"konban hima desu ka",en:"are you free tonight?",parts:["こんばん","ひま","です","か"]},
+        {jp:"あしたはアルバイトです",romaji:"ashita wa arubaito desu",en:"tomorrow I have my part-time job",parts:["あした","は","アルバイト","です"]},
+        {jp:"どこであいますか",romaji:"doko de aimasu ka",en:"where shall we meet?",parts:["どこ","で","あいます","か"]},
+        {jp:"えきのまえであいましょう",romaji:"eki no mae de aimashou",en:"let's meet in front of the station",parts:["えき","の","まえ","で","あいましょう"]}
+      ]},
+    { id:"table", name:"At the table", glyph:"膳", tag:"phrase", genki:"L2–3",
+      note:"いただきます before eating and ごちそうさまでした after are near-universal. Order with 〜をください or 〜をおねがいします. Ask for the bill with おかんじょう(をおねがいします).",
+      items:[
+        {jp:"いただきます",romaji:"itadakimasu",en:"let's eat (before a meal)"},
+        {jp:"ごちそうさまでした",romaji:"gochisousama deshita",en:"thanks for the meal (after)"},
+        {jp:"メニューをください",romaji:"menyuu o kudasai",en:"the menu, please",parts:["メニュー","を","ください"]},
+        {jp:"みずをください",romaji:"mizu o kudasai",en:"water, please",parts:["みず","を","ください"]},
+        {jp:"これをください",romaji:"kore o kudasai",en:"this one, please",parts:["これ","を","ください"]},
+        {jp:"おいしいです",romaji:"oishii desu",en:"it's delicious",parts:["おいしい","です"]},
+        // — added —
+        {jp:"メニュー",romaji:"menyuu",en:"menu"},
+        {jp:"おかんじょう",romaji:"okanjou",en:"the bill / check"},
+        {jp:"おはし",romaji:"ohashi",en:"chopsticks"},
+        {jp:"レストラン",romaji:"resutoran",en:"restaurant"},
+        {jp:"おいしかったです",romaji:"oishikatta desu",en:"it was delicious",parts:["おいしかった","です"]},
+        {jp:"おちゃをおねがいします",romaji:"ocha o onegaishimasu",en:"tea, please",parts:["おちゃ","を","おねがいします"]},
+        {jp:"コーヒーをふたつください",romaji:"koohii o futatsu kudasai",en:"two coffees, please",parts:["コーヒー","を","ふたつ","ください"]},
+        {jp:"おかんじょうをおねがいします",romaji:"okanjou o onegaishimasu",en:"the bill, please",parts:["おかんじょう","を","おねがいします"]},
+        {jp:"なにがおいしいですか",romaji:"nani ga oishii desu ka",en:"what's good here?",parts:["なに","が","おいしい","です","か"]},
+        {jp:"おすすめはなんですか",romaji:"osusume wa nan desu ka",en:"what do you recommend?",parts:["おすすめ","は","なん","です","か"]},
+        {jp:"にくはたべません",romaji:"niku wa tabemasen",en:"I don't eat meat",parts:["にく","は","たべません"]},
+        {jp:"もういっぱいください",romaji:"mou ippai kudasai",en:"one more cup, please",parts:["もう","いっぱい","ください"]}
+      ]},
+
+    /* ---------- Genki L4: The first date ---------- */
+    { id:"desc", name:"Places & where things are", glyph:"所", tag:"phrase", genki:"L4",
+      note:"あります = there is (things), います = there is (people, animals). The place takes に: つくえのうえにほんがあります — on the desk there's a book. Location words attach with の: X の うえ/した/まえ/うしろ/なか/となり/ちかく. Past tense: 〜ました / 〜ませんでした; です → でした.",
+      items:[
+        {jp:"ねこ",romaji:"neko",en:"cat"},
+        {jp:"いぬ",romaji:"inu",en:"dog"},
+        {jp:"はな",romaji:"hana",en:"flower"},
+        {jp:"つくえ",romaji:"tsukue",en:"desk"},
+        {jp:"いす",romaji:"isu",en:"chair"},
+        {jp:"ねこがいます",romaji:"neko ga imasu",en:"there is a cat (います = animate)",parts:["ねこ","が","います"]},
+        {jp:"ほんがあります",romaji:"hon ga arimasu",en:"there is a book (あります = inanimate)",parts:["ほん","が","あります"]},
+        {jp:"つくえのうえ",romaji:"tsukue no ue",en:"on the desk",parts:["つくえ","の","うえ"]},
+        {jp:"いすのした",romaji:"isu no shita",en:"under the chair",parts:["いす","の","した"]},
+        {jp:"きれいなはな",romaji:"kirei na hana",en:"a pretty flower (na-adj + な)",parts:["きれい","な","はな"]},
+        {jp:"このほんはおもしろいです",romaji:"kono hon wa omoshiroi desu",en:"this book is interesting",parts:["この","ほん","は","おもしろい","です"]},
+        {jp:"たのしかったです",romaji:"tanoshikatta desu",en:"it was fun (i-adj past)",parts:["たのしかった","です"]},
+        // — added —
+        {jp:"うしろ",romaji:"ushiro",en:"behind"},
+        {jp:"なか",romaji:"naka",en:"inside"},
+        {jp:"となり",romaji:"tonari",en:"next to"},
+        {jp:"ちかく",romaji:"chikaku",en:"near / nearby"},
+        {jp:"あいだ",romaji:"aida",en:"between"},
+        {jp:"こうえん",romaji:"kouen",en:"park"},
+        {jp:"スーパー",romaji:"suupaa",en:"supermarket"},
+        {jp:"デパート",romaji:"depaato",en:"department store"},
+        {jp:"びょういん",romaji:"byouin",en:"hospital"},
+        {jp:"ホテル",romaji:"hoteru",en:"hotel"},
+        {jp:"ほんや",romaji:"honya",en:"bookstore"},
+        {jp:"おてら",romaji:"otera",en:"temple"},
+        {jp:"バスてい",romaji:"basutei",en:"bus stop",parts:["バス","てい"]},
+        {jp:"まち",romaji:"machi",en:"town / city"},
+        {jp:"いえ",romaji:"ie",en:"house / home"},
+        {jp:"へや",romaji:"heya",en:"room"},
+        {jp:"しゅくだい",romaji:"shukudai",en:"homework"},
+        {jp:"しゃしん",romaji:"shashin",en:"photograph"},
+        {jp:"ひとりで",romaji:"hitori de",en:"alone / by oneself"},
+        {jp:"たくさん",romaji:"takusan",en:"many / a lot"},
+        {jp:"どうして",romaji:"doushite",en:"why"},
+        {jp:"だから",romaji:"dakara",en:"so / therefore"},
+        {jp:"つくえのうえにほんがあります",romaji:"tsukue no ue ni hon ga arimasu",en:"there is a book on the desk",parts:["つくえ","の","うえ","に","ほん","が","あります"]},
+        {jp:"こうえんにいぬがいます",romaji:"kouen ni inu ga imasu",en:"there is a dog in the park",parts:["こうえん","に","いぬ","が","います"]},
+        {jp:"ぎんこうはえきのとなりです",romaji:"ginkou wa eki no tonari desu",en:"the bank is next to the station",parts:["ぎんこう","は","えき","の","となり","です"]},
+        {jp:"かばんのなかにさいふがあります",romaji:"kaban no naka ni saifu ga arimasu",en:"there's a wallet in the bag",parts:["かばん","の","なか","に","さいふ","が","あります"]},
+        {jp:"スーパーのまえ",romaji:"suupaa no mae",en:"in front of the supermarket",parts:["スーパー","の","まえ"]},
+        {jp:"ここにペンがありますか",romaji:"koko ni pen ga arimasu ka",en:"is there a pen here?",parts:["ここ","に","ペン","が","あります","か"]},
+        {jp:"ねこはいません",romaji:"neko wa imasen",en:"there is no cat",parts:["ねこ","は","いません"]},
+        {jp:"きのうこうえんにいきました",romaji:"kinou kouen ni ikimashita",en:"yesterday I went to the park",parts:["きのう","こうえん","に","いきました"]},
+        {jp:"しゅくだいをしませんでした",romaji:"shukudai o shimasen deshita",en:"I didn't do my homework",parts:["しゅくだい","を","しません","でした"]},
+        {jp:"きのうはにちようびでした",romaji:"kinou wa nichiyoubi deshita",en:"yesterday was Sunday",parts:["きのう","は","にちようび","でした"]},
+        {jp:"ともだちとしゃしんをとりました",romaji:"tomodachi to shashin o torimashita",en:"I took photos with a friend",parts:["ともだち","と","しゃしん","を","とりました"]},
+        {jp:"いちじかんまちました",romaji:"ichijikan machimashita",en:"I waited for one hour",parts:["いちじかん","まちました"]},
+        {jp:"ひとりでえいがをみました",romaji:"hitori de eiga o mimashita",en:"I watched a movie alone",parts:["ひとりで","えいが","を","みました"]}
+      ]},
+
+    /* ---------- Genki L5: A trip to Okinawa ---------- */
+    { id:"adj", name:"Colours & adjectives", glyph:"色", tag:"vocab", genki:"L5",
+      note:"い-adjectives end in い (あかい, おおきい) and change form themselves: おおきくないです not big, おおきかったです was big. な-adjectives (きれい, げんき) take な before a noun and use です/じゃないです/でした like nouns. いい is irregular: よくない, よかった.",
+      items:[
+        {jp:"あかい",romaji:"akai",en:"red (i-adj)"},
+        {jp:"あおい",romaji:"aoi",en:"blue (i-adj)"},
+        {jp:"しろい",romaji:"shiroi",en:"white (i-adj)"},
+        {jp:"くろい",romaji:"kuroi",en:"black (i-adj)"},
+        {jp:"おおきい",romaji:"ookii",en:"big (i-adj)"},
+        {jp:"ちいさい",romaji:"chiisai",en:"small (i-adj)"},
+        {jp:"きれい",romaji:"kirei",en:"pretty / clean (na-adj)"},
+        {jp:"ゆうめい",romaji:"yuumei",en:"famous (na-adj)"},
+        {jp:"すき",romaji:"suki",en:"liked / favourite (na-adj)"},
+        // — added —
+        {jp:"あたらしい",romaji:"atarashii",en:"new (i-adj)"},
+        {jp:"ふるい",romaji:"furui",en:"old (thing) (i-adj)"},
+        {jp:"あつい",romaji:"atsui",en:"hot (i-adj)"},
+        {jp:"さむい",romaji:"samui",en:"cold (weather) (i-adj)"},
+        {jp:"いそがしい",romaji:"isogashii",en:"busy (i-adj)"},
+        {jp:"おもしろい",romaji:"omoshiroi",en:"interesting / funny (i-adj)"},
+        {jp:"つまらない",romaji:"tsumaranai",en:"boring (i-adj)"},
+        {jp:"たのしい",romaji:"tanoshii",en:"fun (i-adj)"},
+        {jp:"こわい",romaji:"kowai",en:"scary (i-adj)"},
+        {jp:"むずかしい",romaji:"muzukashii",en:"difficult (i-adj)"},
+        {jp:"やさしい",romaji:"yasashii",en:"easy / kind (i-adj)"},
+        {jp:"ながい",romaji:"nagai",en:"long (i-adj)"},
+        {jp:"みじかい",romaji:"mijikai",en:"short (i-adj)"},
+        {jp:"かわいい",romaji:"kawaii",en:"cute (i-adj)"},
+        {jp:"かっこいい",romaji:"kakkoii",en:"cool / good-looking (i-adj)"},
+        {jp:"はやい",romaji:"hayai",en:"fast / early (i-adj)"},
+        {jp:"ひくい",romaji:"hikui",en:"low / short (height) (i-adj)"},
+        {jp:"きらい",romaji:"kirai",en:"disliked (na-adj)"},
+        {jp:"だいすき",romaji:"daisuki",en:"loved / very fond of (na-adj)"},
+        {jp:"だいきらい",romaji:"daikirai",en:"hated (na-adj)"},
+        {jp:"げんき",romaji:"genki",en:"healthy / energetic (na-adj)"},
+        {jp:"しずか",romaji:"shizuka",en:"quiet (na-adj)"},
+        {jp:"にぎやか",romaji:"nigiyaka",en:"lively (na-adj)"},
+        {jp:"しんせつ",romaji:"shinsetsu",en:"kind (na-adj)"},
+        {jp:"べんり",romaji:"benri",en:"convenient (na-adj, Genki L7)"},
+        {jp:"とても",romaji:"totemo",en:"very"},
+        {jp:"すごく",romaji:"sugoku",en:"extremely (casual)"},
+        {jp:"どんな",romaji:"donna",en:"what kind of"}
+      ]},
+    { id:"describe", name:"Describing & likes", glyph:"好", tag:"phrase", genki:"L5",
+      note:"Likes and dislikes use が, not を: さかながすきです I like fish. Negative い-adjective: drop い, add くないです. Past: drop い, add かったです. な-adjectives: しずかじゃないです, しずかでした. どんな X asks 'what kind of X'.",
+      items:[
+        {jp:"てんき",romaji:"tenki",en:"weather"},
+        {jp:"りょこう",romaji:"ryokou",en:"travel / trip"},
+        {jp:"うみ",romaji:"umi",en:"sea / ocean"},
+        {jp:"やま",romaji:"yama",en:"mountain"},
+        {jp:"たんじょうび",romaji:"tanjoubi",en:"birthday"},
+        {jp:"やすみ",romaji:"yasumi",en:"holiday / day off"},
+        {jp:"ひこうき",romaji:"hikouki",en:"airplane"},
+        {jp:"ぼく",romaji:"boku",en:"I (casual, used by men)"},
+        {jp:"おきなわ",romaji:"okinawa",en:"Okinawa"},
+        {jp:"きょうはあついです",romaji:"kyou wa atsui desu",en:"it's hot today",parts:["きょう","は","あつい","です"]},
+        {jp:"きのうはさむかったです",romaji:"kinou wa samukatta desu",en:"it was cold yesterday",parts:["きのう","は","さむかった","です"]},
+        {jp:"このほんはおもしろくないです",romaji:"kono hon wa omoshirokunai desu",en:"this book is not interesting",parts:["この","ほん","は","おもしろくない","です"]},
+        {jp:"テストはむずかしくなかったです",romaji:"tesuto wa muzukashikunakatta desu",en:"the test wasn't difficult",parts:["テスト","は","むずかしくなかった","です"]},
+        {jp:"にほんごはむずかしいですか",romaji:"nihongo wa muzukashii desu ka",en:"is Japanese difficult?",parts:["にほんご","は","むずかしい","です","か"]},
+        {jp:"てんきがいいですね",romaji:"tenki ga ii desu ne",en:"nice weather, isn't it",parts:["てんき","が","いい","です","ね"]},
+        {jp:"てんきはよくないです",romaji:"tenki wa yokunai desu",en:"the weather is not good (いい → よくない)",parts:["てんき","は","よくない","です"]},
+        {jp:"りょこうはたのしかったです",romaji:"ryokou wa tanoshikatta desu",en:"the trip was fun",parts:["りょこう","は","たのしかった","です"]},
+        {jp:"しずかなまちです",romaji:"shizuka na machi desu",en:"it's a quiet town",parts:["しずか","な","まち","です"]},
+        {jp:"げんきなひとですね",romaji:"genki na hito desu ne",en:"what an energetic person",parts:["げんき","な","ひと","です","ね"]},
+        {jp:"あのまちはにぎやかじゃないです",romaji:"ano machi wa nigiyaka ja nai desu",en:"that town isn't lively",parts:["あの","まち","は","にぎやか","じゃない","です"]},
+        {jp:"きのうはひまでした",romaji:"kinou wa hima deshita",en:"I was free yesterday",parts:["きのう","は","ひま","でした"]},
+        {jp:"さかながすきです",romaji:"sakana ga suki desu",en:"I like fish (すき takes が)",parts:["さかな","が","すき","です"]},
+        {jp:"べんきょうがきらいです",romaji:"benkyou ga kirai desu",en:"I dislike studying",parts:["べんきょう","が","きらい","です"]},
+        {jp:"おんがくがだいすきです",romaji:"ongaku ga daisuki desu",en:"I love music",parts:["おんがく","が","だいすき","です"]},
+        {jp:"どんなおんがくがすきですか",romaji:"donna ongaku ga suki desu ka",en:"what kind of music do you like?",parts:["どんな","おんがく","が","すき","です","か"]},
+        {jp:"すきなたべものはなんですか",romaji:"suki na tabemono wa nan desu ka",en:"what's your favourite food?",parts:["すき","な","たべもの","は","なん","です","か"]},
+        {jp:"あまりすきじゃないです",romaji:"amari suki ja nai desu",en:"I don't like it much",parts:["あまり","すき","じゃない","です"]},
+        {jp:"とてもきれいですね",romaji:"totemo kirei desu ne",en:"it's very pretty, isn't it",parts:["とても","きれい","です","ね"]},
+        {jp:"あたらしいくつをかいました",romaji:"atarashii kutsu o kaimashita",en:"I bought new shoes",parts:["あたらしい","くつ","を","かいました"]},
+        {jp:"おきなわのうみはきれいでした",romaji:"okinawa no umi wa kirei deshita",en:"the sea in Okinawa was beautiful",parts:["おきなわ","の","うみ","は","きれい","でした"]},
+        {jp:"いっしょにおよぎませんか",romaji:"issho ni oyogimasen ka",en:"shall we swim together?",parts:["いっしょに","およぎません","か"]}
+      ]},
+
+    /* ---------- Genki L6: A day in Robert's life ---------- */
+    { id:"teform", name:"Requests · te-form", glyph:"手", tag:"phrase", genki:"L6",
+      note:"The te-form is the workhorse of Japanese. Ru-verbs: drop る, add て (たべて). U-verbs change by ending: う/つ/る → って, む/ぶ/ぬ → んで, く → いて, ぐ → いで, す → して; いく → いって. Then: 〜てください please do, 〜てもいいですか may I?, 〜てはいけません you must not, and て joins two actions in sequence.",
+      items:[
+        {jp:"おかね",romaji:"okane",en:"money"},
+        {jp:"かんじ",romaji:"kanji",en:"kanji (Chinese characters)"},
+        {jp:"きょうかしょ",romaji:"kyoukasho",en:"textbook"},
+        {jp:"まど",romaji:"mado",en:"window"},
+        {jp:"ドア",romaji:"doa",en:"door"},
+        {jp:"でんき",romaji:"denki",en:"electricity / lights"},
+        {jp:"パソコン",romaji:"pasokon",en:"personal computer"},
+        {jp:"にもつ",romaji:"nimotsu",en:"baggage / luggage"},
+        {jp:"たばこ",romaji:"tabako",en:"cigarettes / tobacco"},
+        {jp:"おふろ",romaji:"ofuro",en:"bath"},
+        {jp:"シャワー",romaji:"shawaa",en:"shower"},
+        {jp:"つぎ",romaji:"tsugi",en:"next"},
+        {jp:"あとで",romaji:"ato de",en:"later"},
+        {jp:"すぐ",romaji:"sugu",en:"right away"},
+        {jp:"ゆっくり",romaji:"yukkuri",en:"slowly / leisurely"},
+        {jp:"たべて",romaji:"tabete",en:"eat (te-form, ru-verb)"},
+        {jp:"みて",romaji:"mite",en:"look / watch (te-form)"},
+        {jp:"のんで",romaji:"nonde",en:"drink (te-form, む → んで)"},
+        {jp:"よんで",romaji:"yonde",en:"read (te-form, む → んで)"},
+        {jp:"かいて",romaji:"kaite",en:"write (te-form, く → いて)"},
+        {jp:"まって",romaji:"matte",en:"wait (te-form, つ → って)"},
+        {jp:"いって",romaji:"itte",en:"go (te-form, irregular いく → いって)"},
+        {jp:"して",romaji:"shite",en:"do (te-form)"},
+        {jp:"きて",romaji:"kite",en:"come (te-form; きる wear is also きて)"},
+        {jp:"はなして",romaji:"hanashite",en:"speak (te-form, す → して)"},
+        {jp:"まってください",romaji:"matte kudasai",en:"please wait",parts:["まって","ください"]},
+        {jp:"すわってください",romaji:"suwatte kudasai",en:"please sit down",parts:["すわって","ください"]},
+        {jp:"たってください",romaji:"tatte kudasai",en:"please stand up",parts:["たって","ください"]},
+        {jp:"みてください",romaji:"mite kudasai",en:"please look",parts:["みて","ください"]},
+        {jp:"きいてください",romaji:"kiite kudasai",en:"please listen",parts:["きいて","ください"]},
+        {jp:"ほんをよんでください",romaji:"hon o yonde kudasai",en:"please read the book",parts:["ほん","を","よんで","ください"]},
+        {jp:"なまえをかいてください",romaji:"namae o kaite kudasai",en:"please write your name",parts:["なまえ","を","かいて","ください"]},
+        {jp:"ゆっくりはなしてください",romaji:"yukkuri hanashite kudasai",en:"please speak slowly",parts:["ゆっくり","はなして","ください"]},
+        {jp:"おしえてください",romaji:"oshiete kudasai",en:"please teach / tell me",parts:["おしえて","ください"]},
+        {jp:"てつだってください",romaji:"tetsudatte kudasai",en:"please help me",parts:["てつだって","ください"]},
+        {jp:"まどをあけてください",romaji:"mado o akete kudasai",en:"please open the window",parts:["まど","を","あけて","ください"]},
+        {jp:"ドアをしめてください",romaji:"doa o shimete kudasai",en:"please close the door",parts:["ドア","を","しめて","ください"]},
+        {jp:"でんきをつけてください",romaji:"denki o tsukete kudasai",en:"please turn on the lights",parts:["でんき","を","つけて","ください"]},
+        {jp:"でんきをけしてください",romaji:"denki o keshite kudasai",en:"please turn off the lights",parts:["でんき","を","けして","ください"]},
+        {jp:"ペンをかしてください",romaji:"pen o kashite kudasai",en:"please lend me a pen",parts:["ペン","を","かして","ください"]},
+        {jp:"しゃしんをとってもいいですか",romaji:"shashin o totte mo ii desu ka",en:"may I take a photo?",parts:["しゃしん","を","とって","も","いい","です","か"]},
+        {jp:"ここでたべてもいいですか",romaji:"koko de tabete mo ii desu ka",en:"may I eat here?",parts:["ここ","で","たべて","も","いい","です","か"]},
+        {jp:"はいってもいいですか",romaji:"haitte mo ii desu ka",en:"may I come in?",parts:["はいって","も","いい","です","か"]},
+        {jp:"いいですよ",romaji:"ii desu yo",en:"sure, go ahead",parts:["いい","です","よ"]},
+        {jp:"たばこをすってはいけません",romaji:"tabako o sutte wa ikemasen",en:"you must not smoke",parts:["たばこ","を","すって","は","いけません"]},
+        {jp:"ここでしゃしんをとってはいけません",romaji:"koko de shashin o totte wa ikemasen",en:"you must not take photos here",parts:["ここ","で","しゃしん","を","とって","は","いけません"]},
+        {jp:"おふろにはいります",romaji:"ofuro ni hairimasu",en:"take a bath",parts:["おふろ","に","はいります"]},
+        {jp:"シャワーをあびます",romaji:"shawaa o abimasu",en:"take a shower",parts:["シャワー","を","あびます"]},
+        {jp:"あさおきて、シャワーをあびます",romaji:"asa okite, shawaa o abimasu",en:"in the morning I get up and take a shower",parts:["あさ","おきて","シャワー","を","あびます"]},
+        {jp:"うちにかえって、ばんごはんをたべます",romaji:"uchi ni kaette, bangohan o tabemasu",en:"I go home and eat dinner",parts:["うち","に","かえって","ばんごはん","を","たべます"]},
+        {jp:"ほんをかえします",romaji:"hon o kaeshimasu",en:"return a book",parts:["ほん","を","かえします"]},
+        {jp:"かさをかります",romaji:"kasa o karimasu",en:"borrow an umbrella",parts:["かさ","を","かります"]},
+        {jp:"パソコンをつかいます",romaji:"pasokon o tsukaimasu",en:"use a computer",parts:["パソコン","を","つかいます"]},
+        {jp:"かんじをわすれました",romaji:"kanji o wasuremashita",en:"I forgot the kanji",parts:["かんじ","を","わすれました"]},
+        {jp:"つぎのページをみてください",romaji:"tsugi no peeji o mite kudasai",en:"please look at the next page",parts:["つぎ","の","ページ","を","みて","ください"]}
+      ]},
+
+    /* ---------- Genki L7: Family picture ---------- */
+    { id:"family", name:"People & family", glyph:"家", tag:"vocab", genki:"L7",
+      note:"Japanese has two sets of family words: humble ones for your own family (ちち, はは, あに, あね) and respectful ones for others' (おとうさん, おかあさん, おにいさん, おねえさん). Count people with 〜にん: ひとり, ふたり, さんにん…",
+      items:[
+        {jp:"かぞく",romaji:"kazoku",en:"family"},
+                {jp:"ちち",romaji:"chichi",en:"(my) father"},
+        {jp:"はは",romaji:"haha",en:"(my) mother"},
+        {jp:"あに",romaji:"ani",en:"(my) older brother"},
+        {jp:"あね",romaji:"ane",en:"(my) older sister"},
+        {jp:"おとうと",romaji:"otouto",en:"younger brother"},
+        {jp:"いもうと",romaji:"imouto",en:"younger sister"},
+        {jp:"おとうさん",romaji:"otousan",en:"father (someone else's)"},
+        {jp:"おかあさん",romaji:"okaasan",en:"mother (someone else's)"},
+        // — added —
+        {jp:"おにいさん",romaji:"oniisan",en:"older brother (someone else's)"},
+        {jp:"おねえさん",romaji:"oneesan",en:"older sister (someone else's)"},
+        {jp:"おじいさん",romaji:"ojiisan",en:"grandfather / old man"},
+        {jp:"おばあさん",romaji:"obaasan",en:"grandmother / old woman"},
+        {jp:"きょうだい",romaji:"kyoudai",en:"siblings"},
+        {jp:"こども",romaji:"kodomo",en:"child"},
+                {jp:"おとこのひと",romaji:"otoko no hito",en:"man",parts:["おとこ","の","ひと"]},
+        {jp:"おんなのひと",romaji:"onna no hito",en:"woman",parts:["おんな","の","ひと"]},
+        {jp:"ひとり",romaji:"hitori",en:"one person"},
+        {jp:"ふたり",romaji:"futari",en:"two people"},
+        {jp:"さんにん",romaji:"sannin",en:"three people",parts:["さん","にん"]},
+        {jp:"よにん",romaji:"yonin",en:"four people (irregular)",parts:["よ","にん"]},
+        {jp:"なんにん",romaji:"nannin",en:"how many people?"},
+        {jp:"かぞくはなんにんですか",romaji:"kazoku wa nannin desu ka",en:"how many people are in your family?",parts:["かぞく","は","なんにん","です","か"]},
+        {jp:"よにんかぞくです",romaji:"yonin kazoku desu",en:"we're a family of four",parts:["よにん","かぞく","です"]},
+        {jp:"きょうだいがいますか",romaji:"kyoudai ga imasu ka",en:"do you have siblings?",parts:["きょうだい","が","います","か"]},
+        {jp:"あにがひとりいます",romaji:"ani ga hitori imasu",en:"I have one older brother",parts:["あに","が","ひとり","います"]},
+        {jp:"いもうとはこうこうせいです",romaji:"imouto wa koukousei desu",en:"my younger sister is a high-school student",parts:["いもうと","は","こうこうせい","です"]},
+        {jp:"ちちはかいしゃいんです",romaji:"chichi wa kaishain desu",en:"my father is an office worker",parts:["ちち","は","かいしゃいん","です"]},
+        {jp:"おかあさんはおげんきですか",romaji:"okaasan wa ogenki desu ka",en:"is your mother well?",parts:["おかあさん","は","おげんき","です","か"]}
+      ]},
+    { id:"people", name:"Describing people · 〜ている", glyph:"人", tag:"phrase", genki:"L7",
+      note:"〜ています (te-form + います) covers two things: an action in progress (たべています eating right now) and a lasting state (すんでいます lives, しっています knows, けっこんしています is married). Physical traits use X は Y が adj: あねはせがたかいです — my sister is tall.",
+      items:[
+        {jp:"め",romaji:"me",en:"eye"},
+        {jp:"はな",romaji:"hana",en:"nose (same sound as はな flower)"},
+        {jp:"くち",romaji:"kuchi",en:"mouth"},
+        {jp:"みみ",romaji:"mimi",en:"ear"},
+        {jp:"て",romaji:"te",en:"hand"},
+        {jp:"あし",romaji:"ashi",en:"leg / foot"},
+        {jp:"かお",romaji:"kao",en:"face"},
+        {jp:"あたま",romaji:"atama",en:"head"},
+        {jp:"かみ",romaji:"kami",en:"hair"},
+        {jp:"せ",romaji:"se",en:"height / back"},
+        {jp:"めがね",romaji:"megane",en:"glasses"},
+        {jp:"きる",romaji:"kiru",en:"to wear (top half) — ます-form きます sounds like 'come'"},
+        {jp:"くるま",romaji:"kuruma",en:"car"},
+        {jp:"かいしゃ",romaji:"kaisha",en:"company"},
+        {jp:"うた",romaji:"uta",en:"song"},
+        {jp:"せがたかいです",romaji:"se ga takai desu",en:"is tall",parts:["せ","が","たかい","です"]},
+        {jp:"せがひくいです",romaji:"se ga hikui desu",en:"is short (height)",parts:["せ","が","ひくい","です"]},
+        {jp:"あたまがいいです",romaji:"atama ga ii desu",en:"is smart (lit. head is good)",parts:["あたま","が","いい","です"]},
+        {jp:"かみがながいです",romaji:"kami ga nagai desu",en:"has long hair",parts:["かみ","が","ながい","です"]},
+        {jp:"めがおおきいです",romaji:"me ga ookii desu",en:"has big eyes",parts:["め","が","おおきい","です"]},
+        {jp:"あねはせがたかいです",romaji:"ane wa se ga takai desu",en:"my older sister is tall",parts:["あね","は","せ","が","たかい","です"]},
+        {jp:"たべています",romaji:"tabete imasu",en:"am eating (in progress)",parts:["たべて","います"]},
+        {jp:"いまべんきょうしています",romaji:"ima benkyou shite imasu",en:"I am studying right now",parts:["いま","べんきょうして","います"]},
+        {jp:"なにをしていますか",romaji:"nani o shite imasu ka",en:"what are you doing?",parts:["なに","を","して","います","か"]},
+        {jp:"テレビをみています",romaji:"terebi o mite imasu",en:"I am watching TV",parts:["テレビ","を","みて","います"]},
+        {jp:"とうきょうにすんでいます",romaji:"toukyou ni sunde imasu",en:"I live in Tokyo (state)",parts:["とうきょう","に","すんで","います"]},
+        {jp:"けっこんしています",romaji:"kekkon shite imasu",en:"is married",parts:["けっこんして","います"]},
+        {jp:"しっています",romaji:"shitte imasu",en:"I know",parts:["しって","います"]},
+        {jp:"しりません",romaji:"shirimasen",en:"I don't know (note: not しっていません)"},
+        {jp:"めがねをかけています",romaji:"megane o kakete imasu",en:"is wearing glasses",parts:["めがね","を","かけて","います"]},
+        {jp:"ぼうしをかぶっています",romaji:"boushi o kabutte imasu",en:"is wearing a hat",parts:["ぼうし","を","かぶって","います"]},
+        {jp:"Tシャツをきています",romaji:"tii shatsu o kite imasu",en:"is wearing a T-shirt",parts:["Tシャツ","を","きて","います"]},
+        {jp:"くつをはいています",romaji:"kutsu o haite imasu",en:"is wearing shoes",parts:["くつ","を","はいて","います"]},
+        {jp:"かいしゃにつとめています",romaji:"kaisha ni tsutomete imasu",en:"works for a company",parts:["かいしゃ","に","つとめて","います"]},
+        {jp:"ふとっています",romaji:"futotte imasu",en:"is overweight (state)"},
+        {jp:"やせています",romaji:"yasete imasu",en:"is slim (state)"},
+        {jp:"あにはくるまをもっています",romaji:"ani wa kuruma o motte imasu",en:"my older brother has a car",parts:["あに","は","くるま","を","もって","います"]},
+        {jp:"うたをうたっています",romaji:"uta o utatte imasu",en:"is singing a song",parts:["うた","を","うたって","います"]}
+      ]},
+
+    /* ---------- Genki L8: Barbecue ---------- */
+    { id:"plain", name:"Casual speech · short forms", glyph:"友", tag:"phrase", genki:"L8",
+      note:"Short (plain) forms are what you use with friends and inside longer sentences. Verbs: dictionary form (たべる) and ない-form (たべない; u-verbs change the last vowel to a: のむ → のまない; する → しない, くる → こない, ある → ない). い-adjectives drop です. Nouns and な-adjectives take だ / じゃない. Questions just rise in pitch — no か.",
+      items:[
+        {jp:"たべない",romaji:"tabenai",en:"don't eat (plain negative, ru-verb)"},
+        {jp:"のまない",romaji:"nomanai",en:"don't drink (plain negative, u-verb む → まない)"},
+        {jp:"いかない",romaji:"ikanai",en:"don't go (く → かない)"},
+        {jp:"かわない",romaji:"kawanai",en:"don't buy (う → わない)"},
+        {jp:"またない",romaji:"matanai",en:"don't wait (つ → たない)"},
+        {jp:"はなさない",romaji:"hanasanai",en:"don't speak (す → さない)"},
+        {jp:"しない",romaji:"shinai",en:"don't do (irregular)"},
+        {jp:"こない",romaji:"konai",en:"don't come (irregular)"},
+        {jp:"ない",romaji:"nai",en:"there isn't (plain of ありません)"},
+        {jp:"みる",romaji:"miru",en:"to see / watch (dictionary form)"},
+        {jp:"よむ",romaji:"yomu",en:"to read (dictionary form)"},
+        {jp:"かえる",romaji:"kaeru",en:"to go home (dictionary form)"},
+        {jp:"わかる",romaji:"wakaru",en:"to understand (dictionary form)"},
+        {jp:"だ",romaji:"da",en:"is (plain です)"},
+        {jp:"じゃない",romaji:"ja nai",en:"is not (plain じゃないです)",alt:["janai"]},
+        {jp:"がくせいだ",romaji:"gakusei da",en:"(I'm) a student (casual)",parts:["がくせい","だ"]},
+        {jp:"がくせいじゃない",romaji:"gakusei ja nai",en:"not a student (casual)",parts:["がくせい","じゃない"]},
+        {jp:"げんきだ",romaji:"genki da",en:"(I'm) fine (casual, な-adj + だ)",parts:["げんき","だ"]},
+        {jp:"たかい？",romaji:"takai?",en:"is it expensive? (casual — い-adj alone)",alt:["takai"]},
+        {jp:"たかくない",romaji:"takakunai",en:"not expensive (casual)"},
+        {jp:"いい？",romaji:"ii?",en:"is it okay? (casual)",alt:["ii"]},
+        {jp:"よくない",romaji:"yokunai",en:"not good (casual)"},
+        {jp:"うん",romaji:"un",en:"yeah (casual はい)"},
+        {jp:"ううん",romaji:"uun",en:"nah (casual いいえ)"},
+        {jp:"なにをする？",romaji:"nani o suru?",en:"what are you going to do? (casual)",parts:["なに","を","する"],alt:["nani o suru"]},
+        {jp:"あしたがっこうにいく？",romaji:"ashita gakkou ni iku?",en:"going to school tomorrow? (casual)",parts:["あした","がっこう","に","いく"],alt:["ashita gakkou ni iku"]},
+        {jp:"うん、いく",romaji:"un, iku",en:"yeah, I'm going",parts:["うん","いく"]},
+        {jp:"ううん、いかない",romaji:"uun, ikanai",en:"nah, not going",parts:["ううん","いかない"]},
+        {jp:"コーヒー、のむ？",romaji:"koohii, nomu?",en:"want some coffee? (casual)",parts:["コーヒー","のむ"],alt:["koohii nomu"]},
+        {jp:"きょうはいそがしい",romaji:"kyou wa isogashii",en:"I'm busy today (casual)",parts:["きょう","は","いそがしい"]},
+        {jp:"このほん、おもしろくない",romaji:"kono hon, omoshirokunai",en:"this book's not interesting (casual)",parts:["この","ほん","おもしろくない"]},
+        {jp:"あのひとはせんせいだ",romaji:"ano hito wa sensei da",en:"that person is a teacher (casual)",parts:["あの","ひと","は","せんせい","だ"]},
+        {jp:"あめだ",romaji:"ame da",en:"it's raining! (lit. it's rain)",parts:["あめ","だ"]},
+        {jp:"てんきがいい",romaji:"tenki ga ii",en:"the weather's nice (casual)",parts:["てんき","が","いい"]}
+      ]},
+    { id:"opinion", name:"Opinions, reports & chores", glyph:"思", tag:"phrase", genki:"L8",
+      note:"Short form + とおもいます = I think that…; short form + といっていました = (someone) said that…. 〜ないでください = please don't. Verb (dictionary form) + のがすきです / じょうずです / へたです = like / be good at / be bad at doing. なにか = something, なにも + negative = nothing. When asking who does something, the question word takes が: だれがきますか.",
+      items:[
+        {jp:"あめ",romaji:"ame",en:"rain"},
+        {jp:"はれ",romaji:"hare",en:"sunny weather"},
+        {jp:"くもり",romaji:"kumori",en:"cloudy weather"},
+        {jp:"てんきよほう",romaji:"tenki yohou",en:"weather forecast",parts:["てんき","よほう"]},
+        {jp:"りょうり",romaji:"ryouri",en:"cooking / cuisine"},
+        {jp:"そうじ",romaji:"souji",en:"cleaning"},
+        {jp:"せんたく",romaji:"sentaku",en:"laundry"},
+        {jp:"カメラ",romaji:"kamera",en:"camera"},
+        {jp:"カラオケ",romaji:"karaoke",en:"karaoke"},
+        {jp:"バーベキュー",romaji:"baabekyuu",en:"barbecue"},
+        {jp:"じょうず",romaji:"jouzu",en:"skilful / good at (na-adj)"},
+        {jp:"へた",romaji:"heta",en:"clumsy / bad at (na-adj)"},
+        {jp:"なにか",romaji:"nanika",en:"something"},
+        {jp:"なにも",romaji:"nanimo",en:"nothing (+ negative)"},
+        {jp:"おもいます",romaji:"omoimasu",en:"think"},
+        {jp:"いいます",romaji:"iimasu",en:"say"},
+        {jp:"つくります",romaji:"tsukurimasu",en:"make / cook"},
+        {jp:"あらいます",romaji:"araimasu",en:"wash"},
+        {jp:"ふります",romaji:"furimasu",en:"fall (rain, snow)"},
+        {jp:"はじめます",romaji:"hajimemasu",en:"begin (something)"},
+        {jp:"もっていきます",romaji:"motte ikimasu",en:"take (something) along",parts:["もって","いきます"]},
+        {jp:"うんてんします",romaji:"unten shimasu",en:"drive",parts:["うんてん","します"]},
+        {jp:"そうじします",romaji:"souji shimasu",en:"clean (a room)",parts:["そうじ","します"]},
+        {jp:"せんたくします",romaji:"sentaku shimasu",en:"do laundry",parts:["せんたく","します"]},
+        {jp:"りょうりします",romaji:"ryouri shimasu",en:"cook",parts:["りょうり","します"]},
+        {jp:"あめがふるとおもいます",romaji:"ame ga furu to omoimasu",en:"I think it will rain",parts:["あめ","が","ふる","と","おもいます"]},
+        {jp:"たなかさんはこないとおもいます",romaji:"tanaka san wa konai to omoimasu",en:"I don't think Tanaka will come",parts:["たなかさん","は","こない","と","おもいます"]},
+        {jp:"このえいがはおもしろいとおもいます",romaji:"kono eiga wa omoshiroi to omoimasu",en:"I think this movie is interesting",parts:["この","えいが","は","おもしろい","と","おもいます"]},
+        {jp:"にほんごはむずかしくないとおもいます",romaji:"nihongo wa muzukashikunai to omoimasu",en:"I don't think Japanese is difficult",parts:["にほんご","は","むずかしくない","と","おもいます"]},
+        {jp:"あのひとはがくせいだとおもいます",romaji:"ano hito wa gakusei da to omoimasu",en:"I think that person is a student (noun + だ)",parts:["あの","ひと","は","がくせい","だ","と","おもいます"]},
+        {jp:"どうおもいますか",romaji:"dou omoimasu ka",en:"what do you think?",parts:["どう","おもいます","か"]},
+        {jp:"せんせいはあしたテストがあるといっていました",romaji:"sensei wa ashita tesuto ga aru to itte imashita",en:"the teacher said there's a test tomorrow",parts:["せんせい","は","あした","テスト","が","ある","と","いって","いました"]},
+        {jp:"メアリーさんはいそがしいといっていました",romaji:"mearii san wa isogashii to itte imashita",en:"Mary said she's busy",parts:["メアリーさん","は","いそがしい","と","いって","いました"]},
+        {jp:"しゃしんをとらないでください",romaji:"shashin o toranai de kudasai",en:"please don't take photos",parts:["しゃしん","を","とらない","で","ください"]},
+        {jp:"わすれないでください",romaji:"wasurenai de kudasai",en:"please don't forget",parts:["わすれない","で","ください"]},
+        {jp:"ここにこないでください",romaji:"koko ni konai de kudasai",en:"please don't come here",parts:["ここ","に","こない","で","ください"]},
+        {jp:"りょうりをするのがすきです",romaji:"ryouri o suru no ga suki desu",en:"I like cooking",parts:["りょうり","を","する","の","が","すき","です"]},
+        {jp:"うたうのがじょうずですね",romaji:"utau no ga jouzu desu ne",en:"you're good at singing",parts:["うたう","の","が","じょうず","です","ね"]},
+        {jp:"およぐのがへたです",romaji:"oyogu no ga heta desu",en:"I'm bad at swimming",parts:["およぐ","の","が","へた","です"]},
+        {jp:"そうじするのがきらいです",romaji:"souji suru no ga kirai desu",en:"I hate cleaning",parts:["そうじする","の","が","きらい","です"]},
+        {jp:"だれがきますか",romaji:"dare ga kimasu ka",en:"who is coming? (question word + が)",parts:["だれ","が","きます","か"]},
+        {jp:"なにかたべましたか",romaji:"nanika tabemashita ka",en:"did you eat something?",parts:["なにか","たべました","か"]},
+        {jp:"なにもたべませんでした",romaji:"nanimo tabemasen deshita",en:"I didn't eat anything",parts:["なにも","たべません","でした"]},
+        {jp:"なにかのみませんか",romaji:"nanika nomimasen ka",en:"would you like something to drink?",parts:["なにか","のみません","か"]}
+      ]},
+
+    /* ---------- Genki L9: Kabuki ---------- */
+    { id:"past", name:"Past short forms & because", glyph:"昨", tag:"phrase", genki:"L9",
+      note:"Past short forms: verbs use the te-form with た instead of て (たべた, のんだ, いった); negative past is 〜なかった. い-adjectives: 〜かった / 〜くなかった. Nouns and な-adjectives: だった / じゃなかった. A short-form sentence can describe a noun: きのうみたえいが = the movie I saw yesterday. 〜から = because; まだ〜ていません = haven't yet.",
+      items:[
+        {jp:"いろ",romaji:"iro",en:"colour"},
+        {jp:"おまつり",romaji:"omatsuri",en:"festival"},
+        {jp:"おかし",romaji:"okashi",en:"snack / sweets"},
+        {jp:"くすり",romaji:"kusuri",en:"medicine"},
+        {jp:"コンサート",romaji:"konsaato",en:"concert"},
+        {jp:"さくぶん",romaji:"sakubun",en:"essay / composition"},
+        {jp:"しけん",romaji:"shiken",en:"exam"},
+        {jp:"じんじゃ",romaji:"jinja",en:"shrine"},
+        {jp:"ピアノ",romaji:"piano",en:"piano"},
+        {jp:"ギター",romaji:"gitaa",en:"guitar"},
+        {jp:"びょうき",romaji:"byouki",en:"illness"},
+        {jp:"かぶき",romaji:"kabuki",en:"kabuki (traditional theatre)"},
+        {jp:"さびしい",romaji:"sabishii",en:"lonely (i-adj)"},
+        {jp:"わかい",romaji:"wakai",en:"young (i-adj)"},
+        {jp:"にんきがあります",romaji:"ninki ga arimasu",en:"is popular",parts:["にんき","が","あります"]},
+        {jp:"おどります",romaji:"odorimasu",en:"dance"},
+        {jp:"おわります",romaji:"owarimasu",en:"end / finish"},
+        {jp:"はじまります",romaji:"hajimarimasu",en:"begin (something begins)"},
+        {jp:"ひきます",romaji:"hikimasu",en:"play (a string instrument / piano)"},
+        {jp:"もらいます",romaji:"moraimasu",en:"receive"},
+        {jp:"おぼえます",romaji:"oboemasu",en:"memorise"},
+        {jp:"でます",romaji:"demasu",en:"leave / go out / appear"},
+        {jp:"うんどうします",romaji:"undou shimasu",en:"exercise",parts:["うんどう","します"]},
+        {jp:"さんぽします",romaji:"sanpo shimasu",en:"take a walk",parts:["さんぽ","します"]},
+        {jp:"くすりをのみます",romaji:"kusuri o nomimasu",en:"take medicine (lit. drink)",parts:["くすり","を","のみます"]},
+        {jp:"たべた",romaji:"tabeta",en:"ate (plain past)"},
+        {jp:"のんだ",romaji:"nonda",en:"drank (plain past)"},
+        {jp:"いった",romaji:"itta",en:"went (plain past)"},
+        {jp:"した",romaji:"shita",en:"did (plain past)"},
+        {jp:"きた",romaji:"kita",en:"came (plain past)"},
+        {jp:"たべなかった",romaji:"tabenakatta",en:"didn't eat (plain negative past)"},
+        {jp:"いかなかった",romaji:"ikanakatta",en:"didn't go (plain negative past)"},
+        {jp:"がくせいだった",romaji:"gakusei datta",en:"was a student (plain past)",parts:["がくせい","だった"]},
+        {jp:"がくせいじゃなかった",romaji:"gakusei ja nakatta",en:"wasn't a student (plain negative past)",parts:["がくせい","じゃなかった"]},
+        {jp:"きのうえいがをみた",romaji:"kinou eiga o mita",en:"I saw a movie yesterday (casual)",parts:["きのう","えいが","を","みた"]},
+        {jp:"しゅうまつはなにをした？",romaji:"shuumatsu wa nani o shita?",en:"what did you do at the weekend? (casual)",parts:["しゅうまつ","は","なに","を","した"],alt:["shuumatsu wa nani o shita"]},
+        {jp:"きのうはさむかった",romaji:"kinou wa samukatta",en:"it was cold yesterday (casual)",parts:["きのう","は","さむかった"]},
+        {jp:"テストはむずかしくなかった",romaji:"tesuto wa muzukashikunakatta",en:"the test wasn't hard (casual)",parts:["テスト","は","むずかしくなかった"]},
+        {jp:"かぶきはおもしろかったとおもいます",romaji:"kabuki wa omoshirokatta to omoimasu",en:"I think the kabuki was interesting",parts:["かぶき","は","おもしろかった","と","おもいます"]},
+        {jp:"あめがふったとおもいます",romaji:"ame ga futta to omoimasu",en:"I think it rained",parts:["あめ","が","ふった","と","おもいます"]},
+        {jp:"きのうみたえいが",romaji:"kinou mita eiga",en:"the movie I saw yesterday (verb describing a noun)",parts:["きのう","みた","えいが"]},
+        {jp:"ともだちにもらったほん",romaji:"tomodachi ni moratta hon",en:"the book I got from a friend",parts:["ともだち","に","もらった","ほん"]},
+        {jp:"にほんでかったカメラです",romaji:"nihon de katta kamera desu",en:"it's a camera I bought in Japan",parts:["にほん","で","かった","カメラ","です"]},
+        {jp:"あかいくつをはいているひと",romaji:"akai kutsu o haite iru hito",en:"the person wearing red shoes",parts:["あかい","くつ","を","はいている","ひと"]},
+        {jp:"まだたべていません",romaji:"mada tabete imasen",en:"I haven't eaten yet",parts:["まだ","たべて","いません"]},
+        {jp:"まだしゅくだいをしていません",romaji:"mada shukudai o shite imasen",en:"I haven't done my homework yet",parts:["まだ","しゅくだい","を","して","いません"]},
+        {jp:"もうたべました",romaji:"mou tabemashita",en:"I've already eaten",parts:["もう","たべました"]},
+        {jp:"いそがしかったからいきませんでした",romaji:"isogashikatta kara ikimasen deshita",en:"I didn't go because I was busy",parts:["いそがしかった","から","いきませんでした"]},
+        {jp:"びょうきだったからやすみました",romaji:"byouki datta kara yasumimashita",en:"I took the day off because I was ill",parts:["びょうき","だった","から","やすみました"]},
+        {jp:"どうしてきませんでしたか",romaji:"doushite kimasen deshita ka",en:"why didn't you come?",parts:["どうして","きませんでした","か"]},
+        {jp:"しけんがあったからです",romaji:"shiken ga atta kara desu",en:"because I had an exam",parts:["しけん","が","あった","から","です"]}
+      ]},
+
+    /* ---------- Genki L10: Winter vacation plans ---------- */
+    { id:"compare", name:"Comparing & seasons", glyph:"比", tag:"phrase", genki:"L10",
+      note:"Compare two things with A は B より (adj) です — A is more (adj) than B — or ask A と B と どちらのほうが. For three or more: (group) のなかで X がいちばん. の can replace a noun already mentioned: あかいの = the red one. Adjective + なる = become: さむくなります, げんきになります.",
+      items:[
+        {jp:"きせつ",romaji:"kisetsu",en:"season"},
+        {jp:"はる",romaji:"haru",en:"spring"},
+        {jp:"なつ",romaji:"natsu",en:"summer"},
+        {jp:"あき",romaji:"aki",en:"autumn"},
+        {jp:"ふゆ",romaji:"fuyu",en:"winter"},
+        {jp:"せかい",romaji:"sekai",en:"world"},
+        {jp:"せいかつ",romaji:"seikatsu",en:"life / daily living"},
+        {jp:"ところ",romaji:"tokoro",en:"place"},
+        {jp:"あたたかい",romaji:"atatakai",en:"warm (i-adj)"},
+        {jp:"すずしい",romaji:"suzushii",en:"cool (weather) (i-adj)"},
+        {jp:"つめたい",romaji:"tsumetai",en:"cold (to the touch) (i-adj)"},
+        {jp:"おそい",romaji:"osoi",en:"slow / late (i-adj)"},
+        {jp:"ねむい",romaji:"nemui",en:"sleepy (i-adj)"},
+        {jp:"かんたん",romaji:"kantan",en:"easy / simple (na-adj)"},
+        {jp:"より",romaji:"yori",en:"than (particle)"},
+        {jp:"どちら",romaji:"dochira",en:"which (of two)"},
+        {jp:"いちばん",romaji:"ichiban",en:"the most / number one"},
+        {jp:"なります",romaji:"narimasu",en:"become"},
+        {jp:"ふゆははるよりさむいです",romaji:"fuyu wa haru yori samui desu",en:"winter is colder than spring",parts:["ふゆ","は","はる","より","さむい","です"]},
+        {jp:"でんしゃはバスよりはやいです",romaji:"densha wa basu yori hayai desu",en:"the train is faster than the bus",parts:["でんしゃ","は","バス","より","はやい","です"]},
+        {jp:"なつとふゆとどちらのほうがすきですか",romaji:"natsu to fuyu to dochira no hou ga suki desu ka",en:"which do you like better, summer or winter?",parts:["なつ","と","ふゆ","と","どちら","の","ほう","が","すき","です","か"]},
+        {jp:"ふゆのほうがすきです",romaji:"fuyu no hou ga suki desu",en:"I like winter better",parts:["ふゆ","の","ほう","が","すき","です"]},
+        {jp:"どちらもすきです",romaji:"dochira mo suki desu",en:"I like both",parts:["どちら","も","すき","です"]},
+        {jp:"くだもののなかでなにがいちばんすきですか",romaji:"kudamono no naka de nani ga ichiban suki desu ka",en:"of all fruit, which do you like the most?",parts:["くだもの","の","なか","で","なに","が","いちばん","すき","です","か"]},
+        {jp:"りんごがいちばんすきです",romaji:"ringo ga ichiban suki desu",en:"I like apples the most",parts:["りんご","が","いちばん","すき","です"]},
+        {jp:"かぞくのなかでだれがいちばんせがたかいですか",romaji:"kazoku no naka de dare ga ichiban se ga takai desu ka",en:"who in your family is the tallest?",parts:["かぞく","の","なか","で","だれ","が","いちばん","せ","が","たかい","です","か"]},
+        {jp:"せかいでいちばんおおきいまち",romaji:"sekai de ichiban ookii machi",en:"the biggest city in the world",parts:["せかい","で","いちばん","おおきい","まち"]},
+        {jp:"あかいのをください",romaji:"akai no o kudasai",en:"the red one, please (の = one)",parts:["あかい","の","を","ください"]},
+        {jp:"やすいのがいいです",romaji:"yasui no ga ii desu",en:"a cheap one would be good",parts:["やすい","の","が","いい","です"]},
+        {jp:"わたしのはこれです",romaji:"watashi no wa kore desu",en:"mine is this one",parts:["わたし","の","は","これ","です"]},
+        {jp:"さむくなりました",romaji:"samuku narimashita",en:"it has become cold",parts:["さむく","なりました"]},
+        {jp:"あたたかくなります",romaji:"atatakaku narimasu",en:"it will get warm",parts:["あたたかく","なります"]},
+        {jp:"げんきになりました",romaji:"genki ni narimashita",en:"I got better (な-adj + に + なる)",parts:["げんき","に","なりました"]},
+        {jp:"にほんごがじょうずになりましたね",romaji:"nihongo ga jouzu ni narimashita ne",en:"your Japanese has gotten good!",parts:["にほんご","が","じょうず","に","なりました","ね"]},
+        {jp:"せんせいになりたいです",romaji:"sensei ni naritai desu",en:"I want to become a teacher",parts:["せんせい","に","なりたい","です"]}
+      ]},
+    { id:"travel", name:"Trips · plans & transport", glyph:"旅", tag:"phrase", genki:"L10",
+      note:"Dictionary form + つもりです = intend to. Means of transport takes で: でんしゃでいきます; walking is あるいて. かかります = it takes (time / money): にじかんかかります. どこかに = somewhere; どこにも + negative = nowhere.",
+      items:[
+        {jp:"でんしゃ",romaji:"densha",en:"train"},
+        {jp:"バス",romaji:"basu",en:"bus"},
+        {jp:"しんかんせん",romaji:"shinkansen",en:"bullet train"},
+        {jp:"ふね",romaji:"fune",en:"ship / boat"},
+        {jp:"あるいて",romaji:"aruite",en:"on foot"},
+        {jp:"りょかん",romaji:"ryokan",en:"Japanese inn"},
+        {jp:"たいふう",romaji:"taifuu",en:"typhoon"},
+        {jp:"ふゆやすみ",romaji:"fuyuyasumi",en:"winter break",parts:["ふゆ","やすみ"]},
+        {jp:"はるやすみ",romaji:"haruyasumi",en:"spring break",parts:["はる","やすみ"]},
+        {jp:"なつやすみ",romaji:"natsuyasumi",en:"summer holiday",parts:["なつ","やすみ"]},
+        {jp:"よやく",romaji:"yoyaku",en:"reservation"},
+        {jp:"つもり",romaji:"tsumori",en:"intention"},
+        {jp:"かかります",romaji:"kakarimasu",en:"take (time) / cost (money)"},
+        {jp:"とまります",romaji:"tomarimasu",en:"stay (at a hotel)"},
+        {jp:"あるきます",romaji:"arukimasu",en:"walk"},
+        {jp:"きめます",romaji:"kimemasu",en:"decide"},
+        {jp:"つかれます",romaji:"tsukaremasu",en:"get tired"},
+        {jp:"よやくします",romaji:"yoyaku shimasu",en:"make a reservation",parts:["よやく","します"]},
+        {jp:"どこかに",romaji:"dokoka ni",en:"(to) somewhere",parts:["どこか","に"]},
+        {jp:"どこにも",romaji:"doko ni mo",en:"(to) nowhere (+ negative)",parts:["どこ","に","も"]},
+        {jp:"ふゆやすみににほんにいくつもりです",romaji:"fuyuyasumi ni nihon ni iku tsumori desu",en:"I intend to go to Japan over winter break",parts:["ふゆやすみ","に","にほん","に","いく","つもり","です"]},
+        {jp:"あしたはべんきょうするつもりです",romaji:"ashita wa benkyou suru tsumori desu",en:"I plan to study tomorrow",parts:["あした","は","べんきょうする","つもり","です"]},
+        {jp:"しゅうまつはなにをするつもりですか",romaji:"shuumatsu wa nani o suru tsumori desu ka",en:"what do you plan to do this weekend?",parts:["しゅうまつ","は","なに","を","する","つもり","です","か"]},
+        {jp:"アルバイトをしないつもりです",romaji:"arubaito o shinai tsumori desu",en:"I don't intend to work part-time",parts:["アルバイト","を","しない","つもり","です"]},
+        {jp:"でんしゃでいきます",romaji:"densha de ikimasu",en:"I'll go by train (で = by)",parts:["でんしゃ","で","いきます"]},
+        {jp:"しんかんせんできょうとにいきました",romaji:"shinkansen de kyouto ni ikimashita",en:"I went to Kyoto by bullet train",parts:["しんかんせん","で","きょうと","に","いきました"]},
+        {jp:"あるいてがっこうにいきます",romaji:"aruite gakkou ni ikimasu",en:"I walk to school",parts:["あるいて","がっこう","に","いきます"]},
+        {jp:"どうやっていきますか",romaji:"dou yatte ikimasu ka",en:"how do you get there?",parts:["どうやって","いきます","か"]},
+        {jp:"にじかんかかります",romaji:"nijikan kakarimasu",en:"it takes two hours",parts:["にじかん","かかります"]},
+        {jp:"えきまでじゅっぷんかかります",romaji:"eki made juppun kakarimasu",en:"it takes ten minutes to the station",parts:["えき","まで","じゅっぷん","かかります"]},
+        {jp:"どのぐらいかかりますか",romaji:"dono gurai kakarimasu ka",en:"how long does it take?",parts:["どのぐらい","かかります","か"]},
+        {jp:"いちまんえんぐらいかかります",romaji:"ichiman en gurai kakarimasu",en:"it costs about 10,000 yen",parts:["いちまんえん","ぐらい","かかります"]},
+        {jp:"りょかんにとまりました",romaji:"ryokan ni tomarimashita",en:"I stayed at a Japanese inn",parts:["りょかん","に","とまりました"]},
+        {jp:"しゅうまつはどこかにいきましたか",romaji:"shuumatsu wa dokoka ni ikimashita ka",en:"did you go somewhere at the weekend?",parts:["しゅうまつ","は","どこか","に","いきました","か"]},
+        {jp:"どこにもいきませんでした",romaji:"doko ni mo ikimasen deshita",en:"I didn't go anywhere",parts:["どこ","に","も","いきません","でした"]},
+        {jp:"ホテルをよやくしました",romaji:"hoteru o yoyaku shimashita",en:"I reserved a hotel",parts:["ホテル","を","よやくしました"]},
+        {jp:"つかれました",romaji:"tsukaremashita",en:"I'm tired"}
+      ]},
+
+    /* ---------- Genki L11: After the vacation ---------- */
+    { id:"want", name:"Wants, experiences & lists", glyph:"望", tag:"phrase", genki:"L11",
+      note:"Verb stem + たいです = want to (たべたい); it conjugates like an い-adjective: たべたくない, たべたかった. 〜たり〜たりする lists example activities. Past short form + ことがあります = have (ever) done. や joins nouns as 'and others': きょうとやならに.",
+      items:[
+        {jp:"しょうらい",romaji:"shourai",en:"future"},
+        {jp:"ゆめ",romaji:"yume",en:"dream"},
+        {jp:"がいこく",romaji:"gaikoku",en:"foreign country"},
+        {jp:"おんせん",romaji:"onsen",en:"hot spring"},
+        {jp:"おきゃくさん",romaji:"okyakusan",en:"guest / customer"},
+        {jp:"ドライブ",romaji:"doraibu",en:"a drive"},
+        {jp:"つり",romaji:"tsuri",en:"fishing"},
+        {jp:"キャンプ",romaji:"kyanpu",en:"camping"},
+        {jp:"ふじさん",romaji:"fujisan",en:"Mt. Fuji"},
+        {jp:"きょうと",romaji:"kyouto",en:"Kyoto"},
+        {jp:"なら",romaji:"nara",en:"Nara"},
+        {jp:"ならいます",romaji:"naraimasu",en:"learn / take lessons in"},
+        {jp:"やめます",romaji:"yamemasu",en:"quit"},
+        {jp:"やすみます",romaji:"yasumimasu",en:"rest / be absent"},
+        {jp:"のぼります",romaji:"noborimasu",en:"climb"},
+        {jp:"つります",romaji:"tsurimasu",en:"fish / catch (fish)"},
+        {jp:"けんかします",romaji:"kenka shimasu",en:"quarrel / fight",parts:["けんか","します"]},
+        {jp:"にほんにいきたいです",romaji:"nihon ni ikitai desu",en:"I want to go to Japan",parts:["にほん","に","いきたい","です"]},
+        {jp:"すしがたべたいです",romaji:"sushi ga tabetai desu",en:"I want to eat sushi (たい often takes が)",parts:["すし","が","たべたい","です"]},
+        {jp:"なにがしたいですか",romaji:"nani ga shitai desu ka",en:"what do you want to do?",parts:["なに","が","したい","です","か"]},
+        {jp:"べんきょうしたくないです",romaji:"benkyou shitakunai desu",en:"I don't want to study",parts:["べんきょうしたくない","です"]},
+        {jp:"こどものときせんせいになりたかったです",romaji:"kodomo no toki sensei ni naritakatta desu",en:"when I was a child I wanted to be a teacher",parts:["こども","の","とき","せんせい","に","なりたかった","です"]},
+        {jp:"えいがをみたりかいものをしたりします",romaji:"eiga o mitari kaimono o shitari shimasu",en:"I do things like watch movies and go shopping",parts:["えいが","を","みたり","かいもの","を","したり","します"]},
+        {jp:"しゅうまつはねたりテレビをみたりしました",romaji:"shuumatsu wa netari terebi o mitari shimashita",en:"at the weekend I slept, watched TV and so on",parts:["しゅうまつ","は","ねたり","テレビ","を","みたり","しました"]},
+        {jp:"おんせんにはいったりつりをしたりしたいです",romaji:"onsen ni haittari tsuri o shitari shitai desu",en:"I'd like to go to a hot spring, fish and such",parts:["おんせん","に","はいったり","つり","を","したり","したい","です"]},
+        {jp:"ふじさんにのぼったことがあります",romaji:"fujisan ni nobotta koto ga arimasu",en:"I have climbed Mt. Fuji",parts:["ふじさん","に","のぼった","こと","が","あります"]},
+        {jp:"にほんにいったことがありますか",romaji:"nihon ni itta koto ga arimasu ka",en:"have you ever been to Japan?",parts:["にほん","に","いった","こと","が","あります","か"]},
+        {jp:"すしをたべたことがありません",romaji:"sushi o tabeta koto ga arimasen",en:"I have never eaten sushi",parts:["すし","を","たべた","こと","が","ありません"]},
+        {jp:"かぶきをみたことがあります",romaji:"kabuki o mita koto ga arimasu",en:"I've seen kabuki before",parts:["かぶき","を","みた","こと","が","あります"]},
+        {jp:"きょうとやならにいきました",romaji:"kyouto ya nara ni ikimashita",en:"I went to Kyoto, Nara and other places",parts:["きょうと","や","なら","に","いきました"]},
+        {jp:"すしやてんぷらをたべました",romaji:"sushi ya tenpura o tabemashita",en:"I ate sushi, tempura and so on",parts:["すし","や","てんぷら","を","たべました"]},
+        {jp:"しょうらいのゆめはなんですか",romaji:"shourai no yume wa nan desu ka",en:"what is your dream for the future?",parts:["しょうらい","の","ゆめ","は","なん","です","か"]},
+        {jp:"がいこくではたらきたいです",romaji:"gaikoku de hatarakitai desu",en:"I want to work abroad",parts:["がいこく","で","はたらきたい","です"]},
+        {jp:"にほんごをならっています",romaji:"nihongo o naratte imasu",en:"I'm taking Japanese lessons",parts:["にほんご","を","ならって","います"]},
+        {jp:"アルバイトをやめました",romaji:"arubaito o yamemashita",en:"I quit my part-time job",parts:["アルバイト","を","やめました"]}
+      ]},
+
+    /* ---------- Genki L12: Feeling ill ---------- */
+    { id:"health", name:"Feeling ill · advice", glyph:"病", tag:"phrase", genki:"L12",
+      note:"Short form + んです explains a situation (おなかがいたいんです — the thing is, my stomach hurts). 〜すぎる = too much (たべすぎました). Past short form + ほうがいいです = you'd better…. 〜ので = because (softer than から). 〜なければいけません / casual 〜なきゃいけません = must. 〜でしょうか = I wonder / would it be…?",
+      items:[
+        {jp:"かぜ",romaji:"kaze",en:"a cold"},
+        {jp:"せき",romaji:"seki",en:"cough"},
+        {jp:"ねつ",romaji:"netsu",en:"fever"},
+        {jp:"おなか",romaji:"onaka",en:"stomach"},
+        {jp:"のど",romaji:"nodo",en:"throat"},
+        {jp:"インフルエンザ",romaji:"infuruenza",en:"influenza"},
+        {jp:"けが",romaji:"kega",en:"injury"},
+        {jp:"ストレス",romaji:"sutoresu",en:"stress"},
+        {jp:"きょうみ",romaji:"kyoumi",en:"interest"},
+        {jp:"いたい",romaji:"itai",en:"painful / hurts (i-adj)"},
+        {jp:"わるい",romaji:"warui",en:"bad (i-adj)"},
+        {jp:"かぜをひきます",romaji:"kaze o hikimasu",en:"catch a cold",parts:["かぜ","を","ひきます"]},
+        {jp:"ねつがあります",romaji:"netsu ga arimasu",en:"have a fever",parts:["ねつ","が","あります"]},
+        {jp:"せきがでます",romaji:"seki ga demasu",en:"have a cough",parts:["せき","が","でます"]},
+        {jp:"おなかをこわします",romaji:"onaka o kowashimasu",en:"have an upset stomach",parts:["おなか","を","こわします"]},
+        {jp:"きょうみがあります",romaji:"kyoumi ga arimasu",en:"be interested (in)",parts:["きょうみ","が","あります"]},
+        {jp:"なくします",romaji:"nakushimasu",en:"lose (something)"},
+        {jp:"きぶんがわるいです",romaji:"kibun ga warui desu",en:"I feel unwell",parts:["きぶん","が","わるい","です"]},
+        {jp:"どうしたんですか",romaji:"doushita n desu ka",en:"what's wrong?",parts:["どうした","んです","か"]},
+        {jp:"おなかがいたいんです",romaji:"onaka ga itai n desu",en:"the thing is, my stomach hurts",parts:["おなか","が","いたい","んです"]},
+        {jp:"ねつがあるんです",romaji:"netsu ga aru n desu",en:"I have a fever, you see",parts:["ねつ","が","ある","んです"]},
+        {jp:"あたまがいたいんです",romaji:"atama ga itai n desu",en:"I have a headache",parts:["あたま","が","いたい","んです"]},
+        {jp:"のどがいたいんです",romaji:"nodo ga itai n desu",en:"my throat hurts",parts:["のど","が","いたい","んです"]},
+        {jp:"かぜをひいたんです",romaji:"kaze o hiita n desu",en:"I've caught a cold",parts:["かぜ","を","ひいた","んです"]},
+        {jp:"きのうねなかったんです",romaji:"kinou nenakatta n desu",en:"I didn't sleep last night, that's why",parts:["きのう","ねなかった","んです"]},
+        {jp:"たべすぎました",romaji:"tabesugimashita",en:"I ate too much",parts:["たべ","すぎました"]},
+        {jp:"のみすぎないでください",romaji:"nomisuginai de kudasai",en:"please don't drink too much",parts:["のみすぎない","で","ください"]},
+        {jp:"このかばんはおおきすぎます",romaji:"kono kaban wa ookisugimasu",en:"this bag is too big",parts:["この","かばん","は","おおきすぎます"]},
+        {jp:"くすりをのんだほうがいいです",romaji:"kusuri o nonda hou ga ii desu",en:"you'd better take some medicine",parts:["くすり","を","のんだ","ほう","が","いい","です"]},
+        {jp:"うちでやすんだほうがいいですよ",romaji:"uchi de yasunda hou ga ii desu yo",en:"you should rest at home",parts:["うち","で","やすんだ","ほう","が","いい","です","よ"]},
+        {jp:"びょういんにいったほうがいいです",romaji:"byouin ni itta hou ga ii desu",en:"you should go to a hospital",parts:["びょういん","に","いった","ほう","が","いい","です"]},
+        {jp:"あまりはたらかないほうがいいです",romaji:"amari hatarakanai hou ga ii desu",en:"you'd better not work too much",parts:["あまり","はたらかない","ほう","が","いい","です"]},
+        {jp:"あしたしけんがあるのでべんきょうします",romaji:"ashita shiken ga aru node benkyou shimasu",en:"I'll study because I have an exam tomorrow",parts:["あした","しけん","が","ある","ので","べんきょうします"]},
+        {jp:"びょうきなのでいけません",romaji:"byouki na node ikemasen",en:"I can't go because I'm ill (noun + な + ので)",parts:["びょうき","な","ので","いけません"]},
+        {jp:"さむかったのでかぜをひきました",romaji:"samukatta node kaze o hikimashita",en:"it was cold, so I caught a cold",parts:["さむかった","ので","かぜ","を","ひきました"]},
+        {jp:"しゅくだいをしなければいけません",romaji:"shukudai o shinakereba ikemasen",en:"I have to do my homework",parts:["しゅくだい","を","しなければ","いけません"]},
+        {jp:"くすりをのまなければいけません",romaji:"kusuri o nomanakereba ikemasen",en:"I must take medicine",parts:["くすり","を","のまなければ","いけません"]},
+        {jp:"あしたはやくおきなきゃいけない",romaji:"ashita hayaku okinakya ikenai",en:"I've got to get up early tomorrow (casual)",parts:["あした","はやく","おきなきゃ","いけない"]},
+        {jp:"びょういんにいかなきゃいけません",romaji:"byouin ni ikanakya ikemasen",en:"I've got to go to the hospital",parts:["びょういん","に","いかなきゃ","いけません"]},
+        {jp:"あしたはあめでしょうか",romaji:"ashita wa ame deshou ka",en:"I wonder if it will rain tomorrow",parts:["あした","は","あめ","でしょう","か"]},
+        {jp:"だいじょうぶでしょうか",romaji:"daijoubu deshou ka",en:"will it be all right, I wonder?",parts:["だいじょうぶ","でしょう","か"]},
+        {jp:"おだいじに",romaji:"odaiji ni",en:"take care of yourself (to someone ill)"},
+        {jp:"げんきがないですね",romaji:"genki ga nai desu ne",en:"you look down",parts:["げんき","が","ない","です","ね"]},
+        {jp:"ゆっくりやすんでください",romaji:"yukkuri yasunde kudasai",en:"please get a good rest",parts:["ゆっくり","やすんで","ください"]}
+      ]},
+
+    /* ---------- Travel phrasebook (always open) ---------- */
+    { id:"go", name:"Getting around", glyph:"駅", tag:"phrase", free:true, genki:"Travel",
+      note:"Survival phrases for transport. X はどこですか asks where something is; answers use みぎ / ひだり / まっすぐ. These topics are always unlocked.",
+      items:[
+        {jp:"えき",romaji:"eki",en:"station"},
+        {jp:"でんしゃ",romaji:"densha",en:"train"},
+        {jp:"ちかてつ",romaji:"chikatetsu",en:"subway"},
+        {jp:"バス",romaji:"basu",en:"bus"},
+        {jp:"くうこう",romaji:"kuukou",en:"airport"},
+        {jp:"きっぷ",romaji:"kippu",en:"ticket"},
+        {jp:"みぎ",romaji:"migi",en:"right"},
+        {jp:"ひだり",romaji:"hidari",en:"left"},
+        {jp:"まっすぐ",romaji:"massugu",en:"straight ahead"},
+        {jp:"でぐち",romaji:"deguchi",en:"exit"},
+        {jp:"いりぐち",romaji:"iriguchi",en:"entrance"},
+        {jp:"とうきょう",romaji:"toukyou",en:"Tokyo"},
+        {jp:"えきはどこですか",romaji:"eki wa doko desu ka",en:"where is the station?",parts:["えき","は","どこ","です","か"]},
+        // — added —
+        {jp:"タクシー",romaji:"takushii",en:"taxi"},
+        {jp:"しんかんせん",romaji:"shinkansen",en:"bullet train"},
+        {jp:"つぎのえき",romaji:"tsugi no eki",en:"the next station",parts:["つぎ","の","えき"]},
+        {jp:"みぎにまがってください",romaji:"migi ni magatte kudasai",en:"please turn right",parts:["みぎ","に","まがって","ください"]},
+        {jp:"ひだりです",romaji:"hidari desu",en:"it's on the left",parts:["ひだり","です"]},
+        {jp:"まっすぐいってください",romaji:"massugu itte kudasai",en:"please go straight",parts:["まっすぐ","いって","ください"]},
+        {jp:"とうきょうまでいくらですか",romaji:"toukyou made ikura desu ka",en:"how much to Tokyo?",parts:["とうきょう","まで","いくら","です","か"]},
+        {jp:"このでんしゃはとうきょうにいきますか",romaji:"kono densha wa toukyou ni ikimasu ka",en:"does this train go to Tokyo?",parts:["この","でんしゃ","は","とうきょう","に","いきます","か"]},
+        {jp:"ここでおります",romaji:"koko de orimasu",en:"I'll get off here",parts:["ここ","で","おります"]},
+        {jp:"ちかいですか",romaji:"chikai desu ka",en:"is it near?",parts:["ちかい","です","か"]}
+      ]},
+    { id:"about", name:"Out & about", glyph:"街", tag:"phrase", free:true, genki:"Travel",
+      note:"Phrases for shops, help and misunderstanding. もういちど = once more; わかりません = I don't understand. だいじょうぶです is a flexible 'it's fine / no thanks'.",
+      items:[
+        {jp:"いくらですか",romaji:"ikura desu ka",en:"how much is it?",parts:["いくら","です","か"]},
+        {jp:"これはいくらですか",romaji:"kore wa ikura desu ka",en:"how much is this?",parts:["これ","は","いくら","です","か"]},
+        {jp:"トイレはどこですか",romaji:"toire wa doko desu ka",en:"where's the toilet?",parts:["トイレ","は","どこ","です","か"]},
+        {jp:"げんきん",romaji:"genkin",en:"cash"},
+        {jp:"クレジットカード",romaji:"kurejitto kaado",en:"credit card"},
+        {jp:"えいごがわかりますか",romaji:"eigo ga wakarimasu ka",en:"do you understand English?",parts:["えいご","が","わかります","か"]},
+        {jp:"わかりません",romaji:"wakarimasen",en:"I don't understand"},
+        {jp:"だいじょうぶです",romaji:"daijoubu desu",en:"I'm fine / it's okay"},
+        {jp:"たすけてください",romaji:"tasukete kudasai",en:"please help",parts:["たすけて","ください"]},
+        {jp:"もういちどおねがいします",romaji:"mou ichido onegaishimasu",en:"one more time, please",parts:["もう","いちど","おねがいします"]},
+        {jp:"ちかい",romaji:"chikai",en:"near (i-adj)"},
+        {jp:"とおい",romaji:"tooi",en:"far (i-adj)"},
+        // — added —
+        {jp:"にほんごがすこしわかります",romaji:"nihongo ga sukoshi wakarimasu",en:"I understand a little Japanese",parts:["にほんご","が","すこし","わかります"]},
+        {jp:"えいごのメニューがありますか",romaji:"eigo no menyuu ga arimasu ka",en:"is there an English menu?",parts:["えいご","の","メニュー","が","あります","か"]},
+        {jp:"カードでいいですか",romaji:"kaado de ii desu ka",en:"is card okay?",parts:["カード","で","いい","です","か"]},
+        {jp:"ふくろはいりません",romaji:"fukuro wa irimasen",en:"I don't need a bag",parts:["ふくろ","は","いりません"]},
+        {jp:"ゆっくりおねがいします",romaji:"yukkuri onegaishimasu",en:"slowly, please",parts:["ゆっくり","おねがいします"]},
+        {jp:"かいてください",romaji:"kaite kudasai",en:"please write it down",parts:["かいて","ください"]},
+        {jp:"びょういんはどこですか",romaji:"byouin wa doko desu ka",en:"where is the hospital?",parts:["びょういん","は","どこ","です","か"]},
+        {jp:"すこし",romaji:"sukoshi",en:"a little"},
+        {jp:"おみず",romaji:"omizu",en:"water (polite)"}
+      ]}
+  ]
+};
+
+/* ---------------- Kanji layer ----------------
+   Words stay kana-first. Once the learner is half-way through "Everyday verbs" (Genki starts kanji in L3),
+   words that have a kanji form render as kanji with furigana; mastered words then get a "read" drill.
+   KANJI maps a kana word (or a Build tile) to its kanji form. Ambiguous single kana (に, ご, と, さん…)
+   are deliberately absent so particles and honorifics never turn into numbers.                     */
+const KANJI = {
+  // people & school (L1)
+  "わたし":"私","がくせい":"学生","せんせい":"先生","かいしゃいん":"会社員","いしゃ":"医者","だいがく":"大学","にほん":"日本",
+  "にほんじん":"日本人","アメリカじん":"アメリカ人","なまえ":"名前","おなまえ":"お名前","なん":"何","なに":"何","ほん":"本",
+  "ともだち":"友達","りゅうがくせい":"留学生","だいがくせい":"大学生","こうこうせい":"高校生","こうこう":"高校","いちねんせい":"一年生",
+  "にねんせい":"二年生","ねんせい":"年生","なんねんせい":"何年生","せんこう":"専攻","しごと":"仕事","ひと":"人","たなか":"田中","たなかさん":"田中さん",
+  "にほんご":"日本語","えいご":"英語","ちゅうごく":"中国","ちゅうごくご":"中国語","かんこく":"韓国","かんこくじん":"韓国人","じん":"人",
+  "けいざい":"経済","れきし":"歴史","ぶんがく":"文学","せいじ":"政治","かがく":"科学","べんごし":"弁護士","しゅふ":"主婦",
+  "かんごし":"看護師","だいがくいんせい":"大学院生","イギリスじん":"イギリス人","ちゅうごくじん":"中国人","こくさいかんけい":"国際関係","けんきゅう":"研究",
+  // numbers, time, money (whole-word entries so に / ご / さん tiles stay kana)
+  "いち":"一","じゅう":"十","ひゃく":"百","せん":"千","まん":"万","じゅういち":"十一","じゅうに":"十二","じゅうご":"十五","にじゅう":"二十",
+  "にじゅうさん":"二十三","さんじゅう":"三十","よんじゅう":"四十","ごじゅう":"五十","ろくじゅう":"六十","ななじゅう":"七十","はちじゅう":"八十",
+  "きゅうじゅう":"九十","さんびゃく":"三百","ろっぴゃく":"六百","はっぴゃく":"八百","さんぜん":"三千","はっせん":"八千","いちまん":"一万",
+  "にせん":"二千","ごひゃく":"五百","にせんごひゃく":"二千五百","はんぶん":"半分","なんばん":"何番",
+  "いちじ":"一時","にじ":"二時","さんじ":"三時","よじ":"四時","ごじ":"五時","ろくじ":"六時","しちじ":"七時","はちじ":"八時","くじ":"九時",
+  "じゅうじ":"十時","じゅういちじ":"十一時","じゅうにじ":"十二時","はん":"半","ごぜん":"午前","ごご":"午後","なんじ":"何時","いま":"今",
+  "いちじかん":"一時間","なんさい":"何歳","にじゅっさい":"二十歳","じゅうはっさい":"十八歳","でんわ":"電話","ばんごう":"番号",
+  "でんわばんごう":"電話番号","えん":"円","せんえん":"千円","さんびゃくえん":"三百円","ひとつ":"一つ","ふたつ":"二つ","みっつ":"三つ",
+  "よっつ":"四つ","いつつ":"五つ","ひとり":"一人","ふたり":"二人","さんにん":"三人","よにん":"四人","なんにん":"何人","ひとりで":"一人で",
+  // time words (L3)
+  "きょう":"今日","あした":"明日","きのう":"昨日","まいにち":"毎日","にちようび":"日曜日","げつようび":"月曜日","かようび":"火曜日",
+  "すいようび":"水曜日","もくようび":"木曜日","きんようび":"金曜日","どようび":"土曜日","なんようび":"何曜日","あさ":"朝","ひる":"昼",
+  "よる":"夜","ばん":"晩","こんばん":"今晩","まいあさ":"毎朝","まいばん":"毎晩","しゅうまつ":"週末","せんしゅう":"先週","こんしゅう":"今週",
+  "らいしゅう":"来週","こんげつ":"今月","らいげつ":"来月","いっしょに":"一緒に",
+  // verbs (ます forms, tiles and te-forms)
+  "たべます":"食べます","のみます":"飲みます","みます":"見ます","ききます":"聞きます","よみます":"読みます","いきます":"行きます",
+  "きます":"来ます","かいます":"買います","わかります":"分かります","ねます":"寝ます","おきます":"起きます","かえります":"帰ります",
+  "はなします":"話します","べんきょうします":"勉強します","べんきょう":"勉強","あいます":"会います","かきます":"書きます","とります":"撮ります",
+  "まちます":"待ちます","およぎます":"泳ぎます","のります":"乗ります","でかけます":"出かけます","あそびます":"遊びます","はたらきます":"働きます",
+  "うたいます":"歌います","たべません":"食べません","いきません":"行きません","たべる":"食べる","のむ":"飲む","いく":"行く","くる":"来る",
+  "たべ":"食べ","いき":"行き","のみません":"飲みません","よみました":"読みました","みません":"見ません","いきました":"行きました",
+  "まちました":"待ちました","とりました":"撮りました","かいました":"買いました","みました":"見ました","かえします":"返します",
+  "かります":"借ります","つかいます":"使います","わすれました":"忘れました","はいります":"入ります","おります":"降ります",
+  "いきましょう":"行きましょう","たべましょう":"食べましょう","あいましょう":"会いましょう","およぎません":"泳ぎません","わかりません":"分かりません",
+  "しりません":"知りません","たすけて":"助けて",
+  "たべて":"食べて","みて":"見て","のんで":"飲んで","よんで":"読んで","かいて":"書いて","まって":"待って","いって":"行って","はなして":"話して",
+  "すわって":"座って","たって":"立って","きいて":"聞いて","おしえて":"教えて","てつだって":"手伝って","あけて":"開けて","しめて":"閉めて",
+  "けして":"消して","かして":"貸して","とって":"撮って","はいって":"入って","すって":"吸って","おきて":"起きて","かえって":"帰って",
+  "べんきょうして":"勉強して","すんで":"住んで","けっこんして":"結婚して","しって":"知って","もって":"持って","うたって":"歌って",
+  "まがって":"曲がって","ふとっています":"太っています",
+  // nouns (L2–L7)
+  "ごはん":"ご飯","みず":"水","おみず":"お水","おちゃ":"お茶","にく":"肉","さかな":"魚","たまご":"卵","やさい":"野菜","くだもの":"果物",
+  "あさごはん":"朝ご飯","ひるごはん":"昼ご飯","ばんごはん":"晩ご飯","たべもの":"食べ物","のみもの":"飲み物","おさけ":"お酒","ぎゅうにゅう":"牛乳",
+  "がっこう":"学校","としょかん":"図書館","えいが":"映画","おんがく":"音楽","かいもの":"買い物","かぞく":"家族","ちち":"父","はは":"母",
+  "あに":"兄","あね":"姉","おとうと":"弟","いもうと":"妹","おとうさん":"お父さん","おかあさん":"お母さん","おにいさん":"お兄さん",
+  "おねえさん":"お姉さん","きょうだい":"兄弟","こども":"子供","おとこ":"男","おんな":"女","め":"目","くち":"口","みみ":"耳","て":"手",
+  "あし":"足","かお":"顔","あたま":"頭","かみ":"髪","せ":"背","くるま":"車","かいしゃ":"会社","うた":"歌","ねこ":"猫","いぬ":"犬","はな":"花",
+  "つくえ":"机","まえ":"前","うしろ":"後ろ","なか":"中","うえ":"上","した":"下","となり":"隣","ちかく":"近く","あいだ":"間","こうえん":"公園",
+  "びょういん":"病院","ほんや":"本屋","おてら":"お寺","まち":"町","いえ":"家","へや":"部屋","しゅくだい":"宿題","しゃしん":"写真","えき":"駅",
+  "でんしゃ":"電車","ちかてつ":"地下鉄","くうこう":"空港","きっぷ":"切符","みぎ":"右","ひだり":"左","でぐち":"出口","いりぐち":"入口",
+  "げんきん":"現金","てんき":"天気","りょこう":"旅行","うみ":"海","やま":"山","たんじょうび":"誕生日","やすみ":"休み","ひこうき":"飛行機",
+  "ぼく":"僕","おかね":"お金","かんじ":"漢字","きょうかしょ":"教科書","まど":"窓","でんき":"電気","にもつ":"荷物","おふろ":"お風呂","つぎ":"次",
+  "ぎんこう":"銀行","ゆうびんきょく":"郵便局","きっさてん":"喫茶店","おてあらい":"お手洗い","じしょ":"辞書","しんぶん":"新聞","ざっし":"雑誌",
+  "かさ":"傘","くつ":"靴","さいふ":"財布","とけい":"時計","ぼうし":"帽子","じてんしゃ":"自転車","とうきょう":"東京","おきなわ":"沖縄",
+  "おかんじょう":"お勘定","すこし":"少し","ふくろ":"袋","しんかんせん":"新幹線","げんき":"元気","おげんき":"お元気",
+  // adjectives
+  "たかい":"高い","やすい":"安い","おおきい":"大きい","ちいさい":"小さい","あかい":"赤い","あおい":"青い","しろい":"白い","くろい":"黒い",
+  "あたらしい":"新しい","ふるい":"古い","あつい":"暑い","さむい":"寒い","いそがしい":"忙しい","たのしい":"楽しい","むずかしい":"難しい",
+  "ながい":"長い","みじかい":"短い","はやい":"早い","ひくい":"低い","すき":"好き","きらい":"嫌い","だいすき":"大好き","だいきらい":"大嫌い",
+  "しずか":"静か","ゆうめい":"有名","しんせつ":"親切","べんり":"便利","たのしかった":"楽しかった","さむかった":"寒かった",
+  "むずかしくなかった":"難しくなかった",
+  // L8–L12
+  "たべない":"食べない","のまない":"飲まない","いかない":"行かない","かわない":"買わない","またない":"待たない","はなさない":"話さない",
+  "こない":"来ない","みる":"見る","よむ":"読む","かえる":"帰る","わかる":"分かる","たかくない":"高くない","いそがしい":"忙しい",
+  "あめ":"雨","はれ":"晴れ","くもり":"曇り","よほう":"予報","てんきよほう":"天気予報","りょうり":"料理","そうじ":"掃除","せんたく":"洗濯",
+  "じょうず":"上手","へた":"下手","なにか":"何か","なにも":"何も","おもいます":"思います","いいます":"言います","つくります":"作ります",
+  "あらいます":"洗います","ふります":"降ります","はじめます":"始めます","うんてん":"運転","うんてんします":"運転します","そうじします":"掃除します",
+  "せんたくします":"洗濯します","りょうりします":"料理します","ふる":"降る","ふった":"降った","いって":"行って","うたう":"歌う","およぐ":"泳ぐ",
+  "そうじする":"掃除する","とらない":"撮らない","わすれない":"忘れない",
+  "いろ":"色","おまつり":"お祭り","おかし":"お菓子","くすり":"薬","さくぶん":"作文","しけん":"試験","じんじゃ":"神社","びょうき":"病気",
+  "かぶき":"歌舞伎","さびしい":"寂しい","わかい":"若い","にんき":"人気","おどります":"踊ります","おわります":"終わります","はじまります":"始まります",
+  "ひきます":"弾きます","おぼえます":"覚えます","でます":"出ます","うんどう":"運動","うんどうします":"運動します","さんぽ":"散歩","さんぽします":"散歩します",
+  "たべた":"食べた","のんだ":"飲んだ","いった":"行った","きた":"来た","たべなかった":"食べなかった","いかなかった":"行かなかった","みた":"見た",
+  "もらった":"もらった","かった":"買った","はいている":"はいている","いそがしかった":"忙しかった","おもしろかった":"面白かった","やすみました":"休みました",
+  "きませんでした":"来ませんでした","いきませんでした":"行きませんでした","あった":"あった",
+  "きせつ":"季節","はる":"春","なつ":"夏","あき":"秋","ふゆ":"冬","せかい":"世界","せいかつ":"生活","ところ":"所","あたたかい":"暖かい",
+  "すずしい":"涼しい","つめたい":"冷たい","おそい":"遅い","ねむい":"眠い","かんたん":"簡単","いちばん":"一番","さむく":"寒く","あたたかく":"暖かく",
+  "なりたい":"なりたい","ふね":"船","あるいて":"歩いて","りょかん":"旅館","たいふう":"台風","ふゆやすみ":"冬休み","はるやすみ":"春休み","なつやすみ":"夏休み",
+  "よやく":"予約","よやくします":"予約します","よやくしました":"予約しました","とまります":"泊まります","とまりました":"泊まりました","あるきます":"歩きます",
+  "きめます":"決めます","つかれます":"疲れます","つかれました":"疲れました","きょうと":"京都","なら":"奈良","にじかん":"二時間","じゅっぷん":"十分",
+  "いちまんえん":"一万円","べんきょうする":"勉強する",
+  "しょうらい":"将来","ゆめ":"夢","がいこく":"外国","おんせん":"温泉","おきゃくさん":"お客さん","つり":"釣り","ふじさん":"富士山",
+  "ならいます":"習います","やめます":"辞めます","やすみます":"休みます","のぼります":"登ります","つります":"釣ります","いきたい":"行きたい",
+  "たべたい":"食べたい","したい":"したい","べんきょうしたくない":"勉強したくない","なりたかった":"なりたかった","みたり":"見たり","ねたり":"寝たり",
+  "はいったり":"入ったり","のぼった":"登った","たべた":"食べた","はたらきたい":"働きたい","ならって":"習って","やめました":"辞めました","とき":"時",
+  "かぜ":"風邪","ねつ":"熱","きょうみ":"興味","いたい":"痛い","わるい":"悪い","ひきます":"引きます","ひいた":"引いた","でます":"出ます",
+  "なくします":"無くします","きぶん":"気分","はやく":"早く","やすんで":"休んで","やすんだ":"休んだ","のんだ":"飲んだ","はたらかない":"働かない",
+  "しなければ":"しなければ","のまなければ":"飲まなければ","おきなきゃ":"起きなきゃ","いかなきゃ":"行かなきゃ","おおきすぎます":"大きすぎます",
+  "のみすぎない":"飲みすぎない","すぎました":"すぎました","ねなかった":"寝なかった","おだいじに":"お大事に"
+};
+// per-item overrides where the same kana has two kanji
+const KANJI_BY_ID = { "people-1":"鼻" };   // はな = nose (花 flower is the default)
+const isKanjiCh = ch => /[\u4e00-\u9faf\u3400-\u4dbf々]/.test(ch);
+// Split a kanji-form + kana reading into ruby segments [[text, reading|null], ...]
+function alignRuby(k, reading){
+  if(!k || k===reading) return [[reading,null]];
+  const segs=[]; let re="^"; 
+  for(let i=0;i<k.length;){
+    if(isKanjiCh(k[i])){ let j=i; while(j<k.length && isKanjiCh(k[j])) j++; segs.push([k.slice(i,j),true]); re+="(.+?)"; i=j; }
+    else { let j=i; while(j<k.length && !isKanjiCh(k[j])) j++; const lit=k.slice(i,j); segs.push([lit,false]); re+=lit.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"); i=j; }
+  }
+  re+="$";
+  const m = reading.match(new RegExp(re));
+  if(!m) return [[k,reading]];              // couldn't align: one ruby over the whole word
+  let gi=1; return segs.map(([txt,isK])=> isK ? [txt, m[gi++]] : [txt,null]);
+}
+
+// index items with stable ids + back-refs to topic
+const ITEMS = {};      // id -> item
+const TOPIC_OF = {};   // itemId -> topicId
+COURSE.topics.forEach(t=>{
+  t.itemIds = [];
+  t.items.forEach((it,i)=>{
+    it.id = t.id+"-"+i;
+    it.topic = t.id;
+    it.tags = it.tags || [t.tag];
+    // kanji form: whole-word entry first (so number/time compounds stay intact), else assemble from Build tiles
+    const k0 = KANJI_BY_ID[it.id] || KANJI[it.jp];
+    if(k0){ it.k=k0; it.ruby=alignRuby(k0,it.jp); }
+    else if(it.parts && it.parts.some(p=>KANJI[p])){ it.ruby=[]; it.parts.forEach(p=>alignRuby(KANJI[p]||p,p).forEach(sg=>it.ruby.push(sg))); it.k=it.ruby.map(sg=>sg[0]).join(""); }
+    ITEMS[it.id] = it;
+    TOPIC_OF[it.id] = t.id;
+    t.itemIds.push(it.id);
+  });
+});
+const ALL_IDS = Object.keys(ITEMS);
+const TOPIC = {}; COURSE.topics.forEach(t=>TOPIC[t.id]=t);
+
+/* ---------------- Config ---------------- */
+const CFG = {
+  newPerLesson: 5,
+  lessonSize: 12,
+  dailyMax: 20,
+  targetR: 0.9,            // review when recall prob would drop to this
+  comboEvery: 5,
+  recordMin: 20,           // only celebrate beating a personal best above this
+  xp:{ mc:8, build:12, type:15, read:10, easyBonus:4, comboBonus:20 },
+  readShare: 3,            // at most 1/3 of a session can be kanji reading drills
+  kanjiUnlockAt: 40,       // kanji appears once this many (non-kana) words are mastered
+};
+const DAY = 86400000;
+const now = ()=>Date.now();
+const todayStr = (d=new Date())=>{ const z=new Date(d.getTime()-d.getTimezoneOffset()*60000); return z.toISOString().slice(0,10); };
+const daysAgo = (n)=>{ const d=new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()-n); return d; }; // local-calendar safe across DST
+
+/* ---------------- Storage (on-device; export/import to move it) ---------------- */
+const LS_KEY = "kotoba.v1";
+function blankProfile(){ return { name:"", memory:{}, xp:{total:0, byDay:{}}, streak:{current:0, longest:0, lastActive:""}, answerStreak:{current:0, best:0}, sound:true, theme:"", inputMode:"romaji", kanji:{} }; }
+let profile = blankProfile();
+
+let storeCorrupt=false;
+function initStore(){
+  let raw=null;
+  try{ raw = localStorage.getItem(LS_KEY); }catch(e){}
+  if(!raw) return;
+  try{ profile = normalizeProfile(JSON.parse(raw)); }
+  catch(e){
+    // don't overwrite a corrupted save — park it so it can be recovered from Export/DevTools
+    storeCorrupt=true;
+    try{ localStorage.setItem(LS_KEY+".corrupt."+Date.now(), raw); }catch(e2){}
+  }
+}
+function normalizeProfile(p){ const b=blankProfile(); return {
+  name: p.name||"", memory:p.memory||{}, theme:p.theme||"",
+  xp:{ total:(p.xp&&p.xp.total)||0, byDay:(p.xp&&p.xp.byDay)||{} },
+  streak:{ current:(p.streak&&p.streak.current)||0, longest:(p.streak&&p.streak.longest)||0, lastActive:(p.streak&&p.streak.lastActive)||"" },
+  answerStreak:{ current:(p.answerStreak&&p.answerStreak.current)||0, best:(p.answerStreak&&p.answerStreak.best)||0 },
+  sound: p.sound!==false,
+  inputMode: p.inputMode==="kana"?"kana":"romaji",
+  kanji: p.kanji||{}
+};}
+let saveWarned=false;
+function save(){
+  try{
+    const prev=localStorage.getItem(LS_KEY);
+    if(prev) localStorage.setItem(LS_KEY+".bak", prev);   // one-step-back copy
+    localStorage.setItem(LS_KEY, JSON.stringify(profile));
+  }catch(e){
+    if(!saveWarned){ saveWarned=true; toast("⚠ Couldn't save progress (private mode or storage full)"); }
+  }
+}
+
+/* ---------------- FSRS-lite engine ----------------
+   Confidence == retrievability R = 0.9^(elapsedDays / stability).
+   Correct raises stability (more when R was low); wrong shrinks it. */
+function clamp(x,a,b){ return Math.max(a,Math.min(b,x)); }
+function mem(id){ return profile.memory[id]; }
+function retrievability(m,t){ if(!m||!m.S) return 0; const e=(t-m.last)/DAY; return clamp(Math.pow(0.9, e/m.S),0,1); }
+function confidence(id,t){ const m=mem(id); return m?retrievability(m,t):0; }
+function isNew(id){ return !mem(id); }
+function isDue(id,t){ const m=mem(id); return m && m.due<=t; }
+
+function review(id, grade, t){
+  const m = mem(id);
+  let S,D,reps,lapses;
+  if(!m){
+    D = grade==="easy"?4 : grade==="again"?6.5 : 5;
+    S = grade==="easy"?3 : grade==="again"?0.5 : 1.4;
+    reps = 1; lapses = grade==="again"?1:0;
+  } else {
+    const R = retrievability(m,t);
+    // reviewed early (not due, recall still ~certain) and got it right: no information gained,
+    // so don't stretch the interval — just count the rep. Misses still shrink stability.
+    if(grade!=="again" && m.due>t && R>0.95){ profile.memory[id] = Object.assign({}, m, {reps:m.reps+1}); return; }
+    D = clamp(m.D + (grade==="again"?1.0 : grade==="easy"?-0.8 : -0.3), 1, 10);
+    reps = m.reps+1; lapses = m.lapses + (grade==="again"?1:0);
+    if(grade==="again"){
+      S = Math.max(0.4, m.S*0.5);
+    } else {
+      const factor = grade==="easy"?3.0:1.8;
+      const diffMod = (11-D)/6;
+      S = m.S * (1 + factor*(1-R)*diffMod);
+      S = Math.max(S, m.S*(grade==="easy"?1.5:1.2)); // guarantee growth
+    }
+  }
+  const due = t + (S * Math.log(CFG.targetR)/Math.log(0.9)) * DAY; // = t + S days at targetR 0.9
+  profile.memory[id] = { S, D, last:t, due, reps, lapses };
+}
+
+/* ---------------- XP / streak ---------------- */
+function addXP(n){
+  const before=levelInfo().lv;
+  profile.xp.total += n;
+  const d = todayStr();
+  profile.xp.byDay[d] = (profile.xp.byDay[d]||0) + n;
+  const after=levelInfo().lv;
+  if(after>before) levelUp(after);
+}
+const XP_C = 90;   // level L starts at XP_C*(L-1)^2 → each level needs progressively more
+function levelInfo(){
+  const t=profile.xp.total;
+  const lv=Math.floor(Math.sqrt(t/XP_C))+1;
+  const base=XP_C*(lv-1)*(lv-1);
+  const next=XP_C*lv*lv;
+  return { lv, into:t-base, need:next-base, total:t };
+}
+function currentStreak(){
+  // a streak only counts if you studied today or yesterday
+  const s=profile.streak, d=todayStr(), y=todayStr(daysAgo(1));
+  return (s.lastActive===d || s.lastActive===y) ? s.current : 0;
+}
+function touchStreak(){
+  const d = todayStr(); const s = profile.streak;
+  if(s.lastActive===d) return;
+  const y = todayStr(daysAgo(1));
+  s.current = (s.lastActive===y) ? s.current+1 : 1;
+  s.lastActive = d;
+  s.longest = Math.max(s.longest, s.current);
+}
+
+/* ---------------- Skip: mark earlier topics as known ---------------- */
+// Seeds a memory record for every not-yet-studied word in the topics BEFORE
+// targetIndex, so they enter review rotation. Due dates are staggered by
+// position: the topic just before the start comes due first; the earliest
+// (easiest, most foundational) topic comes due last. Never overwrites real progress.
+function markKnownBefore(targetIndex){
+  const T=now(); let seeded=0;
+  for(let j=0;j<targetIndex;j++){
+    const topic=COURSE.topics[j];
+    const distance = targetIndex - j;         // 1 = topic just before start; larger = earlier/easier
+    const dueDays = 1 + (distance-1)*1.5;      // earlier topics surface later
+    topic.itemIds.forEach((id,k)=>{
+      if(mem(id)) return;                      // keep any word you've actually studied
+      profile.memory[id] = { S:6, D:4.5, reps:1, lapses:0, last:T, due: T + dueDays*DAY + k*2*3600*1000 };
+      seeded++;
+    });
+  }
+  if(seeded) save();
+  return seeded;
+}
+
+/* ---------------- Session generator ---------------- */
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function topicStats(t){
+  const T=now(); let mastered=0, seen=0, due=0, fresh=0, sum=0;
+  t.itemIds.forEach(id=>{ const m=mem(id);
+    if(!m){ fresh++; } else { seen++; sum+=retrievability(m,T); if(m.due<=T)due++; if(m.S>=21 && m.reps>=3)mastered++; }
+  });
+  const avg = t.itemIds.length? (sum/t.itemIds.length):0;
+  return {mastered, seen, due, fresh, avg, total:t.itemIds.length};
+}
+function isLockedIndex(i){
+  const t=COURSE.topics[i];
+  if(t.free || i===0) return false;
+  const p=topicStats(COURSE.topics[i-1]);
+  return p.seen < Math.ceil(p.total/2);
+}
+function buildTopicLesson(topicId){
+  const T=now(); const t=TOPIC[topicId];
+  const fresh = t.itemIds.filter(isNew).slice(0, CFG.newPerLesson);
+  const freshSet = new Set(fresh);
+  // due reviews across whole course, weakest first, topic's own first
+  const due = ALL_IDS.filter(id=>isDue(id,T) && !freshSet.has(id))
+    .sort((a,b)=> (TOPIC_OF[b]===topicId) - (TOPIC_OF[a]===topicId) || confidence(a,T)-confidence(b,T));
+  let queue = fresh.concat(due).slice(0, Math.max(fresh.length, CFG.lessonSize));
+  // top up with lowest-confidence seen topic items if short
+  if(queue.length < Math.min(CFG.lessonSize, t.itemIds.length)){
+    const have=new Set(queue);
+    const extra = t.itemIds.filter(id=>!have.has(id)).sort((a,b)=>confidence(a,T)-confidence(b,T));
+    queue = queue.concat(extra).slice(0, CFG.lessonSize);
+  }
+  return interleave(queue, freshSet);
+}
+function buildDaily(){
+  const T=now();
+  const due = ALL_IDS.filter(id=>isDue(id,T)).sort((a,b)=>confidence(a,T)-confidence(b,T)).slice(0,CFG.dailyMax);
+  // mastered kanji words whose reading isn't solid yet come back as reading drills — capped so vocabulary stays the bulk
+  const readSet=new Set();
+  if(kanjiUnlocked()){
+    const dueSet=new Set(due);
+    const cands=shuffle(ALL_IDS.filter(id=>!dueSet.has(id) && canRead(id,false) && kst(id).ok<3));
+    cands.slice(0, Math.ceil(CFG.dailyMax/CFG.readShare)).forEach(id=>readSet.add(id));
+  }
+  const queue = shuffle(due.concat([...readSet]));
+  return {queue, freshSet:new Set(), readSet};
+}
+function interleave(queue, freshSet){
+  // spread the "new" items out rather than clustering at the front
+  const fresh = queue.filter(id=>freshSet.has(id));
+  const rev = shuffle(queue.filter(id=>!freshSet.has(id)));
+  if(!fresh.length) return {queue:rev, freshSet};
+  const out=[]; const gap = Math.max(1, Math.floor((rev.length+fresh.length)/fresh.length));
+  let fi=0, ri=0, k=0;
+  while(fi<fresh.length || ri<rev.length){
+    if(ri<rev.length){ out.push(rev[ri++]); k++; }
+    if(fi<fresh.length && (k%gap===0 || ri>=rev.length)){ out.push(fresh[fi++]); }
+  }
+  return {queue:out, freshSet};
+}
+
+/* ---------------- Exercise selection ---------------- */
+function chooseKind(id, isFresh){
+  // use the confidence snapshot taken when the session began, so a card reviewed a moment ago isn't treated as 100%
+  const c = (session && session.conf && id in session.conf) ? session.conf[id] : confidence(id, now());
+  const it = ITEMS[id];
+  const canBuild = it.parts && it.parts.length>=2;
+  // items missed earlier this session come back as recognition, not production
+  if(session && session.readSet && session.readSet.has(id)) return "read";
+  if(isFresh || c<0.5 || (session && session._requeued && session._requeued[id])) return "mc";
+  if(session && canRead(id,isFresh)){
+    const cap=Math.ceil(session.total/CFG.readShare); session._reads=session._reads||0;
+    if(session._reads<cap && Math.random() < (kst(id).ok<3 ? 0.6 : 0.25)){ session._reads++; return "read"; }
+  }
+  if(c<0.8) return canBuild ? "build" : (Math.random()<0.5?"type":"mc");
+  // high confidence → production. Phrases: type in kana when kana mode is on; in rōmaji mode
+  // typing a whole sentence in rōmaji teaches little, so they stay on Build.
+  if(canBuild) return kanaMode() ? (Math.random()<0.75?"type":"build") : "build";
+  return "type";
+}
+function distractors(id, useJp, n){
+  const it=ITEMS[id]; const tag=it.tags[0];
+  let pool = ALL_IDS.filter(x=>x!==id && ITEMS[x].tags[0]===tag);
+  if(tag==="kana"){
+    // stay within the same script (hiragana vs katakana)
+    pool = pool.filter(x=>ITEMS[x].script===it.script && ITEMS[x].jp.length===it.jp.length); // same script; singles vs きゃ-type digraphs
+    // look-alikes first, then the rest of the script at random
+    const near = shuffle(pool.filter(x=>(LOOK[it.jp]||[]).includes(ITEMS[x].jp)));
+    const nearSet = new Set(near);
+    // keep it honest: usually 1–2 look-alikes, never all four, so the odd one out isn't a giveaway
+    const take = Math.min(near.length, 1+Math.floor(Math.random()*2));
+    pool = near.slice(0,take).concat(shuffle(pool.filter(x=>!nearSet.has(x))));
+  } else {
+    pool = shuffle(pool);
+  }
+  if(pool.length<n) pool = pool.concat(shuffle(ALL_IDS.filter(x=>x!==id && !pool.includes(x))));
+  // labels are compared literally (norm() would fold "o (wo)" into "o"); glyphs via norm()
+  const lkey=v=>(v||"").toLowerCase().trim();
+  const seen=new Set([useJp?norm(it.jp):lkey(it.en)]); const out=[];
+  const ansJ=norm(it.jp), ansE=lkey(it.en);
+  for(const x of pool){
+    const o=ITEMS[x]; if(norm(o.jp)===ansJ || lkey(o.en)===ansE) continue; // same glyph (に kana vs に "two") or same label
+    const v=useJp?o.jp:o.en; const k=useJp?norm(v):lkey(v);
+    if(!seen.has(k)){ seen.add(k); out.push(v);} if(out.length>=n)break; }
+  return out;
+}
+function norm(s){
+  let v=(s||"").toString().normalize("NFKC").toLowerCase().trim()
+    .replace(/[\s\u3000ー・.,!?;:'"()\-]/g,"").replace(/[、。！？「」]/g,"")
+    .replace(/[\u30a1-\u30f6]/g, ch=>String.fromCharCode(ch.charCodeAt(0)-0x60)); // katakana → hiragana so こーひー matches コーヒー
+  // Unify romanisation styles: macrons, kunrei/IME spellings (si/ti/tu/hu/zi), を as wo/o.
+  v=v.replace(/ō|ô/g,"oo").replace(/ū|û/g,"uu").replace(/ā|â/g,"aa").replace(/ī|î/g,"ii").replace(/ē|ê/g,"ee");
+  v=v.replace(/sya/g,"sha").replace(/syu/g,"shu").replace(/syo/g,"sho").replace(/wo/g,"o");
+  v=v.replace(/si/g,"shi").replace(/ti/g,"chi").replace(/tu/g,"tsu").replace(/(^|[^sc])hu/g,"$1fu").replace(/zi/g,"ji")
+     .replace(/(?:tya|cya)/g,"cha").replace(/(?:tyu|cyu)/g,"chu").replace(/(?:tyo|cyo)/g,"cho")
+     .replace(/(?:zya|jya)/g,"ja").replace(/(?:zyu|jyu)/g,"ju").replace(/(?:zyo|jyo)/g,"jo");
+  // Collapse long vowels so "ohayou", "ohayō" and "ohayo" all compare equal.
+  v=v.replace(/ou|oo/g,"o").replace(/uu/g,"u").replace(/ii/g,"i").replace(/ee/g,"e").replace(/aa/g,"a");
+  return v; }
+
+/* ---------------- App state ---------------- */
+const app = document.getElementById("app");
+const fx = document.getElementById("fx");
+/* ----- navigation: keep one history entry per screen so the system Back button works -----
+   Home is the base entry. Any other screen (words list, lesson intro, lesson, results) or an open modal
+   sits on top as one "sub" entry. Back pops it: modal → close, lesson → pause, anything else → home. */
+const nav={ screen:"home", fromPop:false };
+function navEnter(name){
+  nav.screen=name;
+  const st=history.state;
+  if(!st || st.s!=="sub") history.pushState({s:"sub"},"");
+  else if(st.modal) history.replaceState({s:"sub"},"");
+}
+function navHome(){
+  nav.screen="home";
+  if(!nav.fromPop && history.state && history.state.s==="sub"){ nav.fromPop=true; history.back(); }
+}
+function closeModal(ov){
+  if(!ov.isConnected) return;
+  ov.remove();
+  if(history.state && history.state.modal){ nav.fromPop=true; history.back(); }   // pop the modal's entry silently
+}
+window.addEventListener("popstate",()=>{
+  const wasPop=nav.fromPop; nav.fromPop=false;
+  const ov=document.querySelector(".modal-ov");
+  if(ov){ ov.remove(); if(nav.screen!=="home" && !(history.state&&history.state.s==="sub")) history.pushState({s:"sub"},""); return; }
+  if(wasPop) return;                        // our own history.back() — screen already updated
+  if(nav.screen==="home") return;
+  if(nav.screen==="session" && session){ finishSession(true); return; }   // pause the lesson; results screen re-registers itself
+  nav.fromPop=true; renderHome(); nav.fromPop=false;
+});
+
+let session = null; // {queue, freshSet, i, total, correct, wrong, xp, bestCombo, combo, advanced, source, topicId}
+
+/* ---------------- Rendering: HOME ---------------- */
+function h(tag, attrs, kids){
+  const el=document.createElement(tag);
+  if(attrs) for(const k in attrs){ if(attrs[k]==null||attrs[k]===false)continue; if(k==="class")el.className=attrs[k]; else if(k==="html")el.innerHTML=attrs[k]; else if(k.slice(0,2)==="on")el.addEventListener(k.slice(2),attrs[k]); else el.setAttribute(k,attrs[k]); }
+  (kids||[]).forEach(c=>{ if(c==null)return; el.appendChild(typeof c==="string"?document.createTextNode(c):c); });
+  return el;
+}
+function confColor(c){ return c>=0.9?"var(--matcha)": c>=0.66?"var(--indigo)": c>=0.33?"var(--amber)":"var(--shu)"; }
+
+function modal(titleText, bodyNodes){
+  const ov=h("div",{class:"modal-ov"});
+  const card=h("div",{class:"modal"});
+  card.appendChild(h("div",{class:"modal-h"},[ h("h3",null,[titleText]), h("button",{class:"icon-btn",html:"✕","aria-label":"Close",onclick:()=>closeModal(ov)}) ]));
+  bodyNodes.forEach(n=>card.appendChild(n));
+  ov.appendChild(card);
+  ov.addEventListener("click",e=>{ if(e.target===ov)closeModal(ov); });
+  document.body.appendChild(ov);
+  history.pushState({s:"sub",modal:true},"");
+  return ov;
+}
+function openExport(){
+  const json=JSON.stringify(profile);
+  const ta=h("textarea",{class:"io-area",readonly:"readonly"}); ta.value=json;
+  const status=h("div",{class:"muted",style:"margin-top:8px; min-height:18px"});
+  const copyBtn=h("button",{class:"btn",onclick:()=>{
+    ta.focus(); ta.select(); ta.setSelectionRange(0,999999);
+    const done=ok=>{ status.textContent = ok ? "Copied ✓ — paste it into Import on your other phone." : "Selected — long-press to copy, then paste into Import elsewhere."; };
+    let ok=false;
+    try{ ok=!!(document.execCommand&&document.execCommand("copy")); }catch(e){}
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(json).then(()=>done(true),()=>done(ok)); }
+    else done(ok);
+  }},["Copy"]);
+  modal("Export progress",[
+    h("p",{class:"hint"},["Your full progress — streak, XP, and every word's memory. Copy it and keep it safe, or paste it into Import on another device."]),
+    ta, copyBtn, status
+  ]);
+  setTimeout(()=>{ ta.focus(); ta.select(); },60);
+}
+function openImport(){
+  const ta=h("textarea",{class:"io-area",placeholder:"Paste your exported progress here…"});
+  const status=h("div",{class:"muted",style:"margin-top:8px; min-height:18px"});
+  const restore=h("button",{class:"btn",onclick:()=>{
+    let data;
+    try{ data=JSON.parse(ta.value.trim()); }catch(e){ status.textContent="That doesn't look like valid progress data."; return; }
+    if(!data || typeof data!=="object" || (!data.memory && !data.xp && !data.answerStreak)){ status.textContent="That doesn't look like Kubeba progress."; return; }
+    if(!confirm("Replace the progress on this device with the imported one? This can't be undone.")) return;
+    profile=normalizeProfile(data); save();
+    document.querySelectorAll(".modal-ov").forEach(m=>m.remove());
+    renderHome();
+  }},["Restore"]);
+  modal("Import progress",[
+    h("p",{class:"hint"},["Paste progress exported from another device. This replaces what's on this device."]),
+    ta, restore, status
+  ]);
+  setTimeout(()=>ta.focus(),60);
+}
+
+function noteCard(t){ return h("div",{class:"note-card"},[ h("div",{class:"lbl"},["Grammar note"+(t.genki?" · Genki "+t.genki:"")]), t.note ]); }
+function wordRow(it, T){
+  const m=mem(it.id);
+  const b=h("button",{class:"spk","aria-label":"Play"},["🔊"]); b.addEventListener("click",e=>{ e.stopPropagation(); speak(it.jp,"ja-JP",false); });
+  return h("div",{class:"word-row"},[
+    h("span",{class:"wdot",style:"background:"+(m?confColor(retrievability(m,T)):"var(--line)")}),
+    wJp(it),
+    h("div",{class:"w-meta"},[ h("div",{class:"w-rd"},[it.romaji]), h("div",{class:"w-en"},[it.en]) ]),
+    b ]);
+}
+function openTopicInfo(t){
+  const T=now(); const st=topicStats(t);
+  const body=[ noteCard(t),
+    h("p",{class:"muted"},[st.total+" words · "+st.seen+" seen · "+st.mastered+" mastered"]),
+    h("div",{class:"intro-words"}, t.itemIds.map(id=>wordRow(ITEMS[id],T))) ];
+  const ov=modal(t.name, body);
+  if(!isLockedIndex(COURSE.topics.indexOf(t))) ov.querySelector(".modal").appendChild(h("button",{class:"btn",onclick:()=>{ ov.remove(); startSession(buildTopicLesson(t.id),{source:"topic",topicId:t.id}); }},["Start lesson"]));
+}
+// Shown before a topic lesson that introduces new words: the grammar point + the words about to appear.
+function renderIntro(built, opts){
+  navEnter("intro"); const t=TOPIC[opts.topicId]; const T=now();
+  const fresh=built.queue.filter(id=>built.freshSet.has(id));
+  const top=h("div",{class:"lesson-head"},[ h("button",{class:"close",html:"✕","aria-label":"Back",onclick:renderHome}), h("div",{class:"progress"},[h("i",{style:"width:0%"})]) ]);
+  const wrap=h("div",{class:"wrap"},[
+    h("div",{class:"intro-head"},[ h("div",{class:"glyph"},[t.glyph]), h("div",null,[ h("h2",null,[t.name]), t.genki? h("span",{class:"pill genki"},["Genki "+t.genki]) : null ]) ]),
+    noteCard(t),
+    h("div",{class:"section-title",style:"margin-top:14px"},["New this lesson · "+fresh.length]),
+    h("div",{class:"intro-words"}, fresh.map(id=>wordRow(ITEMS[id],T))),
+    h("button",{class:"btn big",style:"margin-top:18px",onclick:()=>{ opts.skipIntro=true; startSession(built,opts); }},["Start"])
+  ]);
+  app.replaceChildren(top, wrap); window.scrollTo(0,0);
+}
+function renderWords(){
+  navEnter("words"); const T=now();
+  const top = h("div",{class:"topbar"},[
+    h("button",{class:"icon-btn",html:"‹","aria-label":"Back",onclick:renderHome}),
+    h("div",{class:"brand"},[ h("span",{class:"mark serif"},["言葉"]), h("span",{class:"sub"},["Words"]) ]),
+    h("span",{style:"width:38px"})
+  ]);
+  const search=h("input",{class:"word-search",type:"text",placeholder:"Search — English, rōmaji, or kana…",autocapitalize:"none",autocorrect:"off",spellcheck:"false"});
+  const searchBar=h("div",{class:"search-bar"},[search]);
+  const listWrap=h("div",{class:"wrap words-wrap"});
+
+  function playBtn(it){ const b=h("button",{class:"spk","aria-label":"Play"},["🔊"]); b.addEventListener("click",e=>{ e.stopPropagation(); speak(it.jp,"ja-JP",false); }); return b; }
+
+  function render(qraw){
+    const q=(qraw||"").trim().toLowerCase();
+    const nq=norm(q);
+    listWrap.replaceChildren();
+    let total=0;
+    COURSE.topics.forEach((t,i)=>{
+      const locked=isLockedIndex(i);
+      const matches=t.itemIds.map(id=>ITEMS[id]).filter(it=>{
+        if(!q) return true;
+        if((it.en||"").toLowerCase().includes(q)) return true;
+        if((it.romaji||"").toLowerCase().includes(q)) return true;
+        if((it.jp||"").includes(qraw.trim()) || (it.k||"").includes(qraw.trim())) return true;
+        if(nq && (norm(it.romaji).includes(nq) || norm(it.jp).includes(nq))) return true;
+        if((it.alt||[]).some(a=>(a||"").toLowerCase().includes(q))) return true;
+        return false;
+      });
+      if(!matches.length) return;
+      total+=matches.length;
+      listWrap.appendChild(h("div",{class:"word-group"},[ h("span",null,[t.name]), t.genki? h("span",{class:"pill genki"},[t.genki]) : null, locked? h("span",{class:"pill"},["🔒 Locked"]) : null ]));
+      if(!q && t.note) listWrap.appendChild(h("p",{class:"word-note"},[t.note]));
+      matches.forEach(it=>{
+        const m=mem(it.id);
+        const mark = locked ? h("span",{class:"wlock"},["🔒"]) : h("span",{class:"wdot",style:"background:"+(m?confColor(retrievability(m,T)):"var(--line)")});
+        listWrap.appendChild(h("div",{class:"word-row"+(locked?" locked":"")},[
+          mark,
+          wJp(it),
+          h("div",{class:"w-meta"},[ h("div",{class:"w-rd"},[it.romaji]), h("div",{class:"w-en"},[it.en]) ]),
+          playBtn(it)
+        ]));
+      });
+    });
+    if(!total) listWrap.appendChild(h("p",{class:"muted",style:"text-align:center; margin-top:34px"},["No words match “"+qraw.trim()+"”."]));
+  }
+  search.addEventListener("input",()=>render(search.value));
+  render("");
+  app.replaceChildren(top, searchBar, listWrap);
+  window.scrollTo(0,0);
+}
+
+function renderHome(){
+  session=null; navHome();
+  const T=now();
+  const li=levelInfo();
+  const totalDue = ALL_IDS.filter(id=>isDue(id,T)).length;
+  const dailyBuilt = buildDaily(); const readCount = dailyBuilt.readSet ? dailyBuilt.readSet.size : 0;
+  const greetName = profile.name ? profile.name : "";
+
+  const top = h("div",{class:"topbar"},[
+    h("div",{class:"brand"},[ h("span",{class:"mark serif"},["クベバ"]), h("span",{class:"sub"},["Kubeba"]) ]),
+    h("div",{style:"display:flex; gap:6px"},[
+      h("button",{id:"inputBtn",class:"icon-btn mode","aria-label":"Toggle kana / rōmaji typing",title:"Typing: kana or rōmaji",onclick:toggleInputMode},[inputIcon()]),
+      h("button",{id:"soundBtn",class:"icon-btn","aria-label":"Toggle sound",onclick:toggleSound,html:soundIcon()}),
+      h("button",{id:"themeBtn",class:"icon-btn","aria-label":"Toggle theme",onclick:toggleTheme,html:themeIcon()})
+    ])
+  ]);
+
+  const wrap = h("div",{class:"wrap"});
+
+  if(!profile.name){
+    wrap.appendChild(h("div",{class:"panel"},[
+      h("h3",null,["Who's studying?"]),
+      h("p",{class:"hint"},["Progress saves on this device — no account needed. To move it to another phone, use Export & Import at the bottom."]),
+      (function(){ const row=h("div",{class:"name-row"});
+        const inp=h("input",{type:"text",placeholder:"Your name",maxlength:"24"});
+        const go=h("button",{class:"btn",style:"width:auto;padding-left:20px;padding-right:20px",onclick:()=>{ const v=inp.value.trim(); if(v){ profile.name=v; save(); renderHome(); } }},["Start"]);
+        inp.addEventListener("keydown",e=>{ if(e.key==="Enter"){ const v=inp.value.trim(); if(v){profile.name=v;save();renderHome();} } });
+        row.appendChild(inp); row.appendChild(go); return row; })()
+    ]));
+  }
+
+  // stats
+  wrap.appendChild(h("div",{class:"stats-row"},[
+    h("div",{class:"stat"},[ h("div",{class:"k"},["🔥 Day streak"]), h("div",{class:"v"},[String(currentStreak()), h("small",null,[currentStreak()===1?"day":"days"])]) ]),
+    h("div",{class:"stat"},[ h("div",{class:"k"},["✦ Total XP"]), h("div",{class:"v"},[li.total.toLocaleString()]) ]),
+    h("div",{class:"stat"},[ h("div",{class:"k"},["⚡ Answer streak"]), h("div",{class:"v"},[String(profile.answerStreak.current), h("small",null,["best "+profile.answerStreak.best])]) ])
+  ]));
+
+  // level
+  wrap.appendChild(h("div",{class:"level-card"},[
+    h("div",{class:"level-top"},[ h("span",{class:"lv"},["Level "+li.lv]), h("span",{class:"xp"},[li.into+" / "+li.need+" XP"]) ]),
+    h("div",{class:"bar"},[ h("i",{style:"width:"+Math.max(3,Math.round(li.into/li.need*100))+"%"}) ])
+  ]));
+
+  // xp chart (14d)
+  wrap.appendChild(renderXPChart());
+
+  // daily review
+  wrap.appendChild(h("button",{class:"btn shu big daily-cta",disabled: (totalDue||readCount)?null:"disabled",
+    onclick:()=>startSession(buildDaily(),{source:"daily"})},
+    [ totalDue ? ("Daily review · "+totalDue+" due"+(readCount?" + "+readCount+" kanji":"")) : readCount ? ("Kanji reading · "+readCount+" words") : "Nothing due — come back later" ]));
+  if(kanjiUnlocked()) wrap.appendChild(h("p",{class:"kanji-note"},["漢字 unlocked — words you know now show kanji with furigana; mastered words get reading drills."]));
+  else { const mw=masteredWords(); if(mw>=10) wrap.appendChild(h("p",{class:"kanji-note"},["漢字 unlocks at "+CFG.kanjiUnlockAt+" mastered words — "+mw+" so far."])); }
+
+  // path
+  const anyLocked = COURSE.topics.some((t,i)=>{ if(t.free||i===0)return false; const p=topicStats(COURSE.topics[i-1]); return p.seen < Math.ceil(p.total/2); });
+  wrap.appendChild(h("div",{class:"section-title",style:"display:flex; justify-content:space-between; align-items:center"},[ h("span",null,["Course"]), h("button",{class:"words-link",onclick:renderWords},["📖 All words"]) ]));
+  if(anyLocked) wrap.appendChild(h("p",{class:"hint",style:"margin:-4px 4px 12px"},["Already know some? Tap 🔓 on a locked topic to mark earlier ones known and jump there."]));
+  const path=h("div",{class:"path"});
+  COURSE.topics.forEach((t,i)=>{
+    const st=topicStats(t);
+    const prev = i>0 ? topicStats(COURSE.topics[i-1]) : null;
+    const locked = !t.free && i>0 && prev.seen < Math.ceil(prev.total/2);
+    const done = st.mastered===st.total && st.total>0;
+    const pct = Math.round(st.avg*100);
+    const node=h("div",{class:"node"+(locked?" locked":"")});
+    node.appendChild(h("div",{class:"rail"}));
+    const ring=h("div",{class:"ring"+(done?" done":"")});
+    ring.appendChild(h("div",{class:"fill",style:"background:conic-gradient("+confColor(st.avg)+" "+pct+"%, var(--surface-2) 0)"}));
+    ring.appendChild(h("div",{class:"inner serif"},[ done?"✓":t.glyph ]));
+    node.appendChild(ring);
+    const pills=[];
+    if(t.genki) pills.push(h("span",{class:"pill genki"},[t.genki]));
+    if(!locked){
+      if(st.fresh>0) pills.push(h("span",{class:"pill new"},[st.fresh+" new"]));
+      if(st.due>0) pills.push(h("span",{class:"pill due"},[st.due+" review"]));
+      if(st.mastered>0) pills.push(h("span",{class:"pill master"},[st.mastered+" mastered"]));
+      if(!pills.length) pills.push(h("span",{class:"pill"},[st.total+" words"]));
+    } else pills.push(h("span",{class:"pill"},["Locked"]));
+    node.appendChild(h("div",{class:"meta"},[
+      h("div",{class:"nm"},[t.name]),
+      h("div",{class:"ds"},pills)
+    ]));
+    if(t.note){ const ib=h("button",{class:"go info",html:"ⓘ","aria-label":"About this topic"}); ib.addEventListener("click",e=>{ e.stopPropagation(); openTopicInfo(t); }); node.appendChild(ib); }
+    if(!locked){
+      node.appendChild(h("button",{class:"go",html:"▶","aria-label":"Start",onclick:()=>startSession(buildTopicLesson(t.id),{source:"topic",topicId:t.id})}));
+      node.style.cursor="pointer";
+      node.addEventListener("click",e=>{ if(e.target.closest(".go"))return; startSession(buildTopicLesson(t.id),{source:"topic",topicId:t.id}); });
+    } else {
+      const skipBtn=h("button",{class:"go skip","aria-label":"I know up to here",html:"🔓"});
+      skipBtn.addEventListener("click",e=>{ e.stopPropagation(); if(confirm("Mark every topic before “"+t.name+"” as already known?\n\nThose words enter your review rotation over the coming days, and you start fresh here. This can't be undone.")){ const n=markKnownBefore(i); if(n) toast(n+" words added to review"); renderHome(); } });
+      node.appendChild(skipBtn);
+    }
+    path.appendChild(node);
+  });
+  wrap.appendChild(path);
+  wrap.appendChild(h("div",{class:"panel",style:"margin-top:22px"},[
+    h("h3",null,["Back up & move progress"]),
+    h("p",{class:"hint"},["Saved on this device. Export copies your full progress; import it on another phone to move it over."]),
+    h("p",{class:"hint",style:"margin-top:8px"},["Typing mode: ", h("b",null,[kanaMode()?"kana":"rōmaji"]), " — toggle with the ", h("b",null,[inputIcon()]), " button at the top. Kana mode uses your phone's Japanese keyboard; add one in your phone's keyboard settings and switch with the 🌐 key."]),
+    h("div",{style:"display:flex; gap:10px"},[
+      h("button",{class:"btn ghost",style:"flex:1",onclick:openExport},["Export"]),
+      h("button",{class:"btn ghost",style:"flex:1",onclick:openImport},["Import"])
+    ])
+  ]));
+  wrap.appendChild(h("p",{class:"muted",style:"text-align:center;margin-top:22px"},["Follows the Genki I arc (Lessons 1–12) · "+ALL_IDS.length+" words & phrases written for this app"]));
+
+  app.replaceChildren(top, wrap);
+}
+
+function renderXPChart(){
+  const days=[]; for(let i=13;i>=0;i--){ days.push(daysAgo(i)); }
+  const vals=days.map(d=>profile.xp.byDay[todayStr(d)]||0);
+  const max=Math.max(10,...vals);
+  const tdy=todayStr();
+  const cols=days.map((d,idx)=>{
+    const v=vals[idx]; const isT=todayStr(d)===tdy;
+    const wd=["S","M","T","W","T","F","S"][d.getDay()];
+    return h("div",{class:"col"},[
+      h("div",{class:"barwrap"},[ h("div",{class:"b"+(isT?" today":""),style:"height:"+Math.round(v/max*100)+"%",title:v+" XP"}) ]),
+      h("div",{class:"lbl"},[wd])
+    ]);
+  });
+  const wk=vals.reduce((a,b)=>a+b,0);
+  return h("div",{class:"panel"},[
+    h("h3",null,["XP over time"]),
+    h("p",{class:"hint"},[wk>0? (wk.toLocaleString()+" XP in the last 14 days"):"Finish a lesson to start the chart"]),
+    h("div",{class:"chart"},cols)
+  ]);
+}
+
+/* ---------------- Session flow ---------------- */
+function startSession(built,opts){
+  if(!built.queue.length){ renderHome(); return; }
+  if(opts.topicId && !opts.skipIntro && TOPIC[opts.topicId].note && built.queue.some(id=>built.freshSet.has(id))){ renderIntro(built,opts); return; }
+  session={ queue:built.queue.slice(), freshSet:built.freshSet||new Set(), i:0,
+    total:built.queue.length, correct:0, wrong:0, xp:0, combo:profile.answerStreak.current, bestCombo:profile.answerStreak.current,
+    advanced:new Set(), readSet:built.readSet||null, source:opts.source, topicId:opts.topicId, startTopic:opts.topicId?topicStats(TOPIC[opts.topicId]).mastered:0, conf:{},
+    recordToBeat: profile.answerStreak.best, recordBroken:false };
+  const T0=now(); session.queue.forEach(id=>{ session.conf[id]=confidence(id,T0); });
+  navEnter("session");
+  nextCard();
+}
+function sessionHead(){
+  const pct = Math.round(session.i / session.total * 100);
+  const combo = h("div",{class:"combo"+(session.combo>=2?" on":"")},["🔥 "+session.combo]);
+  return h("div",{class:"lesson-head"},[
+    (function(){ let armed=false, timer=null;
+      const b=h("button",{class:"close",html:"✕","aria-label":"End lesson"});
+      b.addEventListener("click",()=>{
+        if(armed){ clearTimeout(timer); finishSession(true); return; }
+        armed=true; b.innerHTML=""; b.style.width="auto"; b.style.fontSize="13px"; b.style.fontWeight="700"; b.style.padding="0 8px"; b.textContent="End lesson?";
+        timer=setTimeout(()=>{ armed=false; b.innerHTML="✕"; b.style.width=""; b.style.fontSize=""; b.style.fontWeight=""; b.style.padding=""; },2500);
+      });
+      return b; })(),
+    h("div",{class:"progress"},[ h("i",{style:"width:"+pct+"%"}) ]),
+    combo
+  ]);
+}
+function nextCard(){
+  if(session.i>=session.queue.length){ finishSession(false); return; }
+  presentCard();
+}
+function presentCard(forceKind){
+  const id=session.queue[session.i];
+  const isFresh=session.freshSet.has(id) && !mem(id);
+  const kind=forceKind || chooseKind(id,isFresh);
+  session._activeKind=kind;
+  const stage=h("div",{class:"stage"});
+  app.replaceChildren(sessionHead(), stage);
+  (kind==="mc"?renderMC : kind==="build"?renderBuild : kind==="read"?renderRead : renderType)(id, kind, stage);
+  window.scrollTo(0,0);
+}
+function actionBar(children){ return h("div",{class:"actionbar"},[ h("div",{class:"inner"},children) ]); }
+function retryBar(o){
+  const inner=[ h("div",{class:"verdict no",style:"margin:2px 0 12px"},[o.text||"Incorrect — want to try again?"]) ];
+  if(o.onAgain) inner.push(h("button",{class:"btn big",onclick:o.onAgain},[o.againLabel||"Try again"]));
+  if(o.extra) inner.push(o.extra);
+  if(o.onShow) inner.push(h("button",{class:"override",onclick:o.onShow},[ h("u",null,[o.showLabel||"Show answer"]) ]));
+  return h("div",{class:"actionbar"},[ h("div",{class:"inner"},inner) ]);
+}
+
+function grade(id, correct, elapsed, fast){
+  const kind = session._kind;
+  const it = ITEMS[id];
+  const wasNew = !mem(id);
+  // a quick 1-in-4 guess on a brand-new word is not "easy"
+  if(kind==="mc" && wasNew) fast=false;
+  const g = correct ? (fast?"easy":"good") : "again";
+  if(kind==="read"){
+    // reading slip ≠ forgetting the word: keep its memory intact, just bring furigana back until two clean reads
+    const k=kst(id);
+    if(correct){ k.ok++; if(k.ok>=2) k.furi=false; } else { k.miss++; k.ok=0; k.furi=true; }
+    profile.kanji[id]=k;
+  } else review(id,g,now());
+  touchStreak();   // the day counts as soon as you answer something, not only on "Finish"
+  let celebrated=false;
+  if(correct){
+    let x = CFG.xp[kind]||8; if(g==="easy") x+=CFG.xp.easyBonus;
+    session.correct++; session.combo++; session.bestCombo=Math.max(session.bestCombo,session.combo);
+    profile.answerStreak.current=session.combo; if(session.combo>profile.answerStreak.best)profile.answerStreak.best=session.combo;
+    session.advanced.add(id);
+    if(!session.recordBroken && session.recordToBeat>=CFG.recordMin && session.combo>session.recordToBeat){
+      // just passed your all-time best
+      session.recordBroken=true; x+=CFG.xp.comboBonus; celebrate(session.combo, "new record!", true); celebrated=true;
+    } else if(session.combo>0 && session.combo%CFG.comboEvery===0){
+      x+=CFG.xp.comboBonus; const big=session.combo%100===0; celebrate(session.combo, big?"streak!":"combo!", big); celebrated=true;
+    }
+    session.xp+=x; addXP(x);
+    sfx(celebrated?"win":"correct");
+  } else {
+    session.wrong++;
+    session.combo=0; profile.answerStreak.current=0;
+    // re-show this item once more, a few cards later
+    if(!session._requeued) session._requeued={};
+    if(kind!=="read" && !session._requeued[id]){ session._requeued[id]=1; const pos=Math.min(session.queue.length, session.i+3); session.queue.splice(pos,0,id); session.total=session.queue.length; }
+    sfx("wrong");
+  }
+  save();
+}
+function advance(){ session.i++; nextCard(); }
+
+/* ----- Multiple choice ----- */
+function renderMC(id,kind,stage){
+  session._kind="mc";
+  const it=ITEMS[id];
+  const isKana=it.tags[0]==="kana";
+  const isFresh=session.freshSet.has(id) && !mem(id);
+  // direction: kana -> either read it (kana→rōmaji) or recognise it (rōmaji→kana); words: mostly jp→en
+  const jpToEn = isKana ? Math.random()<0.5 : Math.random()<0.6;
+  const promptJp = jpToEn;   // prompt side is Japanese when we ask for the meaning
+  const answer = jpToEn ? it.en : it.jp;
+  const opts = shuffle([answer, ...distractors(id,!jpToEn,3)]);
+  const start=now();
+
+  stage.appendChild(h("div",{class:"kicker"},[ isKana ? (jpToEn?"How do you read this?":"Which kana is this?") : (jpToEn?"Choose the meaning":"Choose the Japanese") ]));
+  const optLang = jpToEn ? "en-US" : "ja-JP";
+  stage.appendChild(h("div",{class:"prompt"},[
+    promptJp ? h("div",{class:"big serif"},[jpPrompt(it,isFresh), speakerPair(it.jp,"ja-JP")]) : h("div",{class: isKana?"big":"en"},[it.en, speakerPair(isKana?it.jp:it.en, isKana?"ja-JP":"en-US")]),
+    promptJp && !isKana ? h("div",{class:"rd"},[it.romaji]) : null
+  ]));
+  // kana "how do you read this?" — hearing it IS the answer, so stay quiet; the 🔊 button still works
+  if(!(isKana && promptJp)) autoSpeak(promptJp ? it.jp : (isKana ? it.jp : it.en), (promptJp||isKana) ? "ja-JP" : "en-US");
+  const box=h("div",{class:"choices"+(isKana&&!jpToEn?" grid2":"")});
+  let ended=false, tries=0, rb=null;
+  const reveal=()=>{ Array.from(box.children).forEach(c=>{ if(c.classList.contains("wrong"))return; if(c.textContent===answer)c.classList.add("correct"); else c.classList.add("dim"); }); };
+  const finish=(cv)=>{ if(ended)return; ended=true; if(rb){rb.remove();rb=null;} reveal(); showContinue(stage,cv); };
+  opts.forEach(v=>{
+    const b=h("button",{class:"choice"+(isKana&&!jpToEn?" kana-choice":"")},[ h("span",{class: jpToEn?"":"jpc"},[v]) ]);
+    b.addEventListener("click",()=>{
+      if(ended)return;
+      const ok=(v===answer); const elapsed=now()-start;
+      if(!muted()){
+        if(isKana && jpToEn){ if(ok) speak(it.jp,"ja-JP",false); }   // rōmaji labels aren't speakable; only confirm the right one
+        else speak(v, optLang, false);
+      }
+      if(rb){ rb.remove(); rb=null; }
+      if(ok){ grade(id, true, elapsed, tries===0 && elapsed<3500); b.classList.add("correct"); finish(true); return; }
+      b.classList.add("wrong"); b.appendChild(h("span",{class:"badge"},["✕"])); b.style.pointerEvents="none";
+      tries++;
+      if(tries>=2){ grade(id, false, elapsed, false); finish(false); return; }   // missed the retry → break streak
+      rb=retryBar({ text:"Not quite — pick another. (Miss again and the streak resets.)", onShow:()=>{ grade(id,false,elapsed,false); finish(false); } });
+      document.getElementById("app").appendChild(rb);
+    });
+    box.appendChild(b);
+  });
+  stage.appendChild(box);
+}
+
+/* ----- Build from parts ----- */
+// A lone は / へ tile is a particle: TTS should say "wa" / "e", not "ha" / "he".
+function tileReading(p){ return p==="は" ? "わ" : p==="へ" ? "え" : p; }
+function renderBuild(id,kind,stage){
+  session._kind="build";
+  const it=ITEMS[id];
+  const parts=it.parts;
+  stage.appendChild(h("div",{class:"kicker"},["Build the sentence"]));
+  stage.appendChild(h("div",{class:"prompt"},[ h("div",{class:"en"},[it.en, speakerPair(it.en,"en-US")]) ]));
+  autoSpeak(it.en, "en-US");
+  const line=h("div",{class:"answer-line"});
+  const bank=h("div",{class:"bank"});
+  const placed=[];
+  const tiles = shuffle(parts.map((p,idx)=>({p,idx})));
+  tiles.forEach(o=>{
+    const tb=h("button",{class:"tile"},[o.p]);
+    tb.addEventListener("click",()=>{
+      if(tb.classList.contains("used"))return;
+      if(!muted()) speak(tileReading(o.p), "ja-JP", false);
+      tb.classList.add("used");
+      const pt=h("button",{class:"tile placed"},[o.p]);
+      pt.addEventListener("click",()=>{ pt.remove(); tb.classList.remove("used"); const k=placed.indexOf(o); if(k>=0)placed.splice(k,1); });
+      placed.push(o); line.appendChild(pt);
+    });
+    bank.appendChild(tb);
+  });
+  stage.appendChild(line); stage.appendChild(bank);
+
+  const start=now();
+  const check=h("button",{class:"btn big"},["Check"]);
+  const reveal=h("button",{class:"btn big ghost","aria-label":"Show answer"},["Show answer"]);
+  const bar=actionBar([h("div",{class:"row"},[check,reveal])]);
+  let ended=false, tries=0, rb=null;
+  const okNode=()=>h("div",{class:"verdict ok"},["◎ "+it.romaji+kanjiSuffix(it), speakerPair(it.jp,"ja-JP")]);
+  const ansNode=()=>h("div",{class:"verdict no"},[ h("span",null,["Answer: ", h("span",{class:"sol"},[it.jp]), "  ("+it.romaji+")"+kanjiSuffix(it)]), speakerPair(it.jp,"ja-JP") ]);
+  const finish=(cv, node)=>{ if(ended)return; ended=true; if(rb){rb.remove();rb=null;} if(bar.isConnected)bar.remove(); if(node){ stage.appendChild(node); autoSpeak(it.jp,"ja-JP"); } showContinue(stage,cv); };
+  check.addEventListener("click",()=>{
+    if(ended || !placed.length)return;
+    const ok = placed.map(o=>o.p).join("|")===parts.join("|");
+    const elapsed=now()-start;
+    if(ok){ grade(id, true, elapsed, tries===0 && elapsed<7000); line.classList.add("correct"); finish(true, okNode()); return; }
+    line.classList.add("wrong");
+    tries++;
+    if(tries>=2){ grade(id, false, elapsed, false); finish(false, ansNode()); return; }   // missed the retry → break streak
+    if(bar.isConnected)bar.remove();
+    rb=retryBar({ text:"Not quite — try again. (Miss again and the streak resets.)", againLabel:"Try again", onAgain:()=>{ if(rb){rb.remove();rb=null;} line.classList.remove("wrong"); document.getElementById("app").appendChild(bar); }, onShow:()=>{ grade(id,false,elapsed,false); finish(false, ansNode()); } });
+    document.getElementById("app").appendChild(rb);
+  });
+  reveal.addEventListener("click",()=>{ if(ended)return; grade(id,false,now()-start,false); line.classList.add("wrong"); finish(false, ansNode()); });
+  document.getElementById("app").appendChild(bar);
+}
+
+/* ----- Type / translate ----- */
+function renderType(id,kind,stage){
+  session._kind="type";
+  const it=ITEMS[id];
+  const isKana=it.tags[0]==="kana";
+  // single kana: always show the kana, type its reading (that IS the skill).
+  // words/phrases: kana mode → show EN, type in kana; rōmaji mode → 40% read kana aloud in rōmaji, else EN → rōmaji
+  const useKana = !isKana && kanaMode();
+  const showJp = isKana ? true : (useKana ? false : Math.random()<0.4);
+  stage.appendChild(h("div",{class:"kicker"},[ isKana?"Type the reading in rōmaji": useKana?"Type it in Japanese": showJp?"Type the rōmaji":"Type it in rōmaji" ]));
+  stage.appendChild(h("div",{class:"prompt"},[
+    showJp? h("div",{class:"big serif"},[jpPrompt(it,false), speakerPair(it.jp,"ja-JP")]) : h("div",{class:"en"},[it.en, speakerPair(it.en,"en-US")])
+  ]));
+  if(!showJp) autoSpeak(it.en, "en-US");   // showing the kana and asking for its reading — don't say it
+  const inp=h("input",{class:"type-in",type:"text",autocapitalize:"none",autocomplete:"off",autocorrect:"off",spellcheck:"false",
+    placeholder: useKana?"ひらがな…":"rōmaji…", lang: useKana?"ja":"en", inputmode:"text"});
+  stage.appendChild(inp);
+  const verdict=h("div",{class:"verdict"}); stage.appendChild(verdict);
+  setTimeout(()=>inp.focus(),60);
+  const start=now();
+
+  // never accept what is already on screen; in kana mode the answer must be kana; in rōmaji mode kana is also fine
+  const alts=(it.alt||[]).map(norm);
+  const accepts = useKana ? [norm(it.jp)] : (showJp ? [norm(it.romaji)] : [norm(it.romaji), norm(it.jp)]).concat(alts);
+  if(!showJp && hasKanji(it)) accepts.push(norm(it.k));   // typed with an IME in kanji — also right
+  const check=h("button",{class:"btn big"},["Check"]);
+  const reveal=h("button",{class:"btn big ghost","aria-label":"Show answer"},["Show answer"]);
+  const bar=actionBar([h("div",{class:"row"},[check,reveal])]);
+  document.getElementById("app").appendChild(bar);
+  let ended=false, tries=0, rb=null;
+
+  const finish=(correct)=>{ if(ended)return; ended=true; if(rb){rb.remove();rb=null;} inp.blur(); inp.disabled=true; inp.classList.remove("correct","wrong"); inp.classList.add(correct?"correct":"wrong"); verdict.className="verdict "+(correct?"ok":"no"); verdict.replaceChildren(correct? document.createTextNode("◎ "+(useKana? it.jp+"  ("+it.romaji+")" : it.romaji)+kanjiSuffix(it)) : h("span",null,["Answer: ", h("span",{class:"sol"},[useKana?it.jp:it.romaji]), "  ("+(useKana?it.romaji:it.jp)+")"+kanjiSuffix(it)]), speakerPair(it.jp,"ja-JP")); if(bar.isConnected)bar.remove(); autoSpeak(it.jp,"ja-JP"); showContinue(stage, correct); };
+  function doCheck(){
+    if(ended || rb)return;   // retry bar is showing: wait for "Try again"
+    const raw=inp.value.trim();
+    if(useKana && raw && isLatinOnly(raw)){   // still on the Latin keyboard — nudge, don't burn a try
+      verdict.className="verdict no"; verdict.textContent="Type in kana — switch your keyboard with the 🌐 key"; return;
+    }
+    const val=norm(inp.value);
+    if(!val)return;
+    const ok = accepts.includes(val);
+    const elapsed=now()-start;
+    if(ok){ grade(id,true,elapsed, tries===0 && elapsed<5000); finish(true); return; }
+    inp.classList.add("wrong"); inp.blur();   // drop the keyboard so the retry bar is visible
+    tries++;
+    if(tries>=2){ grade(id,false,elapsed,false); finish(false); return; }   // missed the retry → break streak
+    bar.remove();
+    verdict.className="verdict"; verdict.textContent="";
+    rb=retryBar({
+      text:"Not quite — try again. (Miss again and the streak resets.)",
+      onAgain:()=>{ if(rb){rb.remove();rb=null;} inp.classList.remove("wrong"); inp.value=""; inp.disabled=false; document.getElementById("app").appendChild(bar); setTimeout(()=>inp.focus(),30); },
+      extra: h("button",{class:"override",onclick:()=>{ grade(id,true,elapsed,false); finish(true); }},[ h("u",null,["I was right — count it"]) ]),
+      onShow:()=>{ grade(id,false,elapsed,false); finish(false); }
+    });
+    document.getElementById("app").appendChild(rb);
+  }
+  check.addEventListener("click",doCheck);
+  reveal.addEventListener("click",()=>{ if(ended)return; grade(id,false,now()-start,false); finish(false); });
+  inp.addEventListener("keydown",e=>{ if(e.key==="Enter")doCheck(); });
+  if(!isKana) stage.appendChild(h("button",{class:"mode-link",onclick:()=>{ if(ended)return; profile.inputMode=kanaMode()?"romaji":"kana"; save(); if(bar.isConnected)bar.remove(); presentCard("type"); }},
+    [ h("u",null,[ kanaMode()?"Switch to rōmaji typing":"Switch to kana typing" ]) ]));
+}
+
+/* ----- Read the kanji: bare kanji shown, type the reading ----- */
+function renderRead(id,kind,stage){
+  session._kind="read";
+  const it=ITEMS[id];
+  const useKana=kanaMode();
+  stage.appendChild(h("div",{class:"kicker"},[ useKana?"Read the kanji · type in kana":"Read the kanji · type the rōmaji" ]));
+  stage.appendChild(h("div",{class:"prompt"},[ h("div",{class:"big serif"},[ rubyNode(it,false), speakerPair(it.jp,"ja-JP") ]), h("div",{class:"rd"},[it.en]) ]));
+  const inp=h("input",{class:"type-in",type:"text",autocapitalize:"none",autocomplete:"off",autocorrect:"off",spellcheck:"false",
+    placeholder: useKana?"ひらがな…":"rōmaji…", lang: useKana?"ja":"en", inputmode:"text"});
+  stage.appendChild(inp);
+  const verdict=h("div",{class:"verdict"}); stage.appendChild(verdict);
+  setTimeout(()=>inp.focus(),60);
+  const start=now();
+  const accepts=[norm(it.jp), norm(it.romaji)].concat((it.alt||[]).map(norm));
+  const check=h("button",{class:"btn big"},["Check"]);
+  const reveal=h("button",{class:"btn big ghost","aria-label":"Show answer"},["Show answer"]);
+  const bar=actionBar([h("div",{class:"row"},[check,reveal])]);
+  document.getElementById("app").appendChild(bar);
+  let ended=false, tries=0, rb=null;
+  const finish=(correct)=>{ if(ended)return; ended=true; if(rb){rb.remove();rb=null;} inp.blur(); inp.disabled=true; inp.classList.remove("correct","wrong"); inp.classList.add(correct?"correct":"wrong");
+    verdict.className="verdict "+(correct?"ok":"no");
+    verdict.replaceChildren(correct? document.createTextNode("◎ "+it.jp+"  ("+it.romaji+")") : h("span",null,["Reading: ", h("span",{class:"sol"},[it.jp]), "  ("+it.romaji+")"]), speakerPair(it.jp,"ja-JP"));
+    // show the word once more with furigana so the miss ends on the right pairing
+    if(!correct) stage.querySelector(".prompt .big").replaceChildren(rubyNode(it,true), speakerPair(it.jp,"ja-JP"));
+    if(bar.isConnected)bar.remove(); autoSpeak(it.jp,"ja-JP"); showContinue(stage, correct); };
+  function doCheck(){
+    if(ended || rb)return;
+    const raw=inp.value.trim();
+    if(useKana && raw && isLatinOnly(raw)){ verdict.className="verdict no"; verdict.textContent="Type in kana — switch your keyboard with the 🌐 key"; return; }
+    const val=norm(inp.value); if(!val)return;
+    const elapsed=now()-start;
+    if(accepts.includes(val)){ grade(id,true,elapsed, tries===0 && elapsed<5000); finish(true); return; }
+    inp.classList.add("wrong"); inp.blur(); tries++;
+    if(tries>=2){ grade(id,false,elapsed,false); finish(false); return; }
+    bar.remove(); verdict.className="verdict"; verdict.textContent="";
+    rb=retryBar({ text:"Not quite — try the reading again.",
+      onAgain:()=>{ if(rb){rb.remove();rb=null;} inp.classList.remove("wrong"); inp.value=""; inp.disabled=false; document.getElementById("app").appendChild(bar); setTimeout(()=>inp.focus(),30); },
+      onShow:()=>{ grade(id,false,elapsed,false); finish(false); } });
+    document.getElementById("app").appendChild(rb);
+  }
+  check.addEventListener("click",doCheck);
+  reveal.addEventListener("click",()=>{ if(ended)return; grade(id,false,now()-start,false); finish(false); });
+  inp.addEventListener("keydown",e=>{ if(e.key==="Enter")doCheck(); });
+  stage.appendChild(h("button",{class:"mode-link",onclick:()=>{ if(ended)return; profile.inputMode=kanaMode()?"romaji":"kana"; save(); if(bar.isConnected)bar.remove(); presentCard("read"); }},
+    [ h("u",null,[ kanaMode()?"Switch to rōmaji typing":"Switch to kana typing" ]) ]));
+}
+
+function showContinue(stage, ok){
+  const btn=h("button",{class:"btn big"+(ok?"":" shu"),onclick:advance},[ session.i+1>=session.queue.length?"Finish":"Continue" ]);
+  document.getElementById("app").appendChild(actionBar([btn]));
+  // Enter continues (deferred so the Enter that submitted the answer doesn't also advance)
+  setTimeout(()=>{
+    const onKey=e=>{ if(e.key==="Enter"){ document.removeEventListener("keydown",onKey); if(session && btn.isConnected) advance(); } };
+    document.addEventListener("keydown",onKey);
+    btn.addEventListener("click",()=>document.removeEventListener("keydown",onKey),{once:true});
+  },0);
+}
+
+/* ----- sound: SFX (Web Audio) + pronunciation (Web Speech) ----- */
+let _ac=null;
+function ac(){ try{ if(!_ac) _ac=new (window.AudioContext||window.webkitAudioContext)(); if(_ac&&_ac.state==="suspended")_ac.resume(); }catch(e){} return _ac; }
+function tone(freqs, dur, type, gain){
+  const c=ac(); if(!c)return; const t0=c.currentTime;
+  freqs.forEach((f,i)=>{
+    const o=c.createOscillator(), g=c.createGain();
+    o.type=type||"sine"; o.frequency.value=f;
+    const st=t0+i*(dur*0.55);
+    g.gain.setValueAtTime(0.0001, st);
+    g.gain.exponentialRampToValueAtTime(gain||0.12, st+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, st+dur);
+    o.connect(g); g.connect(c.destination); o.start(st); o.stop(st+dur+0.03);
+  });
+}
+function sfx(kind){
+  if(profile.sound===false) return;
+  if(kind==="correct") tone([659.3,880],0.15,"sine",0.12);
+  else if(kind==="wrong") tone([196,146.8],0.2,"sawtooth",0.07);
+  else if(kind==="win") tone([523.3,659.3,784,1046.5],0.17,"triangle",0.11);
+}
+let _voices=[];
+function loadVoices(){ try{ _voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : []; }catch(e){ _voices=[]; } }
+if(window.speechSynthesis){ loadVoices(); try{ window.speechSynthesis.addEventListener("voiceschanged",loadVoices); }catch(e){} }
+function muted(){ return profile.sound===false; }
+function spokenText(t){
+  // strip display-only annotations so TTS says the word, not the note:
+  // "ten (10)"→"ten", "red (i-adj)"→"red", "hello / good afternoon"→"hello, good afternoon"
+  let s=(t||"").toString()
+    .replace(/[（(][^）)]*[）)]/g, " ")
+    .replace(/\s*\/\s*/g, ", ")
+    .replace(/\s+/g, " ").trim();
+  return s || (t||"").toString().trim();   // fall back if cleaning left nothing
+}
+function speak(text, lang, slow){
+  if(!("speechSynthesis" in window) || !text) return;
+  try{
+    const u=new SpeechSynthesisUtterance(spokenText(text));
+    u.lang=lang||"ja-JP"; u.rate= slow?0.5:0.9; u.pitch=1;
+    if(!_voices.length) loadVoices();
+    const v=_voices.find(v=>v.lang===u.lang) || _voices.find(v=>((v.lang||"").toLowerCase().replace("_","-")).indexOf((u.lang||"ja").slice(0,2))===0);
+    if(v) u.voice=v;
+    window.speechSynthesis.cancel();
+    setTimeout(()=>{ try{ window.speechSynthesis.speak(u); }catch(e){} }, 40);   // cancel()+speak() back-to-back drops utterances on Chrome
+  }catch(e){}
+}
+function autoSpeak(text, lang){ if(!muted()) speak(text, lang, false); }   // incidental audio: silenced by mute
+function speakerPair(text, lang){  // 🔊 play + 🐢 slow — always play, even when muted (explicit)
+  const wrap=h("span",{class:"spk-pair"});
+  const p=h("button",{class:"spk","aria-label":"Play",html:"🔊"});
+  p.addEventListener("click",e=>{ e.stopPropagation(); e.preventDefault(); speak(text,lang,false); });
+  const s=h("button",{class:"spk","aria-label":"Play slowly",html:"🐢"});
+  s.addEventListener("click",e=>{ e.stopPropagation(); e.preventDefault(); speak(text,lang,true); });
+  wrap.appendChild(p); wrap.appendChild(s);
+  return wrap;
+}
+
+/* ----- combo celebration ----- */
+let _toastEl=null,_toastT=null;
+function toast(msg){
+  if(!_toastEl){ _toastEl=h("div",{class:"toast"}); document.body.appendChild(_toastEl); }
+  _toastEl.textContent=msg; requestAnimationFrame(()=>_toastEl.classList.add("on"));
+  clearTimeout(_toastT); _toastT=setTimeout(()=>{ if(_toastEl)_toastEl.classList.remove("on"); },1700);
+}
+function confetti(big){
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(reduce) return;
+  const colors=["#d24e24","#2a3c74","#5f7a43","#c1892e","#3b4f8f"];
+  for(let i=0;i<(big?64:26);i++){
+    const c=h("div",{class:"cf"});
+    c.style.background=colors[i%colors.length];
+    const x=Math.random()*100; c.style.left=x+"vw"; c.style.top="-20px";
+    c.style.transform="rotate("+(Math.random()*360)+"deg)";
+    fx.appendChild(c);
+    const dx=(Math.random()-.5)*160, dur=900+Math.random()*700, rot=(Math.random()-.5)*720;
+    c.animate([{transform:c.style.transform,opacity:1,offset:0},
+      {transform:"translate("+dx+"px,"+(window.innerHeight+60)+"px) rotate("+rot+"deg)",opacity:.9}],
+      {duration:dur,easing:"cubic-bezier(.3,.6,.4,1)",fill:"forwards"});
+    setTimeout(()=>c.remove(),dur+50);
+  }
+}
+function celebrate(n, label, big){
+  const b=h("div",{class:"burst"},[ h("span",{class:"n serif"},[String(n)]), h("span",null,[label||"combo!"]) ]);
+  document.body.appendChild(b); requestAnimationFrame(()=>b.classList.add("go"));
+  setTimeout(()=>b.remove(),1200);
+  confetti(big);
+}
+function levelUp(lv){
+  const b=h("div",{class:"burst lvl"},[ h("span",null,["LEVEL"]), h("span",{class:"n serif"},[String(lv)]) ]);
+  document.body.appendChild(b); requestAnimationFrame(()=>b.classList.add("go"));
+  setTimeout(()=>b.remove(),1700);
+  sfx("win"); confetti(true); toast("⬆ Level "+lv+" reached!");
+}
+
+/* ---------------- Complete ---------------- */
+function finishSession(early){
+  save(); navEnter("complete");
+  const s=session;
+  const acc = (s.correct+s.wrong)? Math.round(s.correct/(s.correct+s.wrong)*100):0;
+  let masteredGain=0;
+  if(s.topicId){ masteredGain = topicStats(TOPIC[s.topicId]).mastered - s.startTopic; }
+  const c=h("div",{class:"complete"});
+  c.appendChild(h("div",{class:"seal serif"},[ acc>=100?"優": acc>=80?"良":"可" ]));
+  c.appendChild(h("h2",null,[ early?"Lesson paused":"Lesson complete" ]));
+  c.appendChild(h("p",{class:"lead"},[ profile.name? ("Nice work, "+profile.name+"."):"Nice work." ]));
+  c.appendChild(h("div",{class:"result-grid"},[
+    h("div",{class:"result"},[ h("div",{class:"rk"},["✦ XP earned"]), h("div",{class:"rv"},["+"+s.xp]) ]),
+    h("div",{class:"result"},[ h("div",{class:"rk"},["Accuracy"]), h("div",{class:"rv"},[acc+"%"]) ]),
+    h("div",{class:"result"},[ h("div",{class:"rk"},["🔥 Streak peak"]), h("div",{class:"rv"},[String(s.bestCombo)]) ]),
+    h("div",{class:"result"},[ h("div",{class:"rk"},["Words practiced"]), h("div",{class:"rv"},[String(s.advanced.size)]) ])
+  ]));
+  if(masteredGain>0) c.appendChild(h("p",{class:"lead"},["🎉 "+masteredGain+" new word"+(masteredGain>1?"s":"")+" mastered!"]));
+  const src=s.source, tid=s.topicId;
+  const startNext=()=>{
+    const hasNew=(topicId)=> TOPIC[topicId].itemIds.some(isNew);
+    let built=null, srcOut="daily", tidOut=null;
+    if(src!=="daily" && tid){
+      // stay in this chapter while it still has new words; otherwise jump to the next unlocked chapter that does
+      let targetId = hasNew(tid) ? tid : null;
+      if(!targetId){
+        const ci = COURSE.topics.findIndex(t=>t.id===tid);
+        for(let i=(ci>=0?ci+1:0); i<COURSE.topics.length; i++){
+          if(!isLockedIndex(i) && hasNew(COURSE.topics[i].id)){ targetId=COURSE.topics[i].id; break; }
+        }
+      }
+      if(targetId){ built=buildTopicLesson(targetId); srcOut="topic"; tidOut=targetId; }
+    }
+    if(!built || !built.queue.length){ built=buildDaily(); srcOut="daily"; tidOut=null; }   // nothing new left → mixed review
+    if(built && built.queue.length) startSession(built, {source:srcOut, topicId:tidOut});
+    else renderHome();
+  };
+  const practiceThis=()=>{
+    let built = tid ? buildTopicLesson(tid) : buildDaily();
+    if(!built || !built.queue.length) built=buildDaily();
+    if(built && built.queue.length) startSession(built, {source: tid?"topic":"daily", topicId: tid});
+    else renderHome();
+  };
+  const actions=h("div",{style:"display:flex; flex-direction:column; gap:10px"});
+  actions.appendChild(h("button",{class:"btn big",onclick:startNext},["Next lesson"]));
+  if(tid && src!=="daily") actions.appendChild(h("button",{class:"btn ghost big",onclick:practiceThis},["Practice this chapter"]));
+  actions.appendChild(h("button",{class:"btn ghost big",onclick:renderHome},["Back to course"]));
+  c.appendChild(actions);
+  const wrap=h("div",{class:"wrap"}); wrap.appendChild(c);
+  app.replaceChildren(h("div",{class:"topbar"},[ h("div",{class:"brand"},[h("span",{class:"mark serif"},["クベバ"])]) ]), wrap);
+  if(!early && acc>=80) setTimeout(()=>celebrate(acc+"%", acc>=100?"perfect!":"nice!"),200);
+}
+
+/* ---------------- Theme ---------------- */
+function themeIcon(){ const t=document.documentElement.getAttribute("data-theme"); return t==="dark"?"☀":"☾"; }
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute("data-theme");
+  const next = cur==="dark"?"light": cur==="light"?"dark": (window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"light":"dark");
+  document.documentElement.setAttribute("data-theme",next);
+  profile.theme=next; save();
+  const btn=document.getElementById("themeBtn"); if(btn)btn.innerHTML=themeIcon();
+}
+function soundIcon(){ return profile.sound===false?"🔇":"🔊"; }
+/* ---------------- Input mode: rōmaji vs kana (phone's own Japanese keyboard) ---------------- */
+function kanaMode(){ return profile.inputMode==="kana"; }
+/* ----- kanji layer ----- */
+let _kuCache={t:0,v:false};
+function kanjiUnlocked(){
+  // a learner-based gate: kanji appears once enough words have actually stuck, not once a topic has been tapped through
+  const T=now(); if(T-_kuCache.t<500) return _kuCache.v;
+  let n=0; for(const id in profile.memory){ const it=ITEMS[id]; if(it && it.tags[0]!=="kana" && isMastered(id)){ n++; if(n>=CFG.kanjiUnlockAt) break; } }
+  _kuCache={t:T, v:n>=CFG.kanjiUnlockAt}; return _kuCache.v;
+}
+function masteredWords(){ let n=0; for(const id in profile.memory){ const it=ITEMS[id]; if(it && it.tags[0]!=="kana" && isMastered(id)) n++; } return n; }
+function kst(id){ return profile.kanji[id] || {ok:0, miss:0, furi:false}; }
+function isMastered(id){ const m=mem(id); return !!m && m.S>=21 && m.reps>=3; }
+function hasKanji(it){ return !!it.k && it.k!==it.jp; }
+function rubyNode(it, showFuri, cls){
+  const sp=h("span",{class:cls||null});
+  it.ruby.forEach(([t,r])=>{ if(r && showFuri){ const rb=document.createElement("ruby"); rb.appendChild(document.createTextNode(t)); const rt=document.createElement("rt"); rt.textContent=r; rb.appendChild(rt); sp.appendChild(rb); } else sp.appendChild(document.createTextNode(t)); });
+  return sp;
+}
+// Japanese side of a prompt: kana until kanji unlocks and while the word is new; then kanji with furigana on its
+// first appearance this session (or after a reading miss), and bare kanji from the second appearance on.
+function jpPrompt(it, isFresh){
+  if(!hasKanji(it) || isFresh || !kanjiUnlocked()) return document.createTextNode(it.jp);
+  const first = !(session && session._kseen && session._kseen.has(it.id));
+  if(session){ session._kseen = session._kseen || new Set(); session._kseen.add(it.id); }
+  return rubyNode(it, first || kst(it.id).furi);
+}
+function wJp(it){ return (hasKanji(it) && kanjiUnlocked()) ? rubyNode(it,true,"w-jp jp") : h("div",{class:"w-jp jp"},[it.jp]); }
+function kanjiSuffix(it){ return (hasKanji(it) && kanjiUnlocked()) ? "  "+it.k : ""; }
+// mastered words with a kanji form, offered as reading drills; eligible more often while the kanji is still shaky
+function canRead(id, isFresh){ const it=ITEMS[id]; return !isFresh && hasKanji(it) && kanjiUnlocked() && isMastered(id); }
+function inputIcon(){ return kanaMode()?"あ":"A"; }
+function toggleInputMode(){
+  profile.inputMode = kanaMode()?"romaji":"kana"; save();
+  const btn=document.getElementById("inputBtn"); if(btn)btn.textContent=inputIcon();
+  toast(kanaMode()? "Kana mode — use your phone's Japanese keyboard (🌐 key)" : "Rōmaji mode");
+}
+const hasKana = v=>/[\u3040-\u30ff]/.test(v);
+const isLatinOnly = v=>/^[a-z0-9\s'\-]+$/i.test(v);
+function toggleSound(){
+  profile.sound = (profile.sound===false);   // was off -> now on; was on -> now off
+  save();
+  const btn=document.getElementById("soundBtn"); if(btn)btn.innerHTML=soundIcon();
+  if(profile.sound){ ac(); sfx("correct"); }   // confirm it's on
+}
+
+/* ---------------- Boot ---------------- */
+function boot(){
+  try{
+    initStore();
+    try{ history.replaceState({s:"home"},""); }catch(e){}
+    if(profile.theme) document.documentElement.setAttribute("data-theme",profile.theme);
+    renderHome();
+    if(storeCorrupt) toast("⚠ Saved progress was unreadable — starting fresh (old copy kept)");
+  }catch(e){
+    app.replaceChildren(h("div",{class:"center-screen"},[
+      h("div",{class:"mark serif",style:"font-size:40px"},["クベバ"]),
+      h("p",{class:"muted",style:"text-align:center"},["Something went wrong while starting. Try updating your browser."]),
+      h("pre",{class:"muted",style:"font-size:11px;white-space:pre-wrap"},[String(e&&e.message||e)])
+    ]));
+  }
+}
+boot();
+
+})();
+</script>
+</body>
+</html>
