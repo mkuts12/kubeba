@@ -428,3 +428,66 @@ test('concept review pauses practice and transfer hides hints without removing h
   await page.getByRole('button', { name: 'Show hints' }).click();
   await expect(page.locator('.note-pill')).toHaveCount(3);
 });
+
+test('visible credits acknowledge sources and encourage direct support for authors', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/');
+  const opener = page.locator('.site-credits').getByRole('button', { name: 'Credits & sources' });
+  await opener.click();
+  const dialog = page.getByRole('dialog', { name: 'Credits & sources', exact: true });
+  await expect(dialog).toBeVisible();
+  await expect(
+    dialog.getByRole('heading', { name: 'Support the authors. Buy the original books.' }),
+  ).toBeVisible();
+  await expect(dialog.locator('.teaching-credit')).toHaveCount(4);
+  await expect(dialog.locator('.music-credit')).toHaveCount(4);
+  await expect(dialog.getByText('Forrest Kinney', { exact: true })).toBeVisible();
+  await expect(dialog.getByRole('link', { name: 'Explore and buy the books' })).toHaveAttribute(
+    'href',
+    'https://forrestkinney.com/improvising-1',
+  );
+  await expect(dialog.getByRole('link', { name: 'Buy from Schott Music' })).toHaveAttribute(
+    'href',
+    /schott-music.com/,
+  );
+  await expect(dialog.getByRole('link', { name: 'Buy the book from Hal Leonard' })).toHaveAttribute(
+    'href',
+    /50449602\/bluegrass-fiddle-and-beyond/,
+  );
+  await expect(
+    dialog.getByRole('link', { name: 'Read and credit the free textbook' }),
+  ).toHaveAttribute('href', 'https://viva.pressbooks.pub/openmusictheory/');
+  await expect(dialog.getByText(/Interlude earns no commission/)).toBeVisible();
+  await expect(
+    dialog.getByRole('link', { name: 'Software and bundled-font license notices' }),
+  ).toHaveAttribute('href', './THIRD_PARTY_NOTICES.txt');
+  expect(await dialog.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath('credits.png'), fullPage: true });
+  await page.keyboard.press('Escape');
+  await expect(dialog).not.toBeVisible();
+  await expect(opener).toBeFocused();
+});
+
+test('reading credits pauses practice without discarding the session or its note', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Just 2 minutes' }).click();
+  await beginPractice(page);
+  for (let i = 0; i < 4; i++)
+    await page.getByRole('button', { name: 'Next step', exact: true }).click();
+  await page
+    .getByRole('textbox', { name: /One idea to take with you/ })
+    .fill('Keep my quiet answer.');
+  await page.locator('.site-credits').getByRole('button', { name: 'Credits & sources' }).click();
+  await expect(page.locator('.leave-dialog')).not.toBeVisible();
+  const timer = await page.locator('.session-time').innerText();
+  await page.waitForTimeout(1100);
+  expect(await page.locator('.session-time').innerText()).toBe(timer);
+  await page.getByRole('button', { name: 'Close credits', exact: true }).click();
+  await expect(page.getByRole('textbox', { name: /One idea to take with you/ })).toHaveValue(
+    'Keep my quiet answer.',
+  );
+  await expect(page.getByRole('button', { name: 'Resume session' })).toBeVisible();
+});

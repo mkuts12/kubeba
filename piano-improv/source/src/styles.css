@@ -3105,6 +3105,349 @@ input[type='range'] {
   }
 }
 
+.sidebar-credits {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  margin: 10px 0 0 8px;
+  padding: 5px 0;
+  background: none;
+  font-size: 10px;
+  color: #7b9169;
+}
+.sidebar-credits:hover {
+  color: #425f35;
+}
+.site-credits {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: calc(100% - 96px);
+  max-width: 1274px;
+  margin: 0 auto;
+  border-top: 1px solid var(--line);
+  padding: 17px 0 26px;
+}
+.site-credits > span {
+  font-size: 9px;
+  line-height: 1.8;
+  color: #a0aa91;
+}
+.site-credits .text-button {
+  flex-shrink: 0;
+  min-height: 44px;
+  font-size: 10px;
+}
+.credits-dialog {
+  width: min(900px, calc(100% - 36px));
+  max-height: 88vh;
+  max-height: 88dvh;
+  padding: 0;
+  border: 1px solid #d7e1ca;
+  border-radius: 13px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 22px 90px #1c2c2440;
+  overflow: auto;
+}
+.credits-dialog::backdrop {
+  background: #1e302963;
+  backdrop-filter: blur(3px);
+}
+.credits-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 23px 28px;
+  background: #f8f7f3fa;
+  border-bottom: 1px solid var(--line);
+}
+.credits-header h2 {
+  font: 400 36px/1.15 var(--serif);
+  margin-top: 7px;
+}
+.credits-header .eyebrow {
+  font-size: 8px;
+}
+.credits-header .icon-button {
+  flex-shrink: 0;
+  height: 42px;
+  width: 42px;
+  border: 1px solid #dfe6d5;
+}
+.credits-body {
+  padding: 25px 28px 30px;
+}
+.credits-intro {
+  font-size: 13px;
+  line-height: 1.9;
+  color: #718365;
+  max-width: 730px;
+}
+.credits-body > section {
+  margin-top: 29px;
+}
+.credits-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #8ba174;
+  margin-bottom: 16px;
+}
+.credits-section-heading h3 {
+  font: 400 28px/1.2 var(--serif);
+  color: #4c673e;
+}
+.teaching-credit-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+.teaching-credit {
+  padding: 22px;
+  border: 1px solid #e0e6d5;
+  border-radius: 9px;
+  background: #fdfdf7;
+  min-width: 0;
+}
+.teaching-credit h4,
+.music-credit h4 {
+  font: 400 26px/1.2 var(--serif);
+  color: #4d683f;
+}
+.teaching-credit p {
+  color: #7b8d6d;
+  font-size: 12px;
+  line-height: 1.9;
+  margin-top: 12px;
+}
+.teaching-credit p.credit-author,
+.music-credit p.credit-author {
+  font-size: 11px;
+  color: #748d61;
+  line-height: 1.8;
+  margin-top: 9px;
+}
+.teaching-credit p.credit-scope {
+  font-size: 10px;
+  color: #94a284;
+}
+.credit-links {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+.credit-links a,
+.music-credit > a,
+.additional-credits a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  line-height: 1.8;
+  color: #718d58;
+  text-underline-offset: 3px;
+}
+.credit-links svg,
+.additional-credits svg,
+.music-credit > a svg {
+  flex-shrink: 0;
+}
+.additional-credits {
+  margin-top: 18px;
+  padding-top: 6px;
+  border-top: 1px solid #e4e9dc;
+}
+.additional-credits summary {
+  cursor: pointer;
+  font-size: 11px;
+  color: #849871;
+  padding: 12px 0;
+  line-height: 1.8;
+}
+.additional-credits ul {
+  margin: 8px 0;
+  padding-left: 19px;
+}
+.additional-credits li {
+  margin: 10px 0;
+  color: #a5b394;
+}
+.credits-section-note {
+  font-size: 12px;
+  line-height: 1.9;
+  color: #809371;
+  margin: 13px 0;
+}
+.credits-section-note a {
+  color: #66864d;
+  text-underline-offset: 3px;
+}
+.music-credit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+}
+.music-credit {
+  padding: 20px 22px;
+  border: 1px solid #dfe6d3;
+  border-radius: 8px;
+  background: #f1f5e9;
+}
+.music-credit h4 {
+  font-size: 24px;
+}
+.music-credit > a {
+  margin-top: 12px;
+}
+.music-credit details {
+  border-top: 1px solid #dfe6d3;
+  margin-top: 12px;
+  padding-top: 4px;
+}
+.music-credit summary {
+  font-size: 10px;
+  color: #82976f;
+  padding: 10px 0;
+  cursor: pointer;
+}
+.music-credit details p {
+  color: #82976f;
+  font-size: 11px;
+  line-height: 1.9;
+  margin-top: 9px;
+}
+.credits-original {
+  font-size: 11px;
+  line-height: 1.9;
+  color: #8e9f7e;
+  margin-top: 18px;
+}
+.credits-disclaimer {
+  border-top: 1px solid #e0e7d5;
+  padding-top: 21px;
+  margin-top: 28px;
+}
+.credits-disclaimer > strong {
+  font-size: 12px;
+  font-weight: 500;
+  color: #6f885a;
+}
+.credits-disclaimer > p {
+  font-size: 11px;
+  line-height: 1.9;
+  color: #8e9f7b;
+  margin-top: 8px;
+}
+.author-support {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 22px;
+  background: #eaf0df;
+  border: 1px solid #d5e1c6;
+  border-radius: 9px;
+  margin-top: 24px;
+}
+.author-support > svg {
+  flex-shrink: 0;
+  color: #7d9864;
+  margin-top: 5px;
+}
+.author-support h3 {
+  font: 400 29px/1.2 var(--serif);
+  color: #506b40;
+}
+.author-support p {
+  color: #7c906a;
+  font-size: 12px;
+  line-height: 1.9;
+  margin-top: 10px;
+}
+.author-support small {
+  display: block;
+  color: #95a483;
+  font-size: 10px;
+  line-height: 1.9;
+  margin-top: 12px;
+}
+.credit-support {
+  margin-top: 19px;
+  border-top: 1px solid #e3e9d8;
+  padding-top: 17px;
+}
+.credit-support .button {
+  text-decoration: none;
+  font-size: 10px;
+  gap: 7px;
+  padding: 11px;
+  max-width: 100%;
+  justify-content: flex-start;
+}
+.credit-support > p {
+  font-size: 10px;
+  color: #91a180;
+  line-height: 1.9;
+  margin-top: 10px;
+}
+@media (max-width: 1150px) {
+  .site-credits {
+    width: calc(100% - 64px);
+  }
+}
+@media (max-width: 700px) {
+  .site-credits {
+    width: calc(100% - 48px);
+    align-items: flex-start;
+    gap: 8px;
+    flex-direction: column;
+    padding-top: 15px;
+  }
+  .credits-header {
+    padding: 18px 20px;
+  }
+  .credits-header h2 {
+    font-size: 32px;
+  }
+  .credits-body {
+    padding: 21px 20px;
+  }
+  .teaching-credit-list {
+    grid-template-columns: 1fr;
+  }
+  .teaching-credit {
+    padding: 19px;
+  }
+  .author-support {
+    padding: 18px;
+    gap: 10px;
+  }
+  .author-support h3 {
+    font-size: 26px;
+  }
+  .author-support > svg {
+    width: 18px;
+    height: 18px;
+  }
+  .music-credit {
+    padding: 18px;
+  }
+}
+@media (max-width: 500px) {
+  .site-credits {
+    width: calc(100% - 40px);
+  }
+}
+
 @media (max-width: 380px) {
   .hero-caption {
     display: none;

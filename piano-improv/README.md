@@ -8,6 +8,8 @@ The lesson library includes Foundations, Theme & Variations (Beethoven, Mozart, 
 
 Every lesson also has an untimed concept guide with A/B listening, a short explanation, and an optional understanding check. Follow the six-topic Learning Path or choose any collection. Practice follows Hear → Try → Create → Transfer → Reflect. Times are suggestions, not forced step changes. Read the [teaching-content review](source/public/PEDAGOGY_REVIEW.md) for the book/author sources consulted, changes made, and review limits.
 
+Open **Credits & sources** in the app footer for teaching authors, music provenance, software/font notices, and direct book links to the author or publisher. The panel encourages readers to support the authors, clearly marks the free textbook, and contains no affiliate links. Opening it pauses practice without losing the session or its note.
+
 ## Folder layout
 
 - `index.html`, `assets/`, and `favicon.svg`: the built app, served by GitHub Pages.

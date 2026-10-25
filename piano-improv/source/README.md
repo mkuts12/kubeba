@@ -25,6 +25,7 @@ Open the local URL shown by Vite. The server binds to loopback only. On a laptop
 - A local piano-style synth with adjustable backing tempo and volume.
 - Three free-play settings and small creative prompts.
 - Optional written reflections, difficulty ratings, and a practice history.
+- Visible Credits & Sources in the footer and desktop sidebar: teaching authors, music provenance, software/font notices, and direct author/publisher book links. The free textbook is clearly marked free. There are no affiliate links or purchase requirements. Opening credits pauses practice without discarding an unfinished session or note.
 - Browser storage for preferences and the most recent 500 sessions.
 - Automatic pause when the tab becomes hidden, and confirmation before leaving an unfinished session.
 - Keyboard controls, reduced-motion support, and layouts for phones, tablets, and desktops.

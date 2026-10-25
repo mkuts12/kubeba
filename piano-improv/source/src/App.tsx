@@ -30,6 +30,7 @@ import { EmptyState, Notes, PianoArtwork, StyleSwitch, Week } from './components
 import StudyPanel from './StudyPanel';
 import LessonGuide from './LessonGuide';
 import LearningPath from './LearningPath';
+import CreditsDialog from './CreditsDialog';
 import { courseMissions, unitFor, type UnitId } from './course';
 import { conceptFor, guidedPrompt, type PlaybackKind } from './theory';
 import {
@@ -92,6 +93,7 @@ export default function App() {
   const [collection, setCollection] = useState<Collection>('foundations');
   const [pathUnit, setPathUnit] = useState<UnitId | null>(null);
   const [mobileMenu, setMobileMenu] = useState(false);
+  const [creditsOpen, setCreditsOpen] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
   const [reflection, setReflection] = useState('');
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
@@ -199,6 +201,13 @@ export default function App() {
     audio.stop();
     setDemoPlaying(false);
   }, [audio]);
+
+  function openCredits() {
+    stopSound();
+    setSession((previous) => (previous ? { ...previous, running: false } : null));
+    setExploring(false);
+    setCreditsOpen(true);
+  }
 
   useEffect(() => {
     const onHidden = () => {
@@ -498,6 +507,10 @@ export default function App() {
             </div>
           </div>
           <span className="sidebar-version">A small space to make music.</span>
+          <button className="sidebar-credits" onClick={openCredits}>
+            <BookOpen size={12} />
+            Credits & sources
+          </button>
         </div>
       </aside>
 
@@ -1318,7 +1331,15 @@ export default function App() {
             </>
           )}
         </main>
+        <footer className="site-credits">
+          <span>Enjoying the ideas? Please support the authors behind them.</span>
+          <button className="text-button" onClick={openCredits}>
+            Credits & sources
+            <ArrowUpRight size={14} />
+          </button>
+        </footer>
       </div>
+      <CreditsDialog open={creditsOpen} onClose={() => setCreditsOpen(false)} />
       <dialog
         ref={dialogRef}
         className="leave-dialog"
