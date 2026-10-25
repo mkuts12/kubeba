@@ -97,20 +97,20 @@ const foundations: Mission[] = [
     title: 'A little goes a long way',
     skill: 'Your first phrases',
     description: 'Three notes. A little space. A melody that is yours.',
-    notes: { classical: ['C', 'D', 'E'], jazz: ['C', 'E♭', 'G'] },
-    demo: { classical: phrase([60, 62, 64, 62, 60]), jazz: phrase([60, 63, 67, 63, 60], true) },
-    harmony: { classical: [C], jazz: [C7] },
+    notes: { classical: ['C', 'E', 'G'], jazz: ['C', 'E', 'G'] },
+    demo: { classical: phrase([60, 64, 67, 64, 60]), jazz: phrase([60, 64, 67, 64, 60], true) },
+    harmony: { classical: [C], jazz: [C] },
     prompts: {
       classical: prompts(
-        'Use only C, D, and E. Make a short phrase, then repeat it with a different ending.',
+        'Use only C, E, and G. Make a short phrase, then repeat it with a different ending.',
         'Make a small melody with your three notes. Repeat ideas you like. Leave a breath between phrases.',
-        'Listen again if you need to. Find the phrase using C, D, and E. Getting the shape matters more than an exact copy.',
+        'Listen again if you need to. Find the phrase using C, E, and G. Getting the shape matters more than an exact copy.',
         sharedReflection,
       ),
       jazz: prompts(
-        'Use C, E-flat, and G. Keep the same notes but change the rhythm. Leave a gap before you answer.',
+        'Use C, E, and G. Keep the same notes but change the rhythm. Leave a gap before you answer.',
         'Play short phrases over the groove. Repeat one idea, change its ending, and let the accompaniment fill the gaps.',
-        'Copy the rhythm using just C. When it feels comfortable, add E-flat and G.',
+        'Copy the rhythm using just C. When it feels comfortable, add E and G.',
         sharedReflection,
       ),
     },
@@ -122,12 +122,12 @@ const foundations: Mission[] = [
     title: 'Have a conversation',
     skill: 'Question & answer',
     description: 'Let one phrase ask. Let the next one answer.',
-    notes: { classical: ['C', 'D', 'E', 'G'], jazz: ['C', 'E♭', 'F', 'G'] },
+    notes: { classical: ['C', 'D', 'E', 'G'], jazz: ['C', 'D', 'E', 'G'] },
     demo: {
       classical: phrase([60, 62, 64, 67, 64, 62, 60]),
-      jazz: phrase([60, 63, 65, 67, 65, 63, 60], true),
+      jazz: phrase([60, 62, 64, 67, 64, 62, 60], true),
     },
-    harmony: { classical: [C], jazz: [C7] },
+    harmony: { classical: [C], jazz: [C] },
     prompts: {
       classical: prompts(
         'Make a question that ends on D or G. Answer it with a phrase that ends on C.',
@@ -150,12 +150,12 @@ const foundations: Mission[] = [
     title: 'One idea, many possibilities',
     skill: 'Motif & variation',
     description: 'Find a small idea worth coming back to.',
-    notes: { classical: ['C', 'D', 'E', 'G', 'A'], jazz: ['C', 'E♭', 'F', 'G', 'B♭'] },
+    notes: { classical: ['C', 'D', 'E', 'G', 'A'], jazz: ['C', 'D', 'E', 'G', 'A'] },
     demo: {
       classical: phrase([60, 62, 64, 62, 64, 67]),
-      jazz: phrase([60, 63, 65, 63, 65, 67], true),
+      jazz: phrase([60, 62, 64, 62, 64, 67], true),
     },
-    harmony: { classical: [C], jazz: [C7] },
+    harmony: { classical: [C], jazz: [C] },
     prompts: {
       classical: prompts(
         'Invent a three-note idea. Repeat it higher on the keyboard, then change only its last note.',
@@ -209,10 +209,10 @@ const foundations: Mission[] = [
     title: 'Make room for both hands',
     skill: 'Simple accompaniment',
     description: 'A quiet left hand. A little more freedom in the right.',
-    notes: { classical: ['C', 'D', 'E', 'G', 'A'], jazz: ['C', 'E♭', 'F', 'G', 'B♭'] },
+    notes: { classical: ['C', 'D', 'E', 'G', 'A'], jazz: ['C', 'D', 'E', 'G', 'A'] },
     demo: {
       classical: phrase([60, 64, 67, 64, 62, 60]),
-      jazz: phrase([60, 63, 67, 65, 63, 60], true),
+      jazz: phrase([60, 64, 67, 64, 62, 60], true),
     },
     harmony: { classical: [C], jazz: [C7] },
     prompts: {
@@ -239,11 +239,11 @@ const foundations: Mission[] = [
     description: 'An opening, a little journey, and a way home.',
     notes: {
       classical: ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
-      jazz: ['C', 'E♭', 'F', 'G♭', 'G', 'B♭'],
+      jazz: ['C', 'E♭', 'F', 'G'],
     },
     demo: {
       classical: phrase([60, 64, 67, 64, 69, 67, 62, 60]),
-      jazz: phrase([60, 63, 65, 66, 67, 65, 63, 60], true),
+      jazz: phrase([60, 63, 65, 65, 67, 65, 63, 60], true),
     },
     harmony: { classical: [C, Am, F, G], jazz: [C7, C7, C7, C7, F7, F7, C7, C7, G7, F7, C7, G7] },
     prompts: {
@@ -254,7 +254,7 @@ const foundations: Mission[] = [
         sharedReflection,
       ),
       jazz: prompts(
-        'Try the C blues notes over the 12-bar form. Make the first four bars simple, then answer them.',
+        'Use the familiar C, E-flat, F, and G over the 12-bar form. Make the first four bars simple, then answer them.',
         'Play a short blues solo. Develop one riff across the form, then finish with a clear final phrase. Outside notes can add tension; listen to where they lead.',
         'Copy one small part of the example. Use it as a riff, with space around it.',
         sharedReflection,
@@ -276,9 +276,9 @@ export function missionsFor(style: Style, collection?: Collection): Mission[] {
 
 export const stages: { id: StageId; label: string; short: string }[] = [
   { id: 'listen', label: 'Hear the idea', short: 'Listen' },
-  { id: 'copy', label: 'Find it by ear', short: 'Copy' },
-  { id: 'change', label: 'Make it your own', short: 'Change' },
-  { id: 'play', label: 'Follow your curiosity', short: 'Play' },
+  { id: 'copy', label: 'Try it with a clear limit', short: 'Try' },
+  { id: 'change', label: 'Create your own version', short: 'Create' },
+  { id: 'play', label: 'Use it with less help', short: 'Transfer' },
   { id: 'reflect', label: 'Take a little with you', short: 'Reflect' },
 ];
 
@@ -298,6 +298,18 @@ export function stageAt(
     start += lengths[index];
   }
   return { index: lengths.length - 1, remaining: 0, start: start - lengths[lengths.length - 1] };
+}
+
+/** The chosen step stays active when its suggested time runs out. */
+export function stageForStep(elapsed: number, duration: Duration, step: number) {
+  const lengths = stageLengths(duration);
+  const index = Math.max(0, Math.min(stages.length - 1, step));
+  const start = lengths.slice(0, index).reduce((sum, value) => sum + value, 0);
+  return {
+    index,
+    start,
+    remaining: Math.max(0, Math.min(lengths[index], start + lengths[index] - elapsed)),
+  };
 }
 
 export function formatTime(seconds: number): string {

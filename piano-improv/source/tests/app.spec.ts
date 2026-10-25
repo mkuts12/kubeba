@@ -15,6 +15,10 @@ async function finishSteps(page: Page) {
   await page.getByRole('button', { name: 'Finish session', exact: true }).click();
 }
 
+async function beginPractice(page: Page) {
+  await page.getByRole('button', { name: 'Start practice', exact: true }).click();
+}
+
 test('home is responsive, style choice persists, and all missions open', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
@@ -34,7 +38,8 @@ test('home is responsive, style choice persists, and all missions open', async (
   );
   await page.getByRole('button', { name: '2 min', exact: true }).click();
   await page.getByRole('button', { name: 'Play this mission' }).nth(2).click();
-  await expect(page.locator('.session-heading')).toContainText('Jazz · 2-minute session');
+  await beginPractice(page);
+  await expect(page.locator('.session-heading')).toContainText('Jazz · 2-minute plan');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('One idea, many possibilities');
   expect(errors).toEqual([]);
 });
@@ -59,6 +64,7 @@ test('session examples, pause, hints, controls, and saved reflections work', asy
   });
   await page.goto('/');
   await page.getByRole('button', { name: 'Just 2 minutes' }).click();
+  await beginPractice(page);
   await expect(page.getByRole('heading', { level: 2, name: 'Hear the idea' })).toBeVisible();
   await expect
     .poll(() => page.evaluate(() => (window as unknown as { sourceStarts: number }).sourceStarts))
@@ -101,6 +107,7 @@ test('session examples, pause, hints, controls, and saved reflections work', asy
 test('leaving an unfinished session requires confirmation', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Let’s play' }).click();
+  await beginPractice(page);
   await navigate(page, 'Explore');
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.getByRole('button', { name: 'Keep practicing' }).click();
@@ -138,20 +145,31 @@ test('unavailable browser storage has a clear warning', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Let’s play' })).toBeVisible();
 });
 
-test('the timer advances through steps and stops at the session end', async ({ page }) => {
+test('suggested times never move the lesson on in the middle of playing', async ({ page }) => {
   await page.clock.install();
   await page.goto('/');
   await page.getByRole('button', { name: 'Just 2 minutes' }).click();
+  await beginPractice(page);
   await page.clock.runFor(16_000);
-  await expect(page.getByRole('heading', { name: 'Find it by ear', exact: true })).toBeVisible();
-  await page.clock.runFor(105_000);
+  await expect(page.getByRole('heading', { name: 'Hear the idea', exact: true })).toBeVisible();
+  await expect(page.locator('.stage-time')).toContainText('Stay with this idea');
+  await page.getByRole('button', { name: 'Next step', exact: true }).click();
+  await page.clock.runFor(21_000);
+  await expect(
+    page.getByRole('heading', { name: 'Try it with a clear limit', exact: true }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Next step', exact: true }).click();
+  await page.getByRole('button', { name: 'Next step', exact: true }).click();
+  await page.getByRole('button', { name: 'Next step', exact: true }).click();
+  await page.getByRole('button', { name: 'Finish session', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'That was your music.' })).toBeVisible();
-  await expect(page.locator('.completion-meta')).toContainText('2:00 practiced');
+  await expect(page.locator('.completion-meta')).toContainText('practiced');
   await page.getByRole('button', { name: 'Save my session' }).click();
   const seconds = await page.evaluate(
     () => JSON.parse(localStorage.getItem('interlude.practice.v1')!).sessions[0].seconds,
   );
-  expect(seconds).toBe(120);
+  expect(seconds).toBeGreaterThanOrEqual(37);
+  expect(seconds).toBeLessThan(40);
 });
 
 test('revisiting saved practice opens the same mission and style', async ({ page }) => {
@@ -180,8 +198,9 @@ test('revisiting saved practice opens the same mission and style', async ({ page
   await page.goto('/');
   await navigate(page, 'My practice');
   await page.getByRole('button', { name: 'Revisit One idea, many possibilities in jazz' }).click();
+  await beginPractice(page);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('One idea, many possibilities');
-  await expect(page.locator('.session-heading')).toContainText('Jazz · 2-minute session');
+  await expect(page.locator('.session-heading')).toContainText('Jazz · 2-minute plan');
 });
 
 test('practice still works if browser audio is unavailable', async ({ page }) => {
@@ -190,9 +209,12 @@ test('practice still works if browser audio is unavailable', async ({ page }) =>
   });
   await page.goto('/');
   await page.getByRole('button', { name: 'Just 2 minutes' }).click();
+  await beginPractice(page);
   await expect(page.getByRole('alert')).toContainText('You can still practice without sound');
   await page.getByRole('button', { name: 'Next step', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Find it by ear', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Try it with a clear limit', exact: true }),
+  ).toBeVisible();
 });
 
 test('the smallest phone layout does not overflow', async ({ page }) => {
@@ -202,6 +224,7 @@ test('the smallest phone layout does not overflow', async ({ page }) => {
     true,
   );
   await page.getByRole('button', { name: 'Just 2 minutes' }).click();
+  await beginPractice(page);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );
@@ -213,6 +236,7 @@ test('screenshots of the home and practice room', async ({ page }, testInfo) => 
   await page.evaluate(() => document.fonts.ready);
   await page.screenshot({ path: testInfo.outputPath('home.png'), fullPage: true });
   await page.getByRole('button', { name: 'Just 2 minutes' }).click();
+  await beginPractice(page);
   await page.getByRole('button', { name: 'Pause session' }).click();
   await page.screenshot({ path: testInfo.outputPath('practice.png'), fullPage: true });
 });
@@ -224,6 +248,7 @@ test('theme lessons compare source and variation without rushing the timer', asy
   await page.getByRole('button', { name: /^Theme & variations/ }).click();
   await expect(page.locator('.mission-card')).toHaveCount(4);
   await page.getByRole('button', { name: 'Play this mission' }).first().click();
+  await beginPractice(page);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('An ode, with your own ending');
   await expect(page.getByRole('button', { name: /^Accompaniment/ })).toHaveAttribute(
     'aria-pressed',
@@ -276,6 +301,7 @@ for (const [collection, title] of [
       .locator('.mission-card')
       .filter({ has: page.getByRole('heading', { name: title, exact: true }) });
     await card.getByRole('button', { name: 'Play this mission' }).click();
+    await beginPractice(page);
     await page.getByRole('button', { name: 'Pause session' }).click();
     await page.getByRole('button', { name: 'Show optional notation' }).click();
     await expect(page.locator('.notation-scroll svg')).toBeVisible();
@@ -320,6 +346,7 @@ test('a jazz theme variation renders rests and explains swing', async ({ page })
     .filter({ hasText: 'One theme, your variations' })
     .getByRole('button', { name: 'Play this mission' })
     .click();
+  await beginPractice(page);
   await page.getByRole('button', { name: 'Pause session' }).click();
   await page.getByRole('button', { name: 'Show optional notation' }).click();
   await page.getByRole('button', { name: 'Our variation', exact: true }).click();
@@ -328,4 +355,76 @@ test('a jazz theme variation renders rests and explains swing', async ({ page })
   await expect(page.locator('.notation-status')).toHaveCount(0);
   await page.getByRole('button', { name: 'Hear one variation', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Stop variation', exact: true })).toBeVisible();
+});
+
+test('the concept guide is untimed, sound-first, and has no quiz gate', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Just 2 minutes' }).click();
+  await expect(page.getByRole('region', { name: 'Lesson concept' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'A phrase needs a little space' })).toBeVisible();
+  const before = await page.locator('.session-time').innerText();
+  await page.waitForTimeout(1000);
+  expect(await page.locator('.session-time').innerText()).toBe(before);
+  expect(
+    await page
+      .locator('.concept-examples')
+      .evaluate(
+        (el) =>
+          !!(
+            el.compareDocumentPosition(document.querySelector('.guide-explanation')!) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+          ),
+      ),
+  ).toBe(true);
+  await page.getByRole('button', { name: /^Hear A:/ }).click();
+  await expect(page.getByRole('button', { name: /^Stop A:/ })).toBeVisible();
+  await page.getByRole('button', { name: /^Hear B:/ }).click();
+  await expect(page.getByRole('button', { name: /^Stop B:/ })).toBeVisible();
+  await page.getByText('Check your understanding', { exact: false }).click();
+  await page.getByRole('button', { name: 'Stop it until you find another note.' }).click();
+  await expect(page.locator('.concept-feedback')).toContainText('Not quite');
+  await expect(page.getByRole('button', { name: 'Start practice', exact: true })).toBeEnabled();
+  await page.screenshot({ path: testInfo.outputPath('concept-guide.png'), fullPage: true });
+  await beginPractice(page);
+  await expect(page.getByRole('heading', { name: 'Hear the idea', exact: true })).toBeVisible();
+});
+
+test('the learning path links topics to actual available lessons', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Follow the learning path' }).click();
+  await expect(page.locator('.path-unit')).toHaveCount(6);
+  await expect(page.locator('.mission-card')).toHaveCount(3);
+  await page.getByRole('button', { name: /Hear the chord/ }).click();
+  await expect(page.locator('.mission-card')).toHaveCount(2);
+  await page
+    .locator('.mission-card')
+    .filter({ hasText: 'Find your way home' })
+    .getByRole('button', { name: 'Play this mission' })
+    .click();
+  await expect(page.getByRole('heading', { name: 'Chord tones are places to land' })).toBeVisible();
+  await expect(page.locator('.guide-explanation')).toContainText('C, E, and G');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test('concept review pauses practice and transfer hides hints without removing help', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Just 2 minutes' }).click();
+  await page.getByRole('button', { name: 'Go straight to playing' }).click();
+  await page.waitForTimeout(350);
+  await page.getByRole('button', { name: /Review the idea/ }).click();
+  await expect(page.getByRole('region', { name: 'Lesson concept' })).toBeVisible();
+  await page.getByRole('button', { name: 'Return to practice' }).click();
+  for (let i = 0; i < 3; i++)
+    await page.getByRole('button', { name: 'Next step', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Use it with less help' })).toBeVisible();
+  await expect(page.getByLabel('Note hints are hidden')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Hear the example' })).not.toBeVisible();
+  await page.getByText('Need a reminder? Open the example', { exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Hear the example' })).toBeVisible();
+  await page.getByRole('button', { name: 'Show hints' }).click();
+  await expect(page.locator('.note-pill')).toHaveCount(3);
 });

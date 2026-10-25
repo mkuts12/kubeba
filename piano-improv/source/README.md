@@ -16,10 +16,12 @@ Open the local URL shown by Vite. The server binds to loopback only. On a laptop
 ## What works
 
 - Six foundation missions, each with classical and jazz instructions and audio examples.
+- A six-topic learning path: phrases, variation, harmony, connecting notes, accompaniment, and form. The order introduces chord tones before dedicated blues tension and keeps Joplin as an optional later challenge.
+- An untimed, sound-first concept guide for every lesson: a goal, two comparison examples, a plain explanation, and an optional understanding check. Reading and the check never block playing.
 - A Theme & Variations collection: Beethoven's Ode to Joy, the theme used in Mozart's K.265, Bach's BWV 846 opening pattern, and a small extract from Joplin's The Entertainer.
 - A First Blues collection: original call-and-response, rhythm, and twelve-bar studies, available in jazz mode.
 - Separate source and variation playback, with optional notation, source credits, and clear notes about adaptations.
-- Two-minute and eight-minute sessions: listen, copy, change, play, and reflect.
+- Two-minute and eight-minute practice plans: hear, try, create, transfer, and reflect. Step times are suggestions; only the player chooses Next or Finish.
 - A local piano-style synth with adjustable backing tempo and volume.
 - Three free-play settings and small creative prompts.
 - Optional written reflections, difficulty ratings, and a practice history.
@@ -27,9 +29,11 @@ Open the local URL shown by Vite. The server binds to loopback only. On a laptop
 - Automatic pause when the tab becomes hidden, and confirmation before leaving an unfinished session.
 - Keyboard controls, reduced-motion support, and layouts for phones, tablets, and desktops.
 
-Sound starts only after a button press. Examples play without backing so they are easy to hear. The session timer waits while an example plays. Backing resumes afterward if a session is running and accompaniment is on. Source-based lessons start with accompaniment off; turn it on when you want support. Turn it off to work on your own left-hand pattern.
+Sound starts only after a button press. Lessons first open an untimed concept guide. Play the A/B examples, read if useful, or go straight to playing. The practice clock starts only after that choice. Examples play without backing so they are easy to hear. The clock waits while an example plays. Backing resumes afterward if practice is running and accompaniment is on. Source-based lessons start with accompaniment off; turn it on when you want support. Turn it off to work on your own left-hand pattern.
 
-Session history records actual timer time, not the selected session length. Example-listening time is not added to that timer. Moving to the next step does not add unplayed minutes. Free play is not timed or saved. A difficult rating suggests revisiting that mission; other ratings suggest the next unvisited mission available in the selected style. Existing foundation history is preserved. Tempo and note count are adjusted by the player, not automatically.
+Session history records actual active practice time, not the selected plan length. Reading and example-listening time are not added. Reaching a suggested step time never changes the task, interrupts a phrase, or ends a session. Staying longer counts toward actual practice time; skipping ahead does not add unplayed minutes. Review the concept at any point to pause practice without losing your place. The transfer step hides note hints and collapses examples, but they can be reopened; backing stays available.
+
+Free play is not timed or saved. A difficult rating suggests revisiting that mission; other ratings suggest the next unvisited mission in the learning-path order for the selected style. Existing history is preserved. A saved visit or a correct concept answer is not treated as proof of playing mastery. Tempo and note count are adjusted by the player, not automatically.
 
 ## Privacy and limits
 
@@ -51,6 +55,9 @@ Browser tests cover desktop, tablet, and phone layouts. They test audio scheduli
 ## Main files
 
 - `src/music.ts`: missions, demonstrations, harmony, and timing.
+- `src/course.ts`: topic order and style-aware lesson selection.
+- `src/theory.ts`: lesson concepts, A/B comparisons, practice tasks, and optional understanding checks.
+- `src/LessonGuide.tsx` and `src/LearningPath.tsx`: the untimed guide and suggested path.
 - `src/repertoire.ts`: source-based collections, excerpts, new variations, and provenance.
 - `src/StudyPanel.tsx`, `src/Notation.tsx`, and `src/score-model.ts`: example comparison and optional notation.
 - `src/audio-timing.ts`: straight and simple 2:1 swing timing.
@@ -72,3 +79,7 @@ The exercises use limited note sets, imitation, motif development, phrasing, sim
 - [Open Music Theory: Blues Harmony](https://viva.pressbooks.pub/openmusictheory/chapter/blues-harmony/)
 
 These teaching pages are references, not copied lesson text. Open Music Theory is CC BY-SA 4.0, except where noted; no book excerpts or images are bundled here. The notes and instructions in the new blues studies are original. See each theme lesson's source panel for its public-domain edition and the exact changes made. No modern recording, arrangement, or translation has been imported.
+
+## Teaching-content review
+
+See [`public/PEDAGOGY_REVIEW.md`](public/PEDAGOGY_REVIEW.md) for the source-based review, exact access limits, findings, and changes. It includes Forrest Kinney's author guides for Create First! / Pattern Play, the available outline of Tim Richards' Improvising Blues Piano, and full accessible Open Music Theory chapters. This is not a claim to have read every commercial book or an endorsement by the authors. No qualified teacher has independently assessed the app or the learner's playing.

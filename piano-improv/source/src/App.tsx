@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -28,20 +28,23 @@ import {
 import { PianoAudio } from './audio';
 import { EmptyState, Notes, PianoArtwork, StyleSwitch, Week } from './components';
 import StudyPanel from './StudyPanel';
+import LessonGuide from './LessonGuide';
+import LearningPath from './LearningPath';
+import { courseMissions, unitFor, type UnitId } from './course';
+import { conceptFor, guidedPrompt, type PlaybackKind } from './theory';
 import {
   explorePrompts,
   formatTime,
   missions,
   missionsFor,
   settings,
-  stageAt,
+  stageForStep,
   stageLengths,
   stages,
   type Difficulty,
   type Duration,
   type Style,
   type Collection,
-  type ExampleKind,
 } from './music';
 import {
   initialState,
@@ -65,6 +68,8 @@ interface Session {
   seconds: number;
   running: boolean;
   done: boolean;
+  preparing: boolean;
+  stepIndex: number;
 }
 
 const navItems = [
@@ -85,6 +90,7 @@ export default function App() {
   const [storageError, setStorageError] = useState(false);
   const [page, setPage] = useState<Page>('today');
   const [collection, setCollection] = useState<Collection>('foundations');
+  const [pathUnit, setPathUnit] = useState<UnitId | null>(null);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
   const [reflection, setReflection] = useState('');
@@ -98,7 +104,7 @@ export default function App() {
   const [unlocked, setUnlocked] = useState(false);
   const [audioError, setAudioError] = useState('');
   const [demoPlaying, setDemoPlaying] = useState(false);
-  const [exampleKind, setExampleKind] = useState<ExampleKind>('original');
+  const [exampleKind, setExampleKind] = useState<PlaybackKind>('original');
   const [beat, setBeat] = useState(0);
   const [bar, setBar] = useState(0);
   const [currentChord, setCurrentChord] = useState('C');
@@ -111,7 +117,12 @@ export default function App() {
   const recommended = recommendedMission(saved.sessions, saved.style);
   const mission = missions.find((m) => m.id === session?.missionId) ?? recommended;
   const sessionStyle = session?.style ?? saved.style;
-  const stage = stageAt(session?.elapsed ?? 0, session?.duration ?? saved.duration);
+  const concept = useMemo(() => conceptFor(mission, sessionStyle), [mission, sessionStyle]);
+  const stage = stageForStep(
+    session?.elapsed ?? 0,
+    session?.duration ?? saved.duration,
+    session?.stepIndex ?? 0,
+  );
   const currentStage = stages[stage.index];
   const setting = settings.find((s) => s.id === exploreId)!;
   const isSaved = session?.id === savedId;
@@ -121,7 +132,13 @@ export default function App() {
   const harmony = page === 'explore' ? setting.harmony : mission.harmony[sessionStyle];
   const audioStyle = page === 'explore' ? setting.style : sessionStyle;
   const backingFeel = page === 'practice' ? mission.backingFeel : undefined;
-  const libraryMissions = missionsFor(saved.style, collection);
+  const libraryMissions = pathUnit
+    ? courseMissions(saved.style, pathUnit)
+    : missionsFor(saved.style, collection);
+
+  useEffect(() => {
+    if (currentStage.id === 'play' && !session?.preparing) setHints(false);
+  }, [currentStage.id, session?.preparing]);
 
   useEffect(() => {
     try {
@@ -165,14 +182,17 @@ export default function App() {
       last = now;
       setSession((previous) => {
         if (!previous?.running || previous.done) return previous;
-        const added = Math.min(delta, previous.duration * 60 - previous.elapsed);
-        const elapsed = previous.elapsed + added;
-        const done = elapsed >= previous.duration * 60;
-        return { ...previous, elapsed, seconds: previous.seconds + added, done, running: !done };
+        const step = stageForStep(previous.elapsed, previous.duration, previous.stepIndex);
+        const end = step.start + stageLengths(previous.duration)[step.index];
+        return {
+          ...previous,
+          elapsed: Math.min(end, previous.elapsed + delta),
+          seconds: previous.seconds + delta,
+        };
       });
     }, 200);
     return () => clearInterval(interval);
-  }, [session?.id, session?.running, session?.done, demoPlaying]);
+  }, [session?.id, session?.running, session?.done, session?.stepIndex, demoPlaying]);
 
   const stopSound = useCallback(() => {
     playbackRequest.current++;
@@ -236,6 +256,12 @@ export default function App() {
   function openCollection(next: Collection) {
     if (next === 'blues') changeStyle('jazz');
     setCollection(next);
+    setPathUnit(null);
+    goTo('practice');
+  }
+
+  function openPath(unit: UnitId = unitFor(recommended.id).id) {
+    setPathUnit(unit);
     goTo('practice');
   }
 
@@ -262,6 +288,7 @@ export default function App() {
     style = saved.style,
   ) {
     const selectedMission = missions.find((m) => m.id === missionId)!;
+    if (pathUnit && unitFor(missionId).id !== pathUnit) setPathUnit(null);
     setCollection(selectedMission.collection ?? 'foundations');
     stopSound();
     setExploring(false);
@@ -280,12 +307,27 @@ export default function App() {
       duration,
       elapsed: 0,
       seconds: 0,
-      running: true,
+      running: false,
       done: false,
+      preparing: true,
+      stepIndex: 0,
     });
     setPage('practice');
     setCurrentChord(missions.find((m) => m.id === missionId)!.harmony[style][0].name);
     void unlockAudio();
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  function beginPractice() {
+    stopSound();
+    void unlockAudio();
+    setSession((previous) => (previous ? { ...previous, preparing: false, running: true } : null));
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  function reviewConcept() {
+    stopSound();
+    setSession((previous) => (previous ? { ...previous, preparing: true, running: false } : null));
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
@@ -301,10 +343,11 @@ export default function App() {
     setDemoPlaying(false);
     setSession((previous) => {
       if (!previous) return null;
-      const current = stageAt(previous.elapsed, previous.duration);
+      const current = stageForStep(previous.elapsed, previous.duration, previous.stepIndex);
       if (current.index === stages.length - 1) return { ...previous, done: true, running: false };
       return {
         ...previous,
+        stepIndex: current.index + 1,
         elapsed: stageLengths(previous.duration)
           .slice(0, current.index + 1)
           .reduce((a, b) => a + b, 0),
@@ -318,10 +361,11 @@ export default function App() {
     setDemoPlaying(false);
     setSession((previous) => {
       if (!previous) return null;
-      const current = stageAt(previous.elapsed, previous.duration);
+      const current = stageForStep(previous.elapsed, previous.duration, previous.stepIndex);
       const index = Math.max(0, current.index - 1);
       return {
         ...previous,
+        stepIndex: index,
         elapsed: stageLengths(previous.duration)
           .slice(0, index)
           .reduce((a, b) => a + b, 0),
@@ -329,7 +373,7 @@ export default function App() {
     });
   }
 
-  async function playDemo(kind: ExampleKind = 'variation') {
+  async function playDemo(kind: PlaybackKind = 'variation') {
     if (demoPlaying && kind === exampleKind) {
       audio.stopDemo();
       setDemoPlaying(false);
@@ -341,7 +385,13 @@ export default function App() {
     setExampleKind(kind);
     setDemoPlaying(true);
     const example =
-      kind === 'original' ? mission.material?.original : mission.material?.variation[sessionStyle];
+      kind === 'concept-a'
+        ? concept.examples[0].audio
+        : kind === 'concept-b'
+          ? concept.examples[1].audio
+          : kind === 'original'
+            ? mission.material?.original
+            : mission.material?.variation[sessionStyle];
     audio.playDemo(
       example?.notes ?? mission.demo[sessionStyle],
       tempo,
@@ -378,6 +428,28 @@ export default function App() {
   ).length;
   const totalMinutes = Math.round(
     saved.sessions.reduce((sum, record) => sum + record.seconds, 0) / 60,
+  );
+
+  const examplePanel = mission.material ? (
+    <StudyPanel
+      key={`${mission.id}-${sessionStyle}`}
+      material={mission.material}
+      style={sessionStyle}
+      playing={
+        demoPlaying && (exampleKind === 'original' || exampleKind === 'variation')
+          ? exampleKind
+          : null
+      }
+      onPlay={(kind) => void playDemo(kind)}
+    />
+  ) : (
+    <button
+      className={`button demo-button ${demoPlaying ? 'playing' : ''}`}
+      onClick={() => void playDemo()}
+    >
+      {demoPlaying ? <Square size={15} /> : <Play size={15} fill="currentColor" />}
+      {demoPlaying ? 'Stop example' : 'Hear the example'}
+    </button>
   );
 
   return (
@@ -522,8 +594,17 @@ export default function App() {
               <section className="collection-discovery" aria-label="New lesson collections">
                 <div>
                   <span className="eyebrow">START WITH SOMETHING YOU KNOW</span>
-                  <h2>A familiar tune. A new possibility.</h2>
-                  <p>Hear a source phrase, compare a variation, then make your own.</p>
+                  <h2>A little theory. A lot of music.</h2>
+                  <p>Understand one idea, hear the difference, then make it your own.</p>
+                </div>
+                <div className="path-invitation">
+                  <div>
+                    <strong>Six steps from phrases to a whole piece</strong>
+                    <p>Pulse → variation → harmony → connecting notes → accompaniment → form</p>
+                  </div>
+                  <button className="button primary" onClick={() => openPath()}>
+                    Follow the learning path <ArrowRight size={16} />
+                  </button>
                 </div>
                 <div className="collection-cards">
                   <button onClick={() => openCollection('themes')}>
@@ -642,11 +723,13 @@ export default function App() {
               </section>
               <div className="library-toolbar">
                 <span>
-                  {collection === 'foundations'
-                    ? 'Six musical skills · two ways to explore each'
-                    : collection === 'themes'
-                      ? 'Four short extracts · many ways to make them yours'
-                      : 'Three original studies · a first step into jazz'}
+                  {pathUnit
+                    ? 'Six connected topics · theory, examples, and guided playing'
+                    : collection === 'foundations'
+                      ? 'Six musical skills · two ways to explore each'
+                      : collection === 'themes'
+                        ? 'Four short extracts · many ways to make them yours'
+                        : 'Three original studies · a first step into jazz'}
                 </span>
                 <div className="duration-picker" role="group" aria-label="Session length">
                   {([2, 8] as Duration[]).map((d) => (
@@ -662,6 +745,13 @@ export default function App() {
                 </div>
               </div>
               <div className="collection-tabs" role="group" aria-label="Lesson collection">
+                <button
+                  aria-pressed={!!pathUnit}
+                  className={pathUnit ? 'selected' : ''}
+                  onClick={() => openPath()}
+                >
+                  Learning path
+                </button>
                 {(
                   [
                     { id: 'foundations', label: 'Foundations' },
@@ -671,15 +761,23 @@ export default function App() {
                 ).map((c) => (
                   <button
                     key={c.id}
-                    aria-pressed={collection === c.id}
-                    className={collection === c.id ? 'selected' : ''}
+                    aria-pressed={!pathUnit && collection === c.id}
+                    className={!pathUnit && collection === c.id ? 'selected' : ''}
                     onClick={() => openCollection(c.id)}
                   >
                     {c.label}
                   </button>
                 ))}
               </div>
-              {collection !== 'foundations' && (
+              {pathUnit && (
+                <LearningPath
+                  style={saved.style}
+                  completed={completedIds}
+                  selected={pathUnit}
+                  onSelect={setPathUnit}
+                />
+              )}
+              {!pathUnit && collection !== 'foundations' && (
                 <p className="collection-intro">
                   {collection === 'themes'
                     ? 'Short public-domain extracts, new teaching variations, and optional notation. These are improvisation lessons, not full-piece tutorials. Joplin is a later ragtime rhythm challenge.'
@@ -704,6 +802,10 @@ export default function App() {
                     </div>
                     <h2>{m.title}</h2>
                     <p>{m.description}</p>
+                    <p className="mission-concept">
+                      <BookOpen size={12} />
+                      {conceptFor(m, saved.style).title}
+                    </p>
                     {m.material && (
                       <p className="mission-source">
                         {m.material.kind === 'study' ? 'Original blues study' : m.material.composer}
@@ -740,150 +842,165 @@ export default function App() {
                   <h1>{mission.title}</h1>
                   <p>
                     {sessionStyle === 'classical' ? 'Classical' : 'Jazz'} · {session.duration}
-                    -minute session · {mission.skill}
+                    -minute plan · {mission.skill}
                   </p>
+                  <span className="session-unit">
+                    Part {unitFor(mission.id).number} · {unitFor(mission.id).title}
+                  </span>
+                  {!session.preparing && (
+                    <button className="review-concept" onClick={reviewConcept}>
+                      <BookOpen size={13} /> Review the idea <span>(pauses practice)</span>
+                    </button>
+                  )}
                 </div>
                 <div className="session-time">
                   <Clock3 size={17} />
-                  <span>{formatTime(session.duration * 60 - session.elapsed)}</span>
-                  <small>remaining</small>
+                  <span>
+                    {formatTime(session.preparing ? session.duration * 60 : session.seconds)}
+                  </span>
+                  <small>{session.preparing ? 'suggested practice' : 'practiced'}</small>
                 </div>
               </section>
-              <div className="stage-track" aria-label="Session steps">
-                {stages.map((s, i) => (
-                  <div
-                    className={`stage-item ${i === stage.index ? 'current' : ''} ${i < stage.index ? 'past' : ''}`}
-                    key={s.id}
-                    aria-current={i === stage.index ? 'step' : undefined}
-                  >
-                    <span>{i < stage.index ? <Check size={14} /> : `0${i + 1}`}</span>
-                    <span>{s.short}</span>
-                    <div className="stage-line">
-                      <i
-                        style={{
-                          width:
-                            i < stage.index
-                              ? '100%'
-                              : i === stage.index
-                                ? `${100 * (1 - stage.remaining / stageLengths(session.duration)[stage.index])}%`
-                                : '0%',
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <section className="practice-card">
-                <div className="practice-card-top">
-                  <span className="eyebrow">STEP {stage.index + 1} OF 5</span>
-                  <span className="stage-time">{formatTime(stage.remaining)} in this step</span>
-                </div>
-                <div className="practice-focus-icon">
-                  {stage.index === 0 ? (
-                    <Headphones size={28} />
-                  ) : stage.index === 4 ? (
-                    <BookOpen size={28} />
-                  ) : (
-                    <Music2 size={28} />
-                  )}
-                </div>
-                <h2 aria-live="polite">{currentStage.label}</h2>
-                <p className="practice-instruction">
-                  {mission.prompts[sessionStyle][currentStage.id]}
-                </p>
-                {currentStage.id !== 'reflect' ? (
-                  <>
-                    {mission.material && (
-                      <StudyPanel
-                        key={`${mission.id}-${sessionStyle}`}
-                        material={mission.material}
-                        style={sessionStyle}
-                        playing={demoPlaying ? exampleKind : null}
-                        onPlay={(kind) => void playDemo(kind)}
-                      />
-                    )}
-                    <div className="suggested-notes">
-                      <span className="eyebrow">YOUR NOTE PALETTE</span>
-                      <button className="subtle-button" onClick={() => setHints(!hints)}>
-                        {hints ? 'Hide hints' : 'Show hints'}
-                      </button>
-                    </div>
-                    <Notes notes={mission.notes[sessionStyle]} hidden={!hints} />
-                    {!mission.material && (
-                      <button
-                        className={`button demo-button ${demoPlaying ? 'playing' : ''}`}
-                        onClick={() => void playDemo()}
+              {session.preparing ? (
+                <LessonGuide
+                  key={`${mission.id}-${sessionStyle}`}
+                  concept={concept}
+                  playing={demoPlaying ? exampleKind : null}
+                  onPlay={(kind) => void playDemo(kind)}
+                  onStart={beginPractice}
+                  returning={session.elapsed > 0}
+                />
+              ) : (
+                <>
+                  <div className="stage-track" aria-label="Session steps">
+                    {stages.map((s, i) => (
+                      <div
+                        className={`stage-item ${i === stage.index ? 'current' : ''} ${i < stage.index ? 'past' : ''}`}
+                        key={s.id}
+                        aria-current={i === stage.index ? 'step' : undefined}
                       >
-                        {demoPlaying ? (
-                          <Square size={15} />
+                        <span>{i < stage.index ? <Check size={14} /> : `0${i + 1}`}</span>
+                        <span>{s.short}</span>
+                        <div className="stage-line">
+                          <i
+                            style={{
+                              width:
+                                i < stage.index
+                                  ? '100%'
+                                  : i === stage.index
+                                    ? `${100 * (1 - stage.remaining / stageLengths(session.duration)[stage.index])}%`
+                                    : '0%',
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <section className="practice-card">
+                    <div className="practice-card-top">
+                      <span className="eyebrow">STEP {stage.index + 1} OF 5</span>
+                      <span className="stage-time">
+                        {stage.remaining > 0
+                          ? `${formatTime(stage.remaining)} suggested`
+                          : 'Stay with this idea, or choose Next step'}
+                      </span>
+                    </div>
+                    <div className="practice-focus-icon">
+                      {stage.index === 0 ? (
+                        <Headphones size={28} />
+                      ) : stage.index === 4 ? (
+                        <BookOpen size={28} />
+                      ) : (
+                        <Music2 size={28} />
+                      )}
+                    </div>
+                    <h2 aria-live="polite">{currentStage.label}</h2>
+                    <p className="active-concept">{concept.title}</p>
+                    <p className="practice-instruction">
+                      {guidedPrompt(concept, currentStage.id) ??
+                        mission.prompts[sessionStyle][currentStage.id]}
+                    </p>
+                    {currentStage.id !== 'reflect' ? (
+                      <>
+                        {currentStage.id === 'play' ? (
+                          <details className="transfer-reminder">
+                            <summary>Need a reminder? Open the example</summary>
+                            {examplePanel}
+                          </details>
                         ) : (
-                          <Play size={15} fill="currentColor" />
+                          examplePanel
                         )}
-                        {demoPlaying ? 'Stop example' : 'Hear the example'}
-                      </button>
+                        <div className="suggested-notes">
+                          <span className="eyebrow">YOUR NOTE PALETTE</span>
+                          <button className="subtle-button" onClick={() => setHints(!hints)}>
+                            {hints ? 'Hide hints' : 'Show hints'}
+                          </button>
+                        </div>
+                        <Notes notes={mission.notes[sessionStyle]} hidden={!hints} />
+                      </>
+                    ) : (
+                      <label className="reflection-field">
+                        One idea to take with you <span>(optional)</span>
+                        <textarea
+                          maxLength={1000}
+                          value={reflection}
+                          onChange={(e) => setReflection(e.target.value)}
+                          placeholder="A phrase, a feeling, something to try again…"
+                        />
+                      </label>
                     )}
-                  </>
-                ) : (
-                  <label className="reflection-field">
-                    One idea to take with you <span>(optional)</span>
-                    <textarea
-                      maxLength={1000}
-                      value={reflection}
-                      onChange={(e) => setReflection(e.target.value)}
-                      placeholder="A phrase, a feeling, something to try again…"
-                    />
-                  </label>
-                )}
-                <div className="practice-tip">
-                  <Leaf size={15} />
-                  <span>{mission.tip}</span>
-                </div>
-              </section>
-              <div className="session-controls">
-                <button
-                  className="text-button"
-                  onClick={previousStage}
-                  disabled={stage.index === 0}
-                >
-                  <ArrowLeft size={16} /> Previous
-                </button>
-                <button className="button primary" onClick={toggleSession}>
-                  {session.running ? <Pause size={17} /> : <Play size={17} />}{' '}
-                  {session.running ? 'Pause session' : 'Resume session'}
-                </button>
-                <button className="text-button" onClick={nextStage}>
-                  {stage.index === 4 ? 'Finish session' : 'Next step'}
-                  <ArrowRight size={16} />
-                </button>
-              </div>
-              {!session.running && (
-                <div className="paused-note" role="status">
-                  Paused. Take your time. Sound and timer will resume when you are ready.
-                </div>
+                    <div className="practice-tip">
+                      <Leaf size={15} />
+                      <span>{mission.tip}</span>
+                    </div>
+                  </section>
+                  <div className="session-controls">
+                    <button
+                      className="text-button"
+                      onClick={previousStage}
+                      disabled={stage.index === 0}
+                    >
+                      <ArrowLeft size={16} /> Previous
+                    </button>
+                    <button className="button primary" onClick={toggleSession}>
+                      {session.running ? <Pause size={17} /> : <Play size={17} />}{' '}
+                      {session.running ? 'Pause session' : 'Resume session'}
+                    </button>
+                    <button className="text-button" onClick={nextStage}>
+                      {stage.index === 4 ? 'Finish session' : 'Next step'}
+                      <ArrowRight size={16} />
+                    </button>
+                  </div>
+                  {!session.running && (
+                    <div className="paused-note" role="status">
+                      Paused. Take your time. Sound and timer will resume when you are ready.
+                    </div>
+                  )}
+                  {mission.material && (
+                    <p className="study-session-note">
+                      The timer waits while examples play. Accompaniment starts off; turn it on
+                      below when you want support.
+                    </p>
+                  )}
+                  <SoundControls
+                    backing={backing}
+                    setBacking={setBacking}
+                    tempo={tempo}
+                    setTempo={setTempo}
+                    volume={volume}
+                    setVolume={setVolume}
+                    beat={beat}
+                    chord={currentChord}
+                    bar={bar}
+                    totalBars={harmony.length}
+                    playing={audioActive && backing && !demoPlaying}
+                  />
+                  <p className="audio-footnote">
+                    Built-in piano-style synth · no microphone or note detection · pauses when you
+                    leave this tab
+                  </p>
+                </>
               )}
-              {mission.material && (
-                <p className="study-session-note">
-                  The timer waits while examples play. Accompaniment starts off; turn it on below
-                  when you want support.
-                </p>
-              )}
-              <SoundControls
-                backing={backing}
-                setBacking={setBacking}
-                tempo={tempo}
-                setTempo={setTempo}
-                volume={volume}
-                setVolume={setVolume}
-                beat={beat}
-                chord={currentChord}
-                bar={bar}
-                totalBars={harmony.length}
-                playing={audioActive && backing && !demoPlaying}
-              />
-              <p className="audio-footnote">
-                Built-in piano-style synth · no microphone or note detection · pauses when you leave
-                this tab
-              </p>
             </>
           )}
 
@@ -895,6 +1012,8 @@ export default function App() {
               <div className="eyebrow">A LITTLE TIME, WELL SPENT</div>
               <h1>{isSaved ? 'A little progress, kept.' : 'That was your music.'}</h1>
               <p>You made room to play. Take one small idea with you.</p>
+              <p className="completion-concept">Your idea today: {concept.title}</p>
+              <p className="completion-check">{concept.reflect}</p>
               <div className="completion-meta">
                 <span>{mission.title}</span>
                 <span>·</span>

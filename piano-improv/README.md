@@ -6,6 +6,8 @@ Short classical and jazz practice sessions for an acoustic piano. Includes audio
 
 The lesson library includes Foundations, Theme & Variations (Beethoven, Mozart, Bach, and a short Joplin extract), and First Blues (original studies). Each new lesson compares a source phrase with a new variation and offers optional notation. Source panels identify the music, its edition, and what was changed. Existing practice history is preserved.
 
+Every lesson also has an untimed concept guide with A/B listening, a short explanation, and an optional understanding check. Follow the six-topic Learning Path or choose any collection. Practice follows Hear → Try → Create → Transfer → Reflect. Times are suggestions, not forced step changes. Read the [teaching-content review](source/public/PEDAGOGY_REVIEW.md) for the book/author sources consulted, changes made, and review limits.
+
 ## Folder layout
 
 - `index.html`, `assets/`, and `favicon.svg`: the built app, served by GitHub Pages.
