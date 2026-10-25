@@ -1,10 +1,12 @@
-import type { Chord, Note, Style } from './music';
+import type { Chord, Feel, Note, Style } from './music';
+import { performedBeat } from './audio-timing';
 
 export interface BackingOptions {
   style: Style;
   tempo: number;
   harmony: Chord[];
-  onBeat?: (beat: number, chord: string) => void;
+  feel?: Feel;
+  onBeat?: (beat: number, chord: string, bar: number) => void;
 }
 
 /** A local piano-like synth. No samples, microphone access, or network requests. */
@@ -140,12 +142,17 @@ export class PianoAudio {
             this.note(midi, at + i * 0.012, secondsPerBeat * 0.6, 0.26),
           );
         }
-        this.note(79, at + (secondsPerBeat * 2) / 3, 0.07, 0.055);
+        this.note(
+          79,
+          at + secondsPerBeat * (options.feel === 'straight' ? 0.5 : 2 / 3),
+          0.07,
+          0.055,
+        );
       }
       const callback = setTimeout(
         () => {
           this.callbacks.delete(callback);
-          options.onBeat?.(withinBar, chord.name);
+          options.onBeat?.(withinBar, chord.name, Math.floor(beat / 4) % options.harmony.length);
         },
         Math.max(0, (at - context.currentTime) * 1000),
       );
@@ -155,7 +162,7 @@ export class PianoAudio {
     }
   }
 
-  playDemo(notes: Note[], tempo: number, onEnd: () => void) {
+  playDemo(notes: Note[], tempo: number, onEnd: () => void, feel: Feel = 'straight') {
     this.stopDemo();
     if (!this.context) return;
     const secondsPerBeat = 60 / tempo;
@@ -163,13 +170,16 @@ export class PianoAudio {
     notes.forEach((note) =>
       this.note(
         note.midi,
-        start + note.beat * secondsPerBeat,
-        note.length * secondsPerBeat,
+        start + performedBeat(note.beat, feel) * secondsPerBeat,
+        (performedBeat(note.beat + note.length, feel) - performedBeat(note.beat, feel)) *
+          secondsPerBeat *
+          0.9,
         0.85,
         true,
       ),
     );
-    const end = Math.max(...notes.map((n) => n.beat + n.length)) * secondsPerBeat + 0.2;
+    const end =
+      Math.max(...notes.map((n) => performedBeat(n.beat + n.length, feel))) * secondsPerBeat + 0.2;
     this.demoTimer = setTimeout(() => {
       this.demoTimer = null;
       onEnd();

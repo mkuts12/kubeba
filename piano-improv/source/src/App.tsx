@@ -27,10 +27,12 @@ import {
 } from 'lucide-react';
 import { PianoAudio } from './audio';
 import { EmptyState, Notes, PianoArtwork, StyleSwitch, Week } from './components';
+import StudyPanel from './StudyPanel';
 import {
   explorePrompts,
   formatTime,
   missions,
+  missionsFor,
   settings,
   stageAt,
   stageLengths,
@@ -38,6 +40,8 @@ import {
   type Difficulty,
   type Duration,
   type Style,
+  type Collection,
+  type ExampleKind,
 } from './music';
 import {
   initialState,
@@ -80,6 +84,7 @@ export default function App() {
   });
   const [storageError, setStorageError] = useState(false);
   const [page, setPage] = useState<Page>('today');
+  const [collection, setCollection] = useState<Collection>('foundations');
   const [mobileMenu, setMobileMenu] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
   const [reflection, setReflection] = useState('');
@@ -93,7 +98,9 @@ export default function App() {
   const [unlocked, setUnlocked] = useState(false);
   const [audioError, setAudioError] = useState('');
   const [demoPlaying, setDemoPlaying] = useState(false);
+  const [exampleKind, setExampleKind] = useState<ExampleKind>('original');
   const [beat, setBeat] = useState(0);
+  const [bar, setBar] = useState(0);
   const [currentChord, setCurrentChord] = useState('C');
   const [exploreId, setExploreId] = useState(settings[0].id);
   const [exploring, setExploring] = useState(false);
@@ -113,6 +120,8 @@ export default function App() {
     page === 'practice' ? !!session?.running && !session.done : page === 'explore' && exploring;
   const harmony = page === 'explore' ? setting.harmony : mission.harmony[sessionStyle];
   const audioStyle = page === 'explore' ? setting.style : sessionStyle;
+  const backingFeel = page === 'practice' ? mission.backingFeel : undefined;
+  const libraryMissions = missionsFor(saved.style, collection);
 
   useEffect(() => {
     try {
@@ -137,16 +146,18 @@ export default function App() {
       style: audioStyle,
       harmony,
       tempo,
-      onBeat: (next, chord) => {
+      feel: backingFeel,
+      onBeat: (next, chord, bar) => {
         setBeat(next);
+        setBar(bar);
         setCurrentChord(chord);
       },
     });
     return () => audio.stopBacking();
-  }, [audio, unlocked, audioActive, backing, demoPlaying, audioStyle, harmony, tempo]);
+  }, [audio, unlocked, audioActive, backing, demoPlaying, audioStyle, harmony, tempo, backingFeel]);
 
   useEffect(() => {
-    if (!session?.running || session.done) return;
+    if (!session?.running || session.done || demoPlaying) return;
     let last = performance.now();
     const interval = setInterval(() => {
       const now = performance.now();
@@ -161,7 +172,7 @@ export default function App() {
       });
     }, 200);
     return () => clearInterval(interval);
-  }, [session?.id, session?.running, session?.done]);
+  }, [session?.id, session?.running, session?.done, demoPlaying]);
 
   const stopSound = useCallback(() => {
     playbackRequest.current++;
@@ -216,9 +227,16 @@ export default function App() {
 
   function changeStyle(style: Style) {
     setSaved((previous) => ({ ...previous, style }));
+    if (style === 'classical' && collection === 'blues') setCollection('themes');
   }
   function changeDuration(duration: Duration) {
     setSaved((previous) => ({ ...previous, duration }));
+  }
+
+  function openCollection(next: Collection) {
+    if (next === 'blues') changeStyle('jazz');
+    setCollection(next);
+    goTo('practice');
   }
 
   function goTo(target: Page) {
@@ -243,14 +261,18 @@ export default function App() {
     duration = saved.duration,
     style = saved.style,
   ) {
+    const selectedMission = missions.find((m) => m.id === missionId)!;
+    setCollection(selectedMission.collection ?? 'foundations');
     stopSound();
     setExploring(false);
     setReflection('');
     setDifficulty(null);
     setSavedId(null);
-    setBacking(true);
+    setBacking(!selectedMission.material);
+    setExampleKind('original');
+    setBar(0);
     setHints(true);
-    setTempo(style === 'jazz' ? 84 : 72);
+    setTempo(selectedMission.tempo ?? (style === 'jazz' ? 84 : 72));
     setSession({
       id: crypto.randomUUID(),
       missionId,
@@ -307,8 +329,8 @@ export default function App() {
     });
   }
 
-  async function playDemo() {
-    if (demoPlaying) {
+  async function playDemo(kind: ExampleKind = 'variation') {
+    if (demoPlaying && kind === exampleKind) {
       audio.stopDemo();
       setDemoPlaying(false);
       return;
@@ -316,8 +338,16 @@ export default function App() {
     const request = ++playbackRequest.current;
     if (!(await unlockAudio())) return;
     if (request !== playbackRequest.current) return;
+    setExampleKind(kind);
     setDemoPlaying(true);
-    audio.playDemo(mission.demo[sessionStyle], tempo, () => setDemoPlaying(false));
+    const example =
+      kind === 'original' ? mission.material?.original : mission.material?.variation[sessionStyle];
+    audio.playDemo(
+      example?.notes ?? mission.demo[sessionStyle],
+      tempo,
+      () => setDemoPlaying(false),
+      example?.feel,
+    );
   }
 
   function saveSession() {
@@ -458,7 +488,10 @@ export default function App() {
                     <span className="pill light">
                       <Leaf size={13} /> YOUR NEXT LITTLE STEP
                     </span>
-                    <span className="mission-count">{recommended.number} / 06</span>
+                    <span className="mission-count">
+                      {recommended.number}
+                      {!recommended.collection ? ' / 06' : ''}
+                    </span>
                   </div>
                   <h2 id="mission-title">{recommended.title}</h2>
                   <p>{recommended.description}</p>
@@ -484,6 +517,32 @@ export default function App() {
                 </div>
                 <PianoArtwork />
                 <span className="hero-caption">A few notes can be enough.</span>
+              </section>
+
+              <section className="collection-discovery" aria-label="New lesson collections">
+                <div>
+                  <span className="eyebrow">START WITH SOMETHING YOU KNOW</span>
+                  <h2>A familiar tune. A new possibility.</h2>
+                  <p>Hear a source phrase, compare a variation, then make your own.</p>
+                </div>
+                <div className="collection-cards">
+                  <button onClick={() => openCollection('themes')}>
+                    <BookOpen size={20} />
+                    <span>
+                      <strong>Theme & variations</strong>
+                      <small>Beethoven · Mozart · Bach · Joplin</small>
+                    </span>
+                    <ArrowUpRight size={17} />
+                  </button>
+                  <button onClick={() => openCollection('blues')}>
+                    <Music2 size={20} />
+                    <span>
+                      <strong>First blues</strong>
+                      <small>Original riffs · rhythm · a twelve-bar chorus</small>
+                    </span>
+                    <ArrowUpRight size={17} />
+                  </button>
+                </div>
               </section>
 
               <section className="today-lower">
@@ -554,7 +613,7 @@ export default function App() {
               </section>
               <footer className="page-footer">
                 <span>
-                  <span className="footer-dot" /> No microphone. No scores. No rush.
+                  <span className="footer-dot" /> No microphone. No grading. No rush.
                 </span>
                 <span>
                   {weekCount > 0
@@ -582,7 +641,13 @@ export default function App() {
                 <StyleSwitch value={saved.style} onChange={changeStyle} />
               </section>
               <div className="library-toolbar">
-                <span>Six musical skills · two ways to explore each</span>
+                <span>
+                  {collection === 'foundations'
+                    ? 'Six musical skills · two ways to explore each'
+                    : collection === 'themes'
+                      ? 'Four short extracts · many ways to make them yours'
+                      : 'Three original studies · a first step into jazz'}
+                </span>
                 <div className="duration-picker" role="group" aria-label="Session length">
                   {([2, 8] as Duration[]).map((d) => (
                     <button
@@ -596,8 +661,33 @@ export default function App() {
                   ))}
                 </div>
               </div>
+              <div className="collection-tabs" role="group" aria-label="Lesson collection">
+                {(
+                  [
+                    { id: 'foundations', label: 'Foundations' },
+                    { id: 'themes', label: 'Theme & variations' },
+                    { id: 'blues', label: 'First blues' },
+                  ] as { id: Collection; label: string }[]
+                ).map((c) => (
+                  <button
+                    key={c.id}
+                    aria-pressed={collection === c.id}
+                    className={collection === c.id ? 'selected' : ''}
+                    onClick={() => openCollection(c.id)}
+                  >
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+              {collection !== 'foundations' && (
+                <p className="collection-intro">
+                  {collection === 'themes'
+                    ? 'Short public-domain extracts, new teaching variations, and optional notation. These are improvisation lessons, not full-piece tutorials. Joplin is a later ragtime rhythm challenge.'
+                    : 'New exercises over common blues harmony—not copied solos or jazz standards. Hear a starting riff and one variation before inventing your own.'}
+                </p>
+              )}
               <div className="mission-grid">
-                {missions.map((m) => (
+                {libraryMissions.map((m) => (
                   <article
                     className={`mission-card ${completedIds.has(m.id) ? 'completed' : ''}`}
                     key={m.id}
@@ -614,6 +704,11 @@ export default function App() {
                     </div>
                     <h2>{m.title}</h2>
                     <p>{m.description}</p>
+                    {m.material && (
+                      <p className="mission-source">
+                        {m.material.kind === 'study' ? 'Original blues study' : m.material.composer}
+                      </p>
+                    )}
                     <Notes notes={m.notes[saved.style].slice(0, 5)} />
                     <button className="text-button" onClick={() => startSession(m.id)}>
                       Play this mission <ArrowRight size={16} />
@@ -698,6 +793,15 @@ export default function App() {
                 </p>
                 {currentStage.id !== 'reflect' ? (
                   <>
+                    {mission.material && (
+                      <StudyPanel
+                        key={`${mission.id}-${sessionStyle}`}
+                        material={mission.material}
+                        style={sessionStyle}
+                        playing={demoPlaying ? exampleKind : null}
+                        onPlay={(kind) => void playDemo(kind)}
+                      />
+                    )}
                     <div className="suggested-notes">
                       <span className="eyebrow">YOUR NOTE PALETTE</span>
                       <button className="subtle-button" onClick={() => setHints(!hints)}>
@@ -705,13 +809,19 @@ export default function App() {
                       </button>
                     </div>
                     <Notes notes={mission.notes[sessionStyle]} hidden={!hints} />
-                    <button
-                      className={`button demo-button ${demoPlaying ? 'playing' : ''}`}
-                      onClick={() => void playDemo()}
-                    >
-                      {demoPlaying ? <Square size={15} /> : <Play size={15} fill="currentColor" />}
-                      {demoPlaying ? 'Stop example' : 'Hear the example'}
-                    </button>
+                    {!mission.material && (
+                      <button
+                        className={`button demo-button ${demoPlaying ? 'playing' : ''}`}
+                        onClick={() => void playDemo()}
+                      >
+                        {demoPlaying ? (
+                          <Square size={15} />
+                        ) : (
+                          <Play size={15} fill="currentColor" />
+                        )}
+                        {demoPlaying ? 'Stop example' : 'Hear the example'}
+                      </button>
+                    )}
                   </>
                 ) : (
                   <label className="reflection-field">
@@ -751,6 +861,12 @@ export default function App() {
                   Paused. Take your time. Sound and timer will resume when you are ready.
                 </div>
               )}
+              {mission.material && (
+                <p className="study-session-note">
+                  The timer waits while examples play. Accompaniment starts off; turn it on below
+                  when you want support.
+                </p>
+              )}
               <SoundControls
                 backing={backing}
                 setBacking={setBacking}
@@ -760,6 +876,8 @@ export default function App() {
                 setVolume={setVolume}
                 beat={beat}
                 chord={currentChord}
+                bar={bar}
+                totalBars={harmony.length}
                 playing={audioActive && backing && !demoPlaying}
               />
               <p className="audio-footnote">
@@ -1131,6 +1249,8 @@ function SoundControls({
   setVolume,
   beat,
   chord,
+  bar = 0,
+  totalBars = 1,
   playing,
 }: {
   backing: boolean;
@@ -1141,6 +1261,8 @@ function SoundControls({
   setVolume: (value: number) => void;
   beat: number;
   chord: string;
+  bar?: number;
+  totalBars?: number;
   playing: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -1159,9 +1281,16 @@ function SoundControls({
         </button>
         <div
           className="chord-pulse"
-          aria-label={playing ? `Current chord ${chord}` : 'Accompaniment stopped'}
+          aria-label={
+            playing ? `Bar ${bar + 1} of ${totalBars}, chord ${chord}` : 'Accompaniment stopped'
+          }
         >
           <span className="chord-name">{playing ? chord : '—'}</span>
+          {totalBars > 1 && (
+            <span className="bar-count">
+              {playing ? `${bar + 1} / ${totalBars}` : `${totalBars} bars`}
+            </span>
+          )}
           <div className="beat-dots" aria-hidden="true">
             {[0, 1, 2, 3].map((b) => (
               <i key={b} className={playing && beat === b ? 'lit' : ''} />

@@ -8,7 +8,7 @@ import {
   weekDates,
   type SessionRecord,
 } from './storage';
-import { missions } from './music';
+import { missions, missionsFor } from './music';
 
 const record: SessionRecord = {
   id: 'test',
@@ -75,6 +75,21 @@ describe('practice calendar', () => {
 });
 
 describe('mission recommendation', () => {
+  it('does not recommend jazz-only blues studies in classical mode', () => {
+    const completed = missionsFor('classical').map((m) => ({ ...record, missionId: m.id }));
+    expect(recommendedMission(completed, 'classical')).toEqual(missions[0]);
+  });
+  it('can retain source-based progress alongside older foundation history', () => {
+    const newer = {
+      ...record,
+      id: 'source-session',
+      missionId: 'ode-answer',
+      difficulty: 'hard' as const,
+    };
+    const state = parseState(JSON.stringify({ ...initialState, sessions: [newer, record] }));
+    expect(state.sessions).toEqual([newer, record]);
+    expect(recommendedMission(state.sessions, 'classical').id).toBe('ode-answer');
+  });
   it('starts with the first mission', () => {
     expect(recommendedMission([], 'classical')).toEqual(missions[0]);
   });

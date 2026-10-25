@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { formatTime, missions, settings, stageAt, stageLengths, stages } from './music';
+import {
+  formatTime,
+  missions,
+  missionsFor,
+  settings,
+  stageAt,
+  stageLengths,
+  stages,
+} from './music';
 
 describe('session structure', () => {
   it.each([2, 8] as const)('has exactly %i minutes of practice steps', (duration) => {
@@ -29,8 +37,9 @@ describe('session structure', () => {
 });
 
 describe('curriculum', () => {
-  it('has six unique missions', () => {
-    expect(missions).toHaveLength(6);
+  it('keeps the six foundations and adds seven unique repertoire lessons', () => {
+    expect(missions).toHaveLength(13);
+    expect(missionsFor('classical', 'foundations')).toHaveLength(6);
     expect(new Set(missions.map((m) => m.id)).size).toBe(missions.length);
   });
   it.each(missions)('$title has a complete classical and jazz version', (mission) => {

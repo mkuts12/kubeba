@@ -1,11 +1,14 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const port = Number(process.env.PORT ?? 5173);
+const baseURL = `http://127.0.0.1:${port}`;
+
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   reporter: 'list',
   use: {
-    baseURL: 'http://127.0.0.1:5173',
+    baseURL,
     trace: 'retain-on-failure',
     launchOptions: { args: ['--mute-audio'] },
   },
@@ -18,8 +21,8 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['iPhone 13'], defaultBrowserType: 'chromium' } },
   ],
   webServer: {
-    command: 'npm run dev -- --port 5173 --strictPort',
-    url: 'http://127.0.0.1:5173',
-    reuseExistingServer: !process.env.CI,
+    command: `npm run dev -- --port ${port} --strictPort`,
+    url: baseURL,
+    reuseExistingServer: process.env.PLAYWRIGHT_REUSE_SERVER === '1',
   },
 });

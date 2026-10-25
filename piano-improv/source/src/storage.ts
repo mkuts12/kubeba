@@ -1,4 +1,4 @@
-import { missions, type Difficulty, type Duration, type Style } from './music';
+import { missions, missionsFor, type Difficulty, type Duration, type Style } from './music';
 
 export interface SessionRecord {
   id: string;
@@ -81,8 +81,10 @@ export function practiceDays(sessions: SessionRecord[]): Set<string> {
 }
 
 export function recommendedMission(sessions: SessionRecord[], style: Style) {
+  const available = missionsFor(style);
   const completed = new Set(sessions.filter((s) => s.style === style).map((s) => s.missionId));
   const last = sessions.find((s) => s.style === style);
-  if (last?.difficulty === 'hard') return missions.find((m) => m.id === last.missionId)!;
-  return missions.find((m) => !completed.has(m.id)) ?? missions[0];
+  const repeat = available.find((m) => m.id === last?.missionId);
+  if (last?.difficulty === 'hard' && repeat) return repeat;
+  return available.find((m) => !completed.has(m.id)) ?? available[0];
 }

@@ -1,3 +1,5 @@
+import { repertoireMissions } from './repertoire';
+
 export type Style = 'classical' | 'jazz';
 export type Duration = 2 | 8;
 export type Difficulty = 'hard' | 'right' | 'easy';
@@ -15,6 +17,29 @@ export interface Note {
   length: number;
 }
 
+export type Collection = 'foundations' | 'themes' | 'blues';
+export type ExampleKind = 'original' | 'variation';
+export type Feel = 'straight' | 'swing';
+
+export interface MusicalExample {
+  notes: Note[];
+  meter: 2 | 4;
+  caption: string;
+  feel?: Feel;
+}
+
+export interface StudyMaterial {
+  title: string;
+  composer: string;
+  sourceUrl: string;
+  rights: string;
+  adaptation: string;
+  kind: 'composition' | 'study';
+  original: MusicalExample;
+  variation: Record<Style, MusicalExample>;
+  listenFor: Record<Style, string>;
+}
+
 export interface Mission {
   id: string;
   number: string;
@@ -26,6 +51,11 @@ export interface Mission {
   prompts: Record<Style, Record<StageId, string>>;
   harmony: Record<Style, Chord[]>;
   tip: string;
+  collection?: Collection;
+  styles?: Style[];
+  tempo?: number;
+  backingFeel?: Feel;
+  material?: StudyMaterial;
 }
 
 const C: Chord = { name: 'C', bass: 48, notes: [60, 64, 67] };
@@ -60,7 +90,7 @@ const prompts = (
 const sharedReflection =
   'Stop playing for a moment. Which part felt like your own idea? Try that phrase once more, then save a short note.';
 
-export const missions: Mission[] = [
+const foundations: Mission[] = [
   {
     id: 'three-notes',
     number: '01',
@@ -233,6 +263,16 @@ export const missions: Mission[] = [
     tip: 'A clear ending can be more satisfying than a complicated middle.',
   },
 ];
+
+export const missions: Mission[] = [...foundations, ...repertoireMissions];
+
+export function missionsFor(style: Style, collection?: Collection): Mission[] {
+  return missions.filter(
+    (m) =>
+      (!m.styles || m.styles.includes(style)) &&
+      (!collection || (m.collection ?? 'foundations') === collection),
+  );
+}
 
 export const stages: { id: StageId; label: string; short: string }[] = [
   { id: 'listen', label: 'Hear the idea', short: 'Listen' },

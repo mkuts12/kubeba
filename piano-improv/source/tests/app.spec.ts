@@ -216,3 +216,116 @@ test('screenshots of the home and practice room', async ({ page }, testInfo) => 
   await page.getByRole('button', { name: 'Pause session' }).click();
   await page.screenshot({ path: testInfo.outputPath('practice.png'), fullPage: true });
 });
+
+test('theme lessons compare source and variation without rushing the timer', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /^Theme & variations/ }).click();
+  await expect(page.locator('.mission-card')).toHaveCount(4);
+  await page.getByRole('button', { name: 'Play this mission' }).first().click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('An ode, with your own ending');
+  await expect(page.getByRole('button', { name: /^Accompaniment/ })).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  );
+  await page.getByRole('button', { name: 'Hear source phrase', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Stop source', exact: true })).toBeVisible();
+  const timer = await page.locator('.session-time').innerText();
+  await page.waitForTimeout(1200);
+  expect(await page.locator('.session-time').innerText()).toBe(timer);
+  await page.getByRole('button', { name: 'Hear one variation', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Stop variation', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Pause session' }).click();
+  await page.getByRole('button', { name: 'Show optional notation' }).click();
+  await expect(page.locator('.notation-scroll svg')).toBeVisible();
+  await expect(page.locator('.score-caption')).toContainText('last D becomes C');
+  await page.getByRole('button', { name: 'Source phrase', exact: true }).click();
+  await expect(page.locator('.notation-scroll svg')).toBeVisible();
+  await expect(page.locator('.score-caption')).toContainText('Opening two bars');
+  await page.getByText('About the source and what we changed', { exact: true }).click();
+  await expect(page.getByRole('link', { name: 'View the source edition' })).toHaveAttribute(
+    'href',
+    /imslp.org/,
+  );
+  await expect(page.locator('.source-details')).toContainText('transposed to C major');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
+  );
+  await page.screenshot({ path: testInfo.outputPath('source-lesson.png'), fullPage: true });
+});
+
+for (const [collection, title] of [
+  ['themes', 'One theme, your variations'],
+  ['themes', 'A melody above Bach'],
+  ['themes', 'Borrow a little ragtime'],
+  ['blues', 'Your first blues conversation'],
+  ['blues', 'Let the spaces swing'],
+  ['blues', 'One idea, twelve bars'],
+] as const) {
+  test(`source and variation notation render for ${title}`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    await page.goto('/');
+    await page
+      .getByRole('button', {
+        name: collection === 'themes' ? /^Theme & variations/ : /^First blues/,
+      })
+      .click();
+    const card = page
+      .locator('.mission-card')
+      .filter({ has: page.getByRole('heading', { name: title, exact: true }) });
+    await card.getByRole('button', { name: 'Play this mission' }).click();
+    await page.getByRole('button', { name: 'Pause session' }).click();
+    await page.getByRole('button', { name: 'Show optional notation' }).click();
+    await expect(page.locator('.notation-scroll svg')).toBeVisible();
+    await expect(page.locator('.notation-status')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Our variation', exact: true }).click();
+    await expect(page.locator('.notation-scroll svg')).toBeVisible();
+    await expect(page.locator('.notation-status')).toHaveCount(0);
+    if (collection === 'blues')
+      await expect(page.locator('.session-heading')).toContainText('Jazz');
+    if (title === 'One idea, twelve bars')
+      await expect(page.locator('.bar-count')).toHaveText('12 bars');
+    if (title === 'Borrow a little ragtime')
+      await expect(page.locator('.score-caption')).toContainText('straight sixteenths');
+    expect(errors).toEqual([]);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true);
+  });
+}
+
+test('switching from blues to classical selects an available collection', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /^First blues/ }).click();
+  await expect(page.locator('.mission-card')).toHaveCount(3);
+  await expect(page.getByRole('button', { name: 'Jazz', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await page.getByRole('button', { name: 'Classical', exact: true }).click();
+  await expect(page.locator('.mission-card')).toHaveCount(4);
+  await expect(
+    page.getByRole('button', { name: 'Theme & variations', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true');
+});
+
+test('a jazz theme variation renders rests and explains swing', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Jazz', exact: true }).click();
+  await page.getByRole('button', { name: /^Theme & variations/ }).click();
+  await page
+    .locator('.mission-card')
+    .filter({ hasText: 'One theme, your variations' })
+    .getByRole('button', { name: 'Play this mission' })
+    .click();
+  await page.getByRole('button', { name: 'Pause session' }).click();
+  await page.getByRole('button', { name: 'Show optional notation' }).click();
+  await page.getByRole('button', { name: 'Our variation', exact: true }).click();
+  await expect(page.locator('.notation-scroll svg')).toBeVisible();
+  await expect(page.locator('.notation-caption')).toContainText('Swing eighths');
+  await expect(page.locator('.notation-status')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Hear one variation', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Stop variation', exact: true })).toBeVisible();
+});
